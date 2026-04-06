@@ -1,6 +1,6 @@
-CREATE DATABASE softwarega
+CREATE DATABASE OasisShop
 
-USE softwarega
+USE OasisShop
 
 GO
 
@@ -181,7 +181,7 @@ begin
 		
 	end
 	else
-		set @Mensaje = 'No se puede repetir el documento para m·s de un usuario'
+		set @Mensaje = 'No se puede repetir el documento para m√°s de un usuario'
 
 
 end
@@ -220,7 +220,7 @@ begin
 		
 	end
 	else
-		set @Mensaje = 'No se puede repetir el documento para m·s de un usuario'
+		set @Mensaje = 'No se puede repetir el documento para m√°s de un usuario'
 
 
 end
