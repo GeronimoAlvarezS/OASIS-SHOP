@@ -774,14 +774,14 @@ GO
 
  insert into USUARIO(Documento,NombreCompleto,Correo,Clave,IdRol,Estado)
  values 
- ('101010','ADMIN','@GMAIL.COM','123',1,1)
+ ('10','Geronimo Administrador','Geronimo@gmail.com','1234',1,1)
 
  GO
 
 
  insert into USUARIO(Documento,NombreCompleto,Correo,Clave,IdRol,Estado)
  values 
- ('20','EMPLEADO','@GMAIL.COM','456',2,1)
+ ('20','Samuel Empleado','samuel@gmail.com','5678',2,1)
 
  GO
 
@@ -807,4 +807,5 @@ GO
   GO
 
   insert into NEGOCIO(IdNegocio,Nombre,RUC,Direccion,Logo) values
-  (1,'Codigo Estudiante','20202020','av. codigo estudiante 123',null)
+  (1,'Adidas','2534642','Calle 125 # 90 - 130',null)
+
