@@ -49,16 +49,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CN_Categoria.cs" />
-    <Compile Include="CN_Cliente.cs" />
-    <Compile Include="CN_Compra.cs" />
-    <Compile Include="CN_Negocio.cs" />
-    <Compile Include="CN_Permiso.cs" />
-    <Compile Include="CN_Proveedor.cs" />
-    <Compile Include="CN_Reporte.cs" />
-    <Compile Include="CN_Rol.cs" />
-    <Compile Include="CN_Usuario.cs" />
-    <Compile Include="CN_Venta.cs" />
-    <Compile Include="CN__Producto.cs" />
+    <Compile Include="ClienteServicio.cs" />
+    <Compile Include="CompraServicio.cs" />
+    <Compile Include="NegocioServicio.cs" />
+    <Compile Include="PermisoServicio.cs" />
+    <Compile Include="ProveedorServicio.cs" />
+    <Compile Include="ReporteServicio.cs" />
+    <Compile Include="RolServicio.cs" />
+    <Compile Include="UsuarioServicio.cs" />
+    <Compile Include="VentaServicio.cs" />
+    <Compile Include="ProductoServicio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
