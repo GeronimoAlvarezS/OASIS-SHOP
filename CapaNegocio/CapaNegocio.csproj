@@ -48,7 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CN_Categoria.cs" />
+    <Compile Include="CategoriaServicio.cs" />
     <Compile Include="ClienteServicio.cs" />
     <Compile Include="CompraServicio.cs" />
     <Compile Include="NegocioServicio.cs" />
