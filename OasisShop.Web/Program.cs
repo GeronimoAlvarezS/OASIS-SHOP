@@ -1,4 +1,10 @@
+
+using CapaDatos.Config;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+ConnectionHelper.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

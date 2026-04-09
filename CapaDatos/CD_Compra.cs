@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using CapaDatos.Config;
+using CapaEntidad;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,7 +15,7 @@ namespace CapaDatos
         public int ObtenerCorrelativo() {
             int idcorrelativo = 0;
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try
@@ -43,7 +44,7 @@ namespace CapaDatos
             Mensaje = string.Empty;
 
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try
@@ -78,7 +79,7 @@ namespace CapaDatos
 
         public Compra ObtenerCompra(string numero) {
             Compra obj = new Compra();
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try
@@ -135,16 +136,16 @@ namespace CapaDatos
             List<Detalle_Compra> oLista = new List<Detalle_Compra>();
             try
             {
-                using (SqlConnection conexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
-                    conexion.Open();
+                    oconexion.Open();
                     StringBuilder query = new StringBuilder();
 
                     query.AppendLine("select p.Nombre,dc.PrecioCompra,dc.Cantidad,dc.MontoTotal from DETALLE_COMPRA dc");
                     query.AppendLine("inner join PRODUCTO p on p.IdProducto = dc.IdProducto");
                     query.AppendLine("where dc.IdCompra =  @idcompra");
 
-                    SqlCommand cmd = new SqlCommand(query.ToString(), conexion);
+                    SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@idcompra", idcompra);
                     cmd.CommandType = System.Data.CommandType.Text;
 

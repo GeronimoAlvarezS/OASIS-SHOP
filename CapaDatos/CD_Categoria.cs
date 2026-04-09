@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using CapaDatos.Config;
+using CapaEntidad;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +17,7 @@ namespace CapaDatos
         {
             List<Categoria> lista = new List<Categoria>();
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try
@@ -65,7 +66,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("SP_RegistrarCategoria", oconexion);
@@ -105,7 +106,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("sp_EditarCategoria", oconexion);
@@ -145,7 +146,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand("sp_EliminarCategoria", oconexion);
                     cmd.Parameters.AddWithValue("IdCategoria", obj.IdCategoria);

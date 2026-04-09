@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using CapaDatos.Config;
+using CapaEntidad;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,7 +18,7 @@ namespace CapaDatos
         {
             List<Producto> lista = new List<Producto>();
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try
@@ -76,7 +77,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("sp_RegistrarProducto", oconexion);
@@ -121,7 +122,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("sp_ModificarProducto", oconexion);
@@ -165,7 +166,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("SP_EliminarProducto", oconexion);

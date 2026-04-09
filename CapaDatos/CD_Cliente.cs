@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using CapaDatos.Config;
+using CapaEntidad;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +17,7 @@ namespace CapaDatos
         {
             List<Cliente> lista = new List<Cliente>();
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try
@@ -68,7 +69,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("sp_RegistrarCliente", oconexion);
@@ -113,7 +114,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("sp_ModificarCliente", oconexion);
@@ -155,7 +156,7 @@ namespace CapaDatos
             Mensaje = string.Empty;
             try
             {
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
                     
                     SqlCommand cmd = new SqlCommand("delete from cliente where IdCliente = @id", oconexion);

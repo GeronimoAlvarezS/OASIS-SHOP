@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using CapaDatos.Config;
+using CapaEntidad;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,7 +16,7 @@ namespace CapaDatos
         {
             List<ReporteCompra> lista = new List<ReporteCompra>();
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
                 try
                 {
@@ -68,7 +69,7 @@ namespace CapaDatos
         {
             List<ReporteVenta> lista = new List<ReporteVenta>();
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
                 try
                 {

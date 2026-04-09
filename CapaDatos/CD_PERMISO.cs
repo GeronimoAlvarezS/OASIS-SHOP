@@ -1,12 +1,12 @@
-﻿using System;
+﻿using CapaDatos.Config;
+using CapaEntidad;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using System.Data;
-using System.Data.SqlClient;
-using CapaEntidad;
 
 namespace CapaDatos
 {
@@ -17,7 +17,7 @@ namespace CapaDatos
         {
             List<Permiso> lista = new List<Permiso>();
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try

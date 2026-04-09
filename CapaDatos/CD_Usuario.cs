@@ -1,12 +1,10 @@
-﻿using System;
+﻿using CapaDatos.Config;
+using CapaEntidad;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using System.Data;
 using System.Data.SqlClient;
-using CapaEntidad;
+using System.Text;
 
 namespace CapaDatos
 {
@@ -16,7 +14,8 @@ namespace CapaDatos
         public List<Usuario> Listar() {
             List<Usuario> lista = new List<Usuario>();
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena)) {
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+            {
 
                 try
                 {
@@ -72,7 +71,8 @@ namespace CapaDatos
 
             try {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena)) {
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+                {
 
                     SqlCommand cmd = new SqlCommand("SP_REGISTRARUSUARIO", oconexion);
                     cmd.Parameters.AddWithValue("Documento",obj.Documento);
@@ -116,7 +116,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
                     SqlCommand cmd = new SqlCommand("SP_EDITARUSUARIO", oconexion);
@@ -162,7 +162,7 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
 
 

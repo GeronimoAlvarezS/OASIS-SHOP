@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using CapaDatos.Config;
+using CapaEntidad;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,11 +19,12 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection conexion = new SqlConnection(Conexion.cadena)) {
-                    conexion.Open();
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+                {
+                    oconexion.Open();
 
                     string query = "select IdNegocio, Nombre, RUC, Direccion from NEGOCIO where IdNegocio = 1";
-                    SqlCommand cmd = new SqlCommand(query, conexion);
+                    SqlCommand cmd = new SqlCommand(query, oconexion);
                     cmd.CommandType = CommandType.Text;
 
                     using(SqlDataReader dr =cmd.ExecuteReader()) {
@@ -58,9 +60,9 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection conexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
-                    conexion.Open();
+                    oconexion.Open();
 
 
                     StringBuilder query = new StringBuilder();
@@ -69,7 +71,7 @@ namespace CapaDatos
                     query.AppendLine("Direccion = @direccion");
                     query.AppendLine("where IdNegocio = 1;");
 
-                    SqlCommand cmd = new SqlCommand(query.ToString(), conexion);
+                    SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@nombre", objeto.Nombre);
                     cmd.Parameters.AddWithValue("@ruc", objeto.RUC);
                     cmd.Parameters.AddWithValue("@direccion", objeto.Direccion);
@@ -98,11 +100,11 @@ namespace CapaDatos
             byte[] LogoBytes = new byte[0];
             try
             {
-                using (SqlConnection conexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
-                    conexion.Open();
+                    oconexion.Open();
                     string query = "select Logo from NEGOCIO where IdNegocio = 1";
-                    SqlCommand cmd = new SqlCommand(query, conexion);
+                    SqlCommand cmd = new SqlCommand(query, oconexion);
                     cmd.CommandType = CommandType.Text;
 
                     using (SqlDataReader dr = cmd.ExecuteReader())
@@ -131,16 +133,16 @@ namespace CapaDatos
             try
             {
 
-                using (SqlConnection conexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
-                    conexion.Open();
+                    oconexion.Open();
 
 
                     StringBuilder query = new StringBuilder();
                     query.AppendLine("update NEGOCIO set Logo = @imagen");
                     query.AppendLine("where IdNegocio = 1;");
 
-                    SqlCommand cmd = new SqlCommand(query.ToString(), conexion);
+                    SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@imagen", image);
                     cmd.CommandType = CommandType.Text;
 

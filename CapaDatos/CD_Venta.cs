@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using CapaDatos.Config;
+using CapaEntidad;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +17,7 @@ namespace CapaDatos
         {
             int idcorrelativo = 0;
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
 
                 try
@@ -43,7 +44,7 @@ namespace CapaDatos
         {
             bool respuesta = true;
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
                 try
                 {
@@ -72,7 +73,7 @@ namespace CapaDatos
         {
             bool respuesta = true;
 
-            using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
                 try
                 {
@@ -103,7 +104,7 @@ namespace CapaDatos
             Mensaje = string.Empty;
             try
             {
-                using (SqlConnection oconexion = new SqlConnection(Conexion.cadena))
+                using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand("usp_RegistrarVenta", oconexion);
                     cmd.Parameters.AddWithValue("IdUsuario", obj.oUsuario.IdUsuario);
@@ -141,10 +142,10 @@ namespace CapaDatos
 
             Venta obj = new Venta();
 
-            using (SqlConnection conexion = new SqlConnection(Conexion.cadena)) {
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString)) {
                 try
                 {
-                    conexion.Open();
+                    oconexion.Open();
                     StringBuilder query = new StringBuilder();
 
                     query.AppendLine("select v.IdVenta,u.NombreCompleto,");
@@ -156,7 +157,7 @@ namespace CapaDatos
                     query.AppendLine("inner join USUARIO u on u.IdUsuario = v.IdUsuario");
                     query.AppendLine("where v.NumeroDocumento = @numero");
 
-                    SqlCommand cmd = new SqlCommand(query.ToString(), conexion);
+                    SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@numero", numero);
                     cmd.CommandType = System.Data.CommandType.Text;
 
@@ -193,16 +194,17 @@ namespace CapaDatos
         public List<Detalle_Venta> ObtenerDetalleVenta(int idVenta) {
             List<Detalle_Venta> oLista = new List<Detalle_Venta>();
 
-            using (SqlConnection conexion = new SqlConnection(Conexion.cadena)) {
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+            {
                 try
                 {
-                    conexion.Open();
+                    oconexion.Open();
                     StringBuilder query = new StringBuilder();
                     query.AppendLine("select p.Nombre,dv.PrecioVenta,dv.Cantidad,dv.SubTotal from DETALLE_VENTA dv");
                     query.AppendLine("inner join PRODUCTO p on p.IdProducto = dv.IdProducto");
                     query.AppendLine(" where dv.IdVenta = @idventa");
 
-                    SqlCommand cmd = new SqlCommand(query.ToString(), conexion);
+                    SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@idventa", idVenta);
                     cmd.CommandType = System.Data.CommandType.Text;
 
