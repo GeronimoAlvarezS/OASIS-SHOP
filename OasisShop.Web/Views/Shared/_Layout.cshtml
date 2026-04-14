@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var permisos = HttpContextAccessor.HttpContext.Session.GetString("Permisos") ?? string.Empty;
+    var nombreCompleto = HttpContextAccessor.HttpContext.Session.GetString("NombreCompleto") ?? "Usuario";
+}
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -9,13 +17,71 @@
 <body style="background-color:#F5F7FA;">
     <div class="d-flex">
         <aside class="text-white p-3" style="width:260px; min-height:100vh; background-color:#1E1B4B;">
-            <h3 class="mb-4">OASIS SHOP</h3>
+            <h3 class="mb-2">OASIS SHOP</h3>
+            <p class="small mb-4">Bienvenido, @nombreCompleto</p>
 
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
                     <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Inicio</a>
                 </li>
-                <li class="nav-item mb-2">
+
+                @if (permisos.Contains("menuusuarios"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menucategorias"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Categorias" asp-action="Index">Categorías</a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menuproductos"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Productos" asp-action="Index">Productos</a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menuclientes"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Clientes" asp-action="Index">Clientes</a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menuproveedores"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Proveedores" asp-action="Index">Proveedores</a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menucompras"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Compras" asp-action="Index">Compras</a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menuventas"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Ventas" asp-action="Index">Ventas</a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menureportes"))
+                {
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" asp-controller="Reportes" asp-action="Index">Reportes</a>
+                    </li>
+                }
+
+                <li class="nav-item mt-4">
                     <a class="nav-link text-white" asp-controller="Auth" asp-action="Logout">Cerrar sesión</a>
                 </li>
             </ul>

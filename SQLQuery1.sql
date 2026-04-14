@@ -793,7 +793,9 @@ GO
   (1,'menuclientes'),
   (1,'menuproveedores'),
   (1,'menureportes'),
-  (1,'menuacercade')
+  (1,'menuacercade'),
+  (1, 'menucategorias'),
+  (1, 'menuproductos')
 
   GO
 

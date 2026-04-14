@@ -1,18 +1,15 @@
-
 using CapaDatos.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-ConnectionHelper.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
+builder.Services.AddHttpContextAccessor();
+
+ConnectionHelper.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
