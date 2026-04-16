@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CapaDatos
 {
-    public class CD_Cliente
+    public class ClienteDatos
     {
 
         public List<Cliente> Listar()

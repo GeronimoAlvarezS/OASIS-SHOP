@@ -63,17 +63,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CD_Categoria.cs" />
-    <Compile Include="CD_Cliente.cs" />
-    <Compile Include="CD_Compra.cs" />
-    <Compile Include="CD_Negocio.cs" />
-    <Compile Include="CD_Permiso.cs" />
-    <Compile Include="CD_Producto.cs" />
-    <Compile Include="CD_Proveedor.cs" />
-    <Compile Include="CD_Reporte.cs" />
-    <Compile Include="CD_Usuario.cs" />
-    <Compile Include="CD_Rol.cs" />
-    <Compile Include="CD_Venta.cs" />
+    <Compile Include="CategoriaDatos.cs" />
+    <Compile Include="ClienteDatos.cs" />
+    <Compile Include="CompraDatos.cs" />
+    <Compile Include="NegocioDatos.cs" />
+    <Compile Include="PermisoDatos.cs" />
+    <Compile Include="ProductoDatos.cs" />
+    <Compile Include="ProveedorDatos.cs" />
+    <Compile Include="ReporteDatos.cs" />
+    <Compile Include="UsuarioDatos.cs" />
+    <Compile Include="RolDatos.cs" />
+    <Compile Include="VentaDatos.cs" />
     <Compile Include="Config\ConnectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
