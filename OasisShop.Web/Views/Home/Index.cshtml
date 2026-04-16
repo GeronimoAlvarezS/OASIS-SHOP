@@ -1,9 +1,398 @@
 ﻿@{
     ViewData["Title"] = "Inicio";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+
+    var nombreUsuario = Context.Session.GetString("NombreCompleto") ?? "Administrador";
+    var primerNombre = nombreUsuario.Split(' ')[0];
 }
 
-<div class="container-fluid">
-    <h1 class="mb-3" style="color:#1E1B4B;">Bienvenido, @ViewBag.NombreCompleto</h1>
-    <p>Este será el dashboard principal del sistema OASIS SHOP.</p>
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OASIS SHOP - Inicio</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                height: 100%;
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #ECEDEF;
+            }
+
+            body {
+                overflow: hidden;
+            }
+
+            .app-container {
+                display: flex;
+                height: 100vh;
+                width: 100%;
+            }
+
+            .sidebar {
+                width: 278px;
+                background: #1D1A5B;
+                color: #FFFFFF;
+                display: flex;
+                flex-direction: column;
+                padding: 14px 12px 18px 12px;
+                flex-shrink: 0;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                scroll-behavior: smooth;
+            }
+
+                .sidebar::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .sidebar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+
+                .sidebar::-webkit-scrollbar-thumb {
+                    background: #4B43D1;
+                    border-radius: 10px;
+                }
+
+            .sidebar-header {
+                margin-bottom: 16px;
+            }
+
+            .brand-title {
+                font-size: 28px;
+                font-weight: 700;
+                line-height: 1.1;
+                margin-bottom: 10px;
+            }
+
+            .user-summary {
+                font-size: 18px;
+                line-height: 1.4;
+                color: #FFFFFF;
+            }
+
+            .menu-section-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #8E8C9E;
+                margin: 18px 0 10px 14px;
+            }
+
+            .menu {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .menu-item {
+                margin-bottom: 6px;
+            }
+
+            .menu-link {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                color: #FFFFFF;
+                text-decoration: none;
+                padding: 11px 14px;
+                border-radius: 8px;
+                font-size: 17px;
+                font-weight: 600;
+                transition: background-color 0.2s ease;
+            }
+
+                .menu-link:hover {
+                    background: rgba(255,255,255,0.08);
+                    color: #FFFFFF;
+                }
+
+                .menu-link.active {
+                    background: #4B43D1;
+                }
+
+            .menu-icon {
+                width: 22px;
+                min-width: 22px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 18px;
+            }
+
+            .menu-icon-img {
+                width: 20px;
+                height: 20px;
+            }
+
+            .menu-arrow {
+                margin-left: auto;
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+            /* MAIN */
+            .main-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                background: #ECEDEF;
+            }
+
+            .topbar {
+                height: 62px;
+                background: #F5F5F5;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 22px;
+                border-bottom: 1px solid #D8D8D8;
+            }
+
+            .menu-toggle {
+                font-size: 34px;
+                color: #111111;
+                line-height: 1;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .topbar-user {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #111111;
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+                .topbar-user .arrow {
+                    font-size: 22px;
+                    line-height: 1;
+                }
+
+            .content {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .welcome-box {
+                text-align: center;
+                max-width: 760px;
+                width: 100%;
+            }
+
+            .welcome-title {
+                color: #22205E;
+                font-size: 38px;
+                font-weight: 800;
+                line-height: 1.1;
+                margin-bottom: 48px;
+            }
+
+            .welcome-logo {
+                max-width: 360px;
+                width: 100%;
+                height: auto;
+            }
+
+            /* RESPONSIVE */
+            @@media (max-width: 992px) {
+                .sidebar {
+                    width: 235px;
+                }
+
+                .brand-title {
+                    font-size: 24px;
+                }
+
+                .welcome-title {
+                    font-size: 32px;
+                }
+
+                .welcome-logo {
+                    max-width: 300px;
+                }
+            }
+
+            @@media (max-width: 768px) {
+                .sidebar {
+                    position: fixed;
+                    left: -280px;
+                    top: 0;
+                    height: 100vh;
+                    z-index: 1000;
+                    transition: left 0.25s ease;
+                }
+
+                    .sidebar.open {
+                        left: 0;
+                    }
+
+                .main-container {
+                    width: 100%;
+                }
+
+                .welcome-title {
+                    font-size: 28px;
+                }
+
+                .topbar {
+                    padding: 0 16px;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Home")" class="menu-link active">
+                        <span class="menu-icon">
+                            <img src="/img/menuInicio.png" alt="Inicio" class="menu-icon-img" />
+                        </span>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="menu-section-title">Gestión</div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Usuario")" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Productos.png" alt="Productos" class="menu-icon-img" />
+                        </span>
+                        <span>Productos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Ventas.png" alt="Ventas" class="menu-icon-img" />
+                        </span>
+                        <span>Ventas</span>
+                        <span class="menu-arrow">›</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Compras.png" alt="Compras" class="menu-icon-img" />
+                        </span>
+                        <span>Compras</span>
+                        <span class="menu-arrow">›</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Clientes.png" alt="Clientes" class="menu-icon-img" />
+                        </span>
+                        <span>Clientes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Proveedores.png" alt="Proveedores" class="menu-icon-img" />
+                        </span>
+                        <span>Proveedores</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="menu-section-title">Reportes</div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/ReporteCompras.png" alt="ReporteCompras" class="menu-icon-img" />
+                        </span>
+                        <span>Compras</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/ReporteVentas.png" alt="ReporteVentas" class="menu-icon-img" />
+                        </span>
+                        <span>Ventas</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="menu-section-title">Configuración</div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Usuario")" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Usuarios.png" alt="Usuarios" class="menu-icon-img" />
+                        </span>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Categoria")" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Categoria.png" alt="Categoria" class="menu-icon-img" />
+                        </span>
+                        <span>Categoria</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <img src="/img/Negocio.png" alt="Negocio" class="menu-icon-img" />
+                        </span>
+                        <span>Negocio</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container">
+            <div class="topbar">
+                <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+
+                <div class="topbar-user">
+                    <span>@nombreUsuario</span>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="welcome-box">
+                    <div class="welcome-title">
+                        ¡Hola @nombreUsuario,<br />
+                        Bienvenido!
+                    </div>
+
+                    <img src="/img/LogoOasis.png" alt="Logo Oasis" class="welcome-logo" />
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('open');
+                }
+            }
+    </script>
+</body>
+</html>
