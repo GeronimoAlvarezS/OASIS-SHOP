@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CapaDatos
 {
-    public class CD_Negocio
+    public class NegocioDatos
     {
         public Negocio ObtenerDatos() {
 

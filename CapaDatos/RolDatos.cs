@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CapaDatos
 {
-    public class CD_Rol
+    public class RolDatos
     {
         public List<Rol> Listar()
         {

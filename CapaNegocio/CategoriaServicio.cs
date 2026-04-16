@@ -7,7 +7,7 @@ namespace CapaNegocio
     public class CN_Categoria
     {
        
-        private CD_Categoria objcd_Categoria = new CD_Categoria();
+        private CategoriaDatos objcd_Categoria = new CategoriaDatos();
 
         public List<Categoria> Listar()
         {

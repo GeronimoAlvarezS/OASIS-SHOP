@@ -7,7 +7,7 @@ namespace CapaNegocio
     public class RolServicio
     {
 
-        private CD_Rol objcd_rol = new CD_Rol();
+        private RolDatos objcd_rol = new RolDatos();
 
 
         public List<Rol> Listar()

@@ -7,7 +7,7 @@ namespace CapaNegocio
     public class PermisoServicio
     {
 
-        private CD_Permiso objcd_permiso = new CD_Permiso();
+        private PermisoDatos objcd_permiso = new PermisoDatos();
 
 
         public List<Permiso> Listar(int IdUsuario)

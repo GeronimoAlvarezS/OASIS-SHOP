@@ -6,7 +6,7 @@ namespace CapaNegocio
 {
     public class ReporteServicio
     {
-        private CD_Reporte objcd_reporte = new CD_Reporte();
+        private ReporteDatos objcd_reporte = new ReporteDatos();
 
         public List<ReporteCompra> Compra(string fechainicio, string fechafin, int idproveedor)
         {

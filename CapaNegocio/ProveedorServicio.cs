@@ -7,7 +7,7 @@ namespace CapaNegocio
     public class ProveedorServicio
     {
 
-        private CD_Proveedor objcd_Proveedor = new CD_Proveedor();
+        private ProveedorDatos objcd_Proveedor = new ProveedorDatos();
 
 
         public List<Proveedor> Listar()

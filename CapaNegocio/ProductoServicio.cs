@@ -8,7 +8,7 @@ namespace CapaNegocio
     {
 
 
-        private CD_Producto objcd_Producto = new CD_Producto();
+        private ProductoDatos objcd_Producto = new ProductoDatos();
 
 
         public List<Producto> Listar()

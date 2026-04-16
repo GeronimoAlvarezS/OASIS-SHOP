@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CapaDatos
 {
-    public class CD_Compra
+    public class CompraDatos
     {
         public int ObtenerCorrelativo() {
             int idcorrelativo = 0;

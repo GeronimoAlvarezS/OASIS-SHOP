@@ -7,7 +7,7 @@ namespace CapaNegocio
 {
     public class VentaServicio
     {
-        private CD_Venta objcd_venta = new CD_Venta();
+        private VentaDatos objcd_venta = new VentaDatos();
 
         public bool RestarStock(int idproducto, int cantidad) {
             return objcd_venta.RestarStock(idproducto, cantidad);

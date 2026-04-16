@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CapaDatos
 {
-    public class CD_Reporte
+    public class ReporteDatos
     {
         public List<ReporteCompra> Compra(string fechainicio, string fechafin, int idproveedor)
         {

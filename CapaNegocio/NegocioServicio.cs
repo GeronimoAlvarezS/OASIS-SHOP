@@ -7,7 +7,7 @@ namespace CapaNegocio
     {
 
 
-        private CD_Negocio objcd_negocio = new CD_Negocio();
+        private NegocioDatos objcd_negocio = new NegocioDatos();
 
 
         public Negocio ObtenerDatos()

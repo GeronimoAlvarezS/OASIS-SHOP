@@ -6,7 +6,7 @@ namespace CapaNegocio
 {
     public class UsuarioServicio
     {
-        private CD_Usuario objcd_usuario = new CD_Usuario();
+        private UsuarioDatos objcd_usuario = new UsuarioDatos();
 
         public List<Usuario> Listar()
         {

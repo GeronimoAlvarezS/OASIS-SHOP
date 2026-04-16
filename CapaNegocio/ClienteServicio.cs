@@ -7,7 +7,7 @@ namespace CapaNegocio
     public class ClienteServicio
     {
 
-        private CD_Cliente objcd_Cliente = new CD_Cliente();
+        private ClienteDatos objcd_Cliente = new ClienteDatos();
 
 
         public List<Cliente> Listar()

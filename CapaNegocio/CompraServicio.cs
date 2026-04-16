@@ -8,7 +8,7 @@ namespace CapaNegocio
     public class CompraServicio
     {
 
-        private CD_Compra objcd_compra = new CD_Compra();
+        private CompraDatos objcd_compra = new CompraDatos();
 
 
         public int ObtenerCorrelativo()
