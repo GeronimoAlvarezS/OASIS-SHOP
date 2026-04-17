@@ -1,0 +1,660 @@
+﻿@model IEnumerable<OasisShop.Web.Models.ViewModels.CategoriaViewModel>
+@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Categorías";
+    var nombreUsuario = Context.Session.GetString("NombreCompleto") ?? "Administrador";
+    var totalCategorias = Model?.Count() ?? 0;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OASIS SHOP - Categorías</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                height: 100%;
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: #ECEDEF;
+            }
+
+            body {
+                overflow: hidden;
+            }
+
+            .app-container {
+                display: flex;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .sidebar {
+                width: 278px;
+                background: #1D1A5B;
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                padding: 14px 12px 18px;
+                flex-shrink: 0;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .sidebar::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .sidebar::-webkit-scrollbar-thumb {
+                background: #4B43D1;
+                border-radius: 10px;
+            }
+
+            .menu {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .menu-item {
+                margin-bottom: 6px;
+            }
+
+            .menu-link {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                color: #FFFFFF;
+                text-decoration: none;
+                padding: 11px 14px;
+                border-radius: 8px;
+                font-size: 17px;
+                font-weight: 600;
+                transition: background-color .2s ease;
+            }
+
+            .menu-link:hover {
+                background: rgba(255,255,255,.08);
+                color: #fff;
+            }
+
+            .menu-link.active {
+                background: #4B43D1;
+            }
+
+            .menu-section-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #8E8C9E;
+                margin: 18px 0 10px 14px;
+            }
+
+            .menu-icon {
+                width: 22px;
+                min-width: 22px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 18px;
+            }
+
+            .menu-arrow {
+                margin-left: auto;
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+            .main-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                background: #ECEDEF;
+            }
+
+            .topbar {
+                height: 62px;
+                background: #F5F5F5;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 22px;
+                border-bottom: 1px solid #D8D8D8;
+            }
+
+            .menu-toggle {
+                font-size: 34px;
+                color: #111;
+                line-height: 1;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .topbar-user {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #111;
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+            .topbar-avatar {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: #6D728F;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-weight: bold;
+            }
+
+            .page-content {
+                flex: 1;
+                overflow-y: auto;
+                padding: 18px 20px 28px;
+            }
+
+            .page-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+                padding: 0 20px;
+            }
+
+            .page-title {
+                font-size: 24px;
+                font-weight: 800;
+                color: #151515;
+                margin: 0;
+            }
+
+            .page-count {
+                font-size: 14px;
+                color: #666;
+                font-weight: 600;
+            }
+
+            .toolbar-card {
+                background: #F5F5F5;
+                border-radius: 8px;
+                padding: 14px 18px;
+                margin: 0 20px 18px;
+            }
+
+            .btn-primary-custom {
+                background: #241E65;
+                color: white;
+                border: none;
+                border-radius: 7px;
+                padding: 10px 16px;
+                font-weight: 700;
+                min-width: 150px;
+            }
+
+            .btn-primary-custom:hover {
+                background: #1b174d;
+            }
+
+            .search-row {
+                display: flex;
+                justify-content: flex-end;
+                margin: 0 20px 8px;
+            }
+
+            .search-input {
+                width: 180px;
+                height: 30px;
+                border: 1px solid #8F8F8F;
+                border-radius: 7px;
+                padding: 4px 10px;
+                font-size: 13px;
+                background: #F5F5F5;
+            }
+
+            .table-card {
+                background: #F5F5F5;
+                border-radius: 8px;
+                margin: 0 20px;
+                overflow: hidden;
+                box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            }
+
+            .table-custom {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13px;
+            }
+
+            .table-custom thead th {
+                background: #DCDDDF;
+                color: #676767;
+                font-weight: 700;
+                text-align: center;
+                padding: 12px 8px;
+                border: 1px solid #BFC1C6;
+            }
+
+            .table-custom tbody td {
+                background: #F5F5F5;
+                color: #5A5A5A;
+                padding: 10px 8px;
+                border: 1px solid #C9CBD1;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            .table-checkbox {
+                width: 16px;
+                height: 16px;
+            }
+
+            .badge-estado {
+                font-weight: 700;
+                padding: 4px 8px;
+                border-radius: 12px;
+                display: inline-block;
+                min-width: 72px;
+            }
+
+            .estado-activo {
+                background: #D9F5DF;
+                color: #177A2E;
+            }
+
+            .estado-inactivo {
+                background: #F9D8D8;
+                color: #A32626;
+            }
+
+            .btn-action {
+                border: none;
+                border-radius: 4px;
+                padding: 4px 10px;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 700;
+                margin: 0 2px;
+            }
+
+            .btn-edit {
+                background: #4B43D1;
+            }
+
+            .btn-detail {
+                background: #31C95B;
+            }
+
+            .pagination-row {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 8px;
+                padding: 12px 14px;
+                font-size: 13px;
+                color: #666;
+            }
+
+            .page-number {
+                width: 18px;
+                height: 18px;
+                border-radius: 3px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: #E2E2E2;
+                color: #666;
+                font-weight: 700;
+            }
+
+            .page-number.active {
+                background: #241E65;
+                color: #fff;
+            }
+
+            .modal-header-custom {
+                background: #241E65;
+                color: #fff;
+            }
+
+            .form-label {
+                font-weight: 700;
+                color: #444;
+            }
+
+            .form-control, .form-select {
+                border-radius: 8px;
+            }
+
+            @@media (max-width: 768px) {
+                .sidebar {
+                    position: fixed;
+                    left: -280px;
+                    top: 0;
+                    z-index: 1000;
+                    transition: left .25s ease;
+                }
+
+                .sidebar.open {
+                    left: 0;
+                }
+
+                .page-header,
+                .toolbar-card,
+                .search-row,
+                .table-card {
+                    margin-left: 10px;
+                    margin-right: 10px;
+                }
+
+                .table-card {
+                    overflow-x: auto;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Home")" class="menu-link">
+                        <span class="menu-icon">🏠</span>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="menu-section-title">Gestión</div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">📦</span>
+                        <span>Productos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">💸</span>
+                        <span>Ventas</span>
+                        <span class="menu-arrow">›</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">🛒</span>
+                        <span>Compras</span>
+                        <span class="menu-arrow">›</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">👥</span>
+                        <span>Clientes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">🏭</span>
+                        <span>Proveedores</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="menu-section-title">Reportes</div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">🧾</span>
+                        <span>Compras</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">📄</span>
+                        <span>Ventas</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="menu-section-title">Configuración</div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Usuario")" class="menu-link">
+                        <span class="menu-icon">👨‍👩‍👧‍👦</span>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Categoria")" class="menu-link active">
+                        <span class="menu-icon">◻️</span>
+                        <span>Categoria</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <span class="menu-icon">🏪</span>
+                        <span>Negocio</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container">
+            <div class="topbar">
+                <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+
+                <div class="topbar-user">
+                    <div class="topbar-avatar">@nombreUsuario.Substring(0, 1).ToUpper()</div>
+                    <span>@nombreUsuario</span>
+                    <span>˅</span>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">Categorias</h1>
+                    <div class="page-count">@totalCategorias Categorias registradas</div>
+                </div>
+
+                @if (TempData["MensajeOk"] != null)
+                {
+                    <div class="alert alert-success mx-3">@TempData["MensajeOk"]</div>
+                }
+
+                @if (TempData["MensajeError"] != null)
+                {
+                    <div class="alert alert-danger mx-3">@TempData["MensajeError"]</div>
+                }
+
+                <div class="toolbar-card">
+                    <button type="button" class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalCategoria" onclick="limpiarFormulario()">
+                        Crear categoria
+                    </button>
+                </div>
+
+                <div class="search-row">
+                    <input type="text" class="search-input" id="txtBuscar" placeholder="Buscar categoria..." />
+                </div>
+
+                <div class="table-card">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;"><input type="checkbox" class="table-checkbox" /></th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th style="width:170px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCategorias">
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><input type="checkbox" class="table-checkbox" /></td>
+                                        <td>@item.Descripcion</td>
+                                        <td>
+                                            @if (item.Estado)
+                                            {
+                                                <span class="badge-estado estado-activo">Activo</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge-estado estado-inactivo">Inactivo</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <button type="button"
+                                                    class="btn-action btn-edit"
+                                                    onclick="editarCategoria('@item.IdCategoria','@item.Descripcion','@item.Estado.ToString().ToLower()')">
+                                                ✏ Editar
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn-action btn-detail"
+                                                    onclick="verDetalle('@item.IdCategoria','@item.Descripcion','@(item.Estado ? "Activo" : "Inactivo")')">
+                                                ⦿ Detalles
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4">No hay categorías registradas.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="pagination-row">
+                        <span>Anterior</span>
+                        <span class="page-number active">1</span>
+                        <span class="page-number">2</span>
+                        <span class="page-number">3</span>
+                        <span class="page-number">4</span>
+                        <span class="page-number">5</span>
+                        <span>Siguiente</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal fade" id="modalCategoria" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" id="tituloModalCategoria">Crear categoria</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="post" asp-controller="Categoria" asp-action="Guardar">
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-body">
+                        <input type="hidden" id="IdCategoria" name="IdCategoria" value="0" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="Descripcion" name="Descripcion" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" id="Estado" name="Estado" required>
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn-primary-custom">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title">Detalle de categoría</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p><strong>ID:</strong> <span id="detalleId"></span></p>
+                    <p><strong>Descripción:</strong> <span id="detalleDescripcion"></span></p>
+                    <p><strong>Estado:</strong> <span id="detalleEstado"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('open');
+                }
+            }
+
+            function limpiarFormulario() {
+                document.getElementById('tituloModalCategoria').innerText = 'Crear categoria';
+                document.getElementById('IdCategoria').value = 0;
+                document.getElementById('Descripcion').value = '';
+                document.getElementById('Estado').value = 'true';
+            }
+
+            function editarCategoria(id, descripcion, estado) {
+                document.getElementById('tituloModalCategoria').innerText = 'Editar categoria';
+                document.getElementById('IdCategoria').value = id;
+                document.getElementById('Descripcion').value = descripcion;
+                document.getElementById('Estado').value = estado;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalCategoria'));
+                modal.show();
+            }
+
+            function verDetalle(id, descripcion, estado) {
+                document.getElementById('detalleId').innerText = id;
+                document.getElementById('detalleDescripcion').innerText = descripcion;
+                document.getElementById('detalleEstado').innerText = estado;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+                modal.show();
+            }
+
+            document.getElementById('txtBuscar').addEventListener('keyup', function () {
+                const filtro = this.value.toLowerCase();
+                const filas = document.querySelectorAll('#tablaCategorias tr');
+
+                filas.forEach(fila => {
+                    fila.style.display = fila.innerText.toLowerCase().includes(filtro) ? '' : 'none';
+                });
+            });
+    </script>
+</body>
+</html>
