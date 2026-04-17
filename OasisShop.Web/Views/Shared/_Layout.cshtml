@@ -13,83 +13,420 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - OASIS SHOP</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                height: 100%;
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: #ECEDEF;
+            }
+
+            body {
+                overflow: hidden;
+            }
+
+            .app-container {
+                display: flex;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .sidebar {
+                width: 270px;
+                min-width: 270px;
+                background: #1E1B4B;
+                color: #FFFFFF;
+                display: flex;
+                flex-direction: column;
+                padding: 16px 12px 18px 12px;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                transition: all 0.25s ease;
+            }
+
+                .sidebar::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .sidebar::-webkit-scrollbar-thumb {
+                    background: #4B43D1;
+                    border-radius: 10px;
+                }
+
+                .sidebar.collapsed {
+                    width: 0;
+                    min-width: 0;
+                    padding-left: 0;
+                    padding-right: 0;
+                    overflow: hidden;
+                }
+
+            .brand-title {
+                font-size: 28px;
+                font-weight: 800;
+                color: #FFFFFF;
+                margin-bottom: 8px;
+            }
+
+            .user-summary {
+                font-size: 14px;
+                color: #FFFFFF;
+                margin-bottom: 26px;
+            }
+
+            .menu-section-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #8E8C9E;
+                margin: 18px 0 10px 10px;
+            }
+
+            .nav-custom {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .nav-item-custom {
+                margin-bottom: 8px;
+            }
+
+            .nav-link-custom {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                color: #FFFFFF;
+                text-decoration: none;
+                padding: 11px 14px;
+                border-radius: 8px;
+                font-size: 17px;
+                font-weight: 600;
+                transition: background-color .2s ease;
+            }
+
+                .nav-link-custom:hover {
+                    background: rgba(255,255,255,.08);
+                    color: #FFFFFF;
+                }
+
+                .nav-link-custom.active {
+                    background: #4B43D1;
+                }
+
+            .nav-icon {
+                width: 22px;
+                min-width: 22px;
+                text-align: center;
+                font-size: 18px;
+            }
+
+            .nav-arrow {
+                margin-left: auto;
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+            .main-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                background: #ECEDEF;
+                transition: all 0.25s ease;
+            }
+
+            .topbar {
+                height: 62px;
+                background: #F5F5F5;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 22px;
+                border-bottom: 1px solid #D8D8D8;
+                position: relative;
+            }
+
+            .menu-toggle {
+                font-size: 34px;
+                color: #111111;
+                line-height: 1;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .topbar-user-wrapper {
+                position: relative;
+            }
+
+            .topbar-user {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #111111;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                user-select: none;
+            }
+
+                .topbar-user .arrow {
+                    font-size: 13px;
+                    transition: transform 0.2s ease;
+                }
+
+            .topbar-user-wrapper.open .arrow {
+                transform: rotate(180deg);
+            }
+
+            .user-dropdown {
+                position: absolute;
+                top: 42px;
+                right: 0;
+                min-width: 170px;
+                display: none;
+                z-index: 2000;
+            }
+
+            .topbar-user-wrapper.open .user-dropdown {
+                display: block;
+            }
+
+            .logout-btn {
+                width: 100%;
+                border: none;
+                background: #3C227B;
+                color: #FFFFFF;
+                font-size: 14px;
+                font-weight: 700;
+                border-radius: 4px;
+                padding: 10px 14px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                text-decoration: none;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+            }
+
+                .logout-btn:hover {
+                    background: #2f1b61;
+                    color: #FFFFFF;
+                }
+
+            .page-content {
+                flex: 1;
+                overflow-y: auto;
+                padding: 20px;
+            }
+
+            @@media (max-width: 768px) {
+                .sidebar {
+                    position: fixed;
+                    left: 0;
+                    top: 0;
+                    z-index: 1200;
+                    width: 270px;
+                    min-width: 270px;
+                }
+
+                    .sidebar.collapsed {
+                        transform: translateX(-100%);
+                        width: 270px;
+                        min-width: 270px;
+                        padding-left: 12px;
+                        padding-right: 12px;
+                    }
+
+                .topbar {
+                    padding: 0 16px;
+                }
+            }
+    </style>
 </head>
-<body style="background-color:#F5F7FA;">
-    <div class="d-flex">
-        <aside class="text-white p-3" style="width:260px; min-height:100vh; background-color:#1E1B4B;">
-            <h3 class="mb-2">OASIS SHOP</h3>
-            <p class="small mb-4">Bienvenido, @nombreCompleto</p>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand-title">OASIS SHOP</div>
+            <div class="user-summary">Bienvenido, @nombreCompleto</div>
 
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Inicio</a>
+            <ul class="nav-custom">
+                <li class="nav-item-custom">
+                    <a class="nav-link-custom active" asp-controller="Home" asp-action="Index">
+                        <span class="nav-icon">🏠</span>
+                        <span>Inicio</span>
+                    </a>
                 </li>
+            </ul>
 
-                @if (permisos.Contains("menuusuarios"))
-                {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
-                    </li>
-                }
-
-                @if (permisos.Contains("menucategorias"))
-                {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Categorias" asp-action="Index">Categorías</a>
-                    </li>
-                }
-
+            <div class="menu-section-title">Gestión</div>
+            <ul class="nav-custom">
                 @if (permisos.Contains("menuproductos"))
                 {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Productos" asp-action="Index">Productos</a>
-                    </li>
-                }
-
-                @if (permisos.Contains("menuclientes"))
-                {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Clientes" asp-action="Index">Clientes</a>
-                    </li>
-                }
-
-                @if (permisos.Contains("menuproveedores"))
-                {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Proveedores" asp-action="Index">Proveedores</a>
-                    </li>
-                }
-
-                @if (permisos.Contains("menucompras"))
-                {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Compras" asp-action="Index">Compras</a>
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Productos" asp-action="Index">
+                            <span class="nav-icon">📦</span>
+                            <span>Productos</span>
+                        </a>
                     </li>
                 }
 
                 @if (permisos.Contains("menuventas"))
                 {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Ventas" asp-action="Index">Ventas</a>
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Ventas" asp-action="Index">
+                            <span class="nav-icon">💸</span>
+                            <span>Ventas</span>
+                            <span class="nav-arrow">›</span>
+                        </a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menucompras"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Compras" asp-action="Index">
+                            <span class="nav-icon">🛒</span>
+                            <span>Compras</span>
+                            <span class="nav-arrow">›</span>
+                        </a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menuclientes"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Clientes" asp-action="Index">
+                            <span class="nav-icon">👥</span>
+                            <span>Clientes</span>
+                        </a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menuproveedores"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Proveedores" asp-action="Index">
+                            <span class="nav-icon">🏭</span>
+                            <span>Proveedores</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            <div class="menu-section-title">Reportes</div>
+            <ul class="nav-custom">
+                @if (permisos.Contains("menucompras"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Compras" asp-action="Index">
+                            <span class="nav-icon">🧾</span>
+                            <span>Compras</span>
+                        </a>
+                    </li>
+                }
+
+                @if (permisos.Contains("menuventas"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Ventas" asp-action="Index">
+                            <span class="nav-icon">📄</span>
+                            <span>Ventas</span>
+                        </a>
                     </li>
                 }
 
                 @if (permisos.Contains("menureportes"))
                 {
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white" asp-controller="Reportes" asp-action="Index">Reportes</a>
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Reportes" asp-action="Index">
+                            <span class="nav-icon">📊</span>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            <div class="menu-section-title">Configuración</div>
+            <ul class="nav-custom">
+                @if (permisos.Contains("menuusuarios"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Usuario" asp-action="Index">
+                            <span class="nav-icon">👨‍👩‍👧‍👦</span>
+                            <span>Usuarios</span>
+                        </a>
                     </li>
                 }
 
-                <li class="nav-item mt-4">
-                    <a class="nav-link text-white" asp-controller="Auth" asp-action="Logout">Cerrar sesión</a>
+                @if (permisos.Contains("menucategorias"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom" asp-controller="Categoria" asp-action="Index">
+                            <span class="nav-icon">◻️</span>
+                            <span>Categoria</span>
+                        </a>
+                    </li>
+                }
+
+                <li class="nav-item-custom">
+                    <a class="nav-link-custom" href="#">
+                        <span class="nav-icon">🏪</span>
+                        <span>Negocio</span>
+                    </a>
                 </li>
             </ul>
         </aside>
 
-        <main class="flex-grow-1 p-4">
-            @RenderBody()
+        <main class="main-container">
+            <div class="topbar">
+                <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+
+                <div class="topbar-user-wrapper" id="userDropdownWrapper">
+                    <div class="topbar-user" onclick="toggleUserDropdown()">
+                        <span>@nombreCompleto</span>
+                        <span class="arrow">▼</span>
+                    </div>
+
+                    <div class="user-dropdown">
+                        <a asp-controller="Auth" asp-action="Logout" class="logout-btn">
+                            <span>Cerrar sesión</span>
+                            <span>⇱</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                @RenderBody()
+            </div>
         </main>
     </div>
+
+    <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('collapsed');
+            }
+
+            function toggleUserDropdown() {
+                const wrapper = document.getElementById('userDropdownWrapper');
+                wrapper.classList.toggle('open');
+            }
+
+            document.addEventListener('click', function (event) {
+                const wrapper = document.getElementById('userDropdownWrapper');
+
+                if (wrapper && !wrapper.contains(event.target)) {
+                    wrapper.classList.remove('open');
+                }
+            });
+    </script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
