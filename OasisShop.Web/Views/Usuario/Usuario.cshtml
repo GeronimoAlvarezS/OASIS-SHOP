@@ -1,1 +1,469 @@
-﻿
+﻿@model IEnumerable<CapaEntidad.Usuario>
+@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Usuarios";
+    var nombreUsuario = Context.Session.GetString("NombreCompleto") ?? "Administrador";
+    var totalUsuarios = Model?.Count() ?? 0;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OASIS SHOP - Usuarios</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+            * { box-sizing: border-box; }
+
+            html, body {
+                height: 100%;
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: #ECEDEF;
+            }
+
+            body { overflow: hidden; }
+
+            .app-container {
+                display: flex;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .sidebar {
+                width: 278px;
+                background: #1D1A5B;
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                padding: 14px 12px 18px;
+                flex-shrink: 0;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .menu-section-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #8E8C9E;
+                margin: 18px 0 10px 14px;
+            }
+
+            .menu {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .menu-item { margin-bottom: 6px; }
+
+            .menu-link {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                color: #FFF;
+                text-decoration: none;
+                padding: 11px 14px;
+                border-radius: 8px;
+                font-size: 17px;
+                font-weight: 600;
+            }
+
+            .menu-link:hover,
+            .menu-link.active {
+                background: #4B43D1;
+                color: #FFF;
+            }
+
+            .main-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                background: #ECEDEF;
+            }
+
+            .topbar {
+                height: 62px;
+                background: #F5F5F5;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 22px;
+                border-bottom: 1px solid #D8D8D8;
+            }
+
+            .menu-toggle {
+                font-size: 34px;
+                color: #111;
+                cursor: pointer;
+            }
+
+            .topbar-user {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #111;
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+            .page-content {
+                flex: 1;
+                overflow-y: auto;
+                padding: 18px 20px 28px;
+            }
+
+            .page-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+                padding: 0 20px;
+            }
+
+            .page-title {
+                font-size: 24px;
+                font-weight: 800;
+                margin: 0;
+            }
+
+            .page-count {
+                font-size: 14px;
+                color: #666;
+                font-weight: 600;
+            }
+
+            .toolbar-card {
+                background: #F5F5F5;
+                border-radius: 8px;
+                padding: 14px 18px;
+                margin: 0 20px 18px;
+            }
+
+            .btn-primary-custom {
+                background: #241E65;
+                color: white;
+                border: none;
+                border-radius: 7px;
+                padding: 10px 16px;
+                font-weight: 700;
+                min-width: 135px;
+            }
+
+            .btn-primary-custom:hover {
+                background: #1b174d;
+            }
+
+            .search-row {
+                display: flex;
+                justify-content: flex-end;
+                margin: 0 20px 8px;
+            }
+
+            .search-input {
+                width: 180px;
+                height: 30px;
+                border: 1px solid #8F8F8F;
+                border-radius: 7px;
+                padding: 4px 10px;
+                font-size: 13px;
+                background: #F5F5F5;
+            }
+
+            .table-card {
+                background: #F5F5F5;
+                border-radius: 8px;
+                margin: 0 20px;
+                overflow: hidden;
+                box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            }
+
+            .table-custom {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13px;
+            }
+
+            .table-custom thead th {
+                background: #DCDDDF;
+                color: #676767;
+                font-weight: 700;
+                text-align: center;
+                padding: 12px 8px;
+                border: 1px solid #BFC1C6;
+            }
+
+            .table-custom tbody td {
+                background: #F5F5F5;
+                color: #5A5A5A;
+                padding: 10px 8px;
+                border: 1px solid #C9CBD1;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            .btn-action {
+                border: none;
+                border-radius: 4px;
+                padding: 4px 10px;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 700;
+                margin: 0 2px;
+            }
+
+            .btn-edit { background: #4B43D1; }
+            .btn-detail { background: #31C95B; }
+
+            .modal-header-custom {
+                background: #241E65;
+                color: #fff;
+            }
+
+            .form-label {
+                font-weight: 700;
+                color: #444;
+            }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Home")" class="menu-link">Inicio</a>
+                </li>
+            </ul>
+
+            <div class="menu-section-title">Configuración</div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="@Url.Action("Index", "Usuario")" class="menu-link active">Usuarios</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-container">
+            <div class="topbar">
+                <div class="menu-toggle">☰</div>
+                <div class="topbar-user">@nombreUsuario</div>
+            </div>
+
+            <div class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">Usuarios</h1>
+                    <div class="page-count">@totalUsuarios Usuarios registrados</div>
+                </div>
+
+                @if (TempData["MensajeOk"] != null)
+                {
+                    <div class="alert alert-success mx-3">@TempData["MensajeOk"]</div>
+                }
+
+                @if (TempData["MensajeError"] != null)
+                {
+                    <div class="alert alert-danger mx-3">@TempData["MensajeError"]</div>
+                }
+
+                <div class="toolbar-card">
+                    <button type="button" class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalUsuario" onclick="limpiarFormulario()">
+                        Crear usuario
+                    </button>
+                </div>
+
+                <div class="search-row">
+                    <input type="text" class="search-input" id="txtBuscar" placeholder="Buscar usuario..." />
+                </div>
+
+                <div class="table-card">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Documento</th>
+                                <th>Nombre Completo</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaUsuarios">
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.IdUsuario</td>
+                                        <td>@item.Documento</td>
+                                        <td>@item.NombreCompleto</td>
+                                        <td>@item.Correo</td>
+                                        <td>@item.oRol?.Descripcion</td>
+                                        <td>@(item.Estado ? "Activo" : "Inactivo")</td>
+                                        <td>
+                                            <button type="button"
+                                                    class="btn-action btn-edit"
+                                                    onclick="editarUsuario('@item.IdUsuario','@item.Documento','@item.NombreCompleto','@item.Correo','@item.Clave','@item.oRol?.IdRol','@item.Estado.ToString().ToLower()')">
+                                                Editar
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn-action btn-detail"
+                                                    onclick="verDetalle('@item.IdUsuario','@item.Documento','@item.NombreCompleto','@item.Correo','@item.oRol?.Descripcion','@(item.Estado ? "Activo" : "Inactivo")')">
+                                                Detalles
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7">No hay usuarios registrados.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" id="tituloModalUsuario">Crear usuario</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="post" asp-controller="Usuario" asp-action="Guardar">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <input type="hidden" id="IdUsuario" name="IdUsuario" value="0" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Número de documento</label>
+                                <input type="text" class="form-control" id="Documento" name="Documento" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre completo</label>
+                                <input type="text" class="form-control" id="NombreCompleto" name="NombreCompleto" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Correo</label>
+                                <input type="email" class="form-control" id="Correo" name="Correo" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="Clave" name="Clave" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Rol</label>
+                                <select class="form-select" id="IdRol" name="IdRol" required>
+                                    <option value="">Seleccione</option>
+                                    <option value="1">Administrador</option>
+                                    <option value="2">Empleado</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" id="Estado" name="Estado" required>
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn-primary-custom">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title">Detalle de usuario</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p><strong>ID:</strong> <span id="detalleId"></span></p>
+                    <p><strong>Documento:</strong> <span id="detalleDocumento"></span></p>
+                    <p><strong>Nombre completo:</strong> <span id="detalleNombre"></span></p>
+                    <p><strong>Correo:</strong> <span id="detalleCorreo"></span></p>
+                    <p><strong>Rol:</strong> <span id="detalleRol"></span></p>
+                    <p><strong>Estado:</strong> <span id="detalleEstado"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+            function limpiarFormulario() {
+                document.getElementById('tituloModalUsuario').innerText = 'Crear usuario';
+                document.getElementById('IdUsuario').value = 0;
+                document.getElementById('Documento').value = '';
+                document.getElementById('NombreCompleto').value = '';
+                document.getElementById('Correo').value = '';
+                document.getElementById('Clave').value = '';
+                document.getElementById('IdRol').value = '';
+                document.getElementById('Estado').value = 'true';
+            }
+
+            function editarUsuario(id, documento, nombre, correo, clave, idRol, estado) {
+                document.getElementById('tituloModalUsuario').innerText = 'Editar usuario';
+                document.getElementById('IdUsuario').value = id;
+                document.getElementById('Documento').value = documento;
+                document.getElementById('NombreCompleto').value = nombre;
+                document.getElementById('Correo').value = correo;
+                document.getElementById('Clave').value = clave;
+                document.getElementById('IdRol').value = idRol;
+                document.getElementById('Estado').value = estado;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalUsuario'));
+                modal.show();
+            }
+
+            function verDetalle(id, documento, nombre, correo, rol, estado) {
+                document.getElementById('detalleId').innerText = id;
+                document.getElementById('detalleDocumento').innerText = documento;
+                document.getElementById('detalleNombre').innerText = nombre;
+                document.getElementById('detalleCorreo').innerText = correo;
+                document.getElementById('detalleRol').innerText = rol;
+                document.getElementById('detalleEstado').innerText = estado;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+                modal.show();
+            }
+
+            document.getElementById('txtBuscar').addEventListener('keyup', function () {
+                const filtro = this.value.toLowerCase();
+                const filas = document.querySelectorAll('#tablaUsuarios tr');
+
+                filas.forEach(fila => {
+                    fila.style.display = fila.innerText.toLowerCase().includes(filtro) ? '' : 'none';
+                });
+            });
+    </script>
+</body>
+</html>
