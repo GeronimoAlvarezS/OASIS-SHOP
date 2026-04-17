@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OasisShop.Web.Models.ViewModels;
+﻿using CapaDatos;
 using CapaEntidad;
 using CapaNegocio;
+using Microsoft.AspNetCore.Mvc;
+using OasisShop.Web.Models.ViewModels;
 using System.Linq;
 
 namespace OasisShop.Web.Controllers
 {
     public class CategoriaController : Controller
     {
-        private readonly CN_Categoria _categoriaServicio = new CN_Categoria();
+        private readonly CategoriaDatos _categoriaServicio = new CategoriaDatos();
 
         [HttpGet]
         public IActionResult Index()
