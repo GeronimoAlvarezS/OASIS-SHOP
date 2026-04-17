@@ -21,37 +21,33 @@ namespace OasisShop.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
+                TempData["AlertType"] = "warning";
+                TempData["AlertMessage"] = "Debes completar todos los campos obligatorios.";
                 return View("~/Views/Auth/Login.cshtml", model);
             }
 
             string documento = model.Documento?.Trim() ?? string.Empty;
             string clave = model.Clave?.Trim() ?? string.Empty;
 
-            List<Usuario> listaUsuarios = new UsuarioServicio().Listar();
-
-            Usuario usuario = listaUsuarios.FirstOrDefault(u =>
-                (u.Documento ?? string.Empty).Trim() == documento &&
-                (u.Clave ?? string.Empty).Trim() == clave);
+            Usuario usuario = new UsuarioServicio().ObtenerPorCredenciales(documento, clave);
 
             if (usuario == null)
             {
-                string usuariosDebug = string.Join(" | ", listaUsuarios.Select(u =>
-                    $"Id:{u.IdUsuario}, Doc:'{u.Documento}', Clave:'{u.Clave}', Estado:{u.Estado}"));
-
-                ViewBag.DebugInfo = $"Documento recibido: '{documento}' | Clave recibida: '{clave}' | Total usuarios: {listaUsuarios.Count} | Datos: {usuariosDebug}";
-                ModelState.AddModelError(string.Empty, "Documento o clave incorrectos.");
+                TempData["AlertType"] = "danger";
+                TempData["AlertMessage"] = "Documento o clave incorrectos.";
                 return View("~/Views/Auth/Login.cshtml", model);
             }
 
             if (!usuario.Estado)
             {
-                ModelState.AddModelError(string.Empty, "El usuario está inactivo.");
+                TempData["AlertType"] = "info";
+                TempData["AlertMessage"] = "El usuario está inactivo.";
                 return View("~/Views/Auth/Login.cshtml", model);
             }
 
             HttpContext.Session.SetInt32("IdUsuario", usuario.IdUsuario);
-            HttpContext.Session.SetString("NombreCompleto", usuario.NombreCompleto);
-            HttpContext.Session.SetString("Documento", usuario.Documento);
+            HttpContext.Session.SetString("NombreCompleto", usuario.NombreCompleto ?? string.Empty);
+            HttpContext.Session.SetString("Documento", usuario.Documento ?? string.Empty);
             HttpContext.Session.SetInt32("IdRol", usuario.oRol.IdRol);
 
             List<Permiso> listaPermisos = new PermisoServicio().Listar(usuario.IdUsuario);
@@ -59,12 +55,17 @@ namespace OasisShop.Web.Controllers
 
             HttpContext.Session.SetString("Permisos", permisos);
 
+            TempData["AlertType"] = "success";
+            TempData["AlertMessage"] = "Inicio de sesión exitoso.";
+
             return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            TempData["AlertType"] = "info";
+            TempData["AlertMessage"] = "Has cerrado sesión correctamente.";
             return RedirectToAction("Login", "Auth");
         }
     }

@@ -14,142 +14,222 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <style>
-            * {
-                box-sizing: border-box;
-            }
+        * {
+            box-sizing: border-box;
+        }
 
-            html, body {
-                height: 100%;
-                margin: 0;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-            body {
-                background: url('/img/FondoLogin.png') no-repeat center center fixed;
-                background-size: cover;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
+        body {
+            background: url('/img/FondoLogin.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-            .login-wrapper {
-                width: 100%;
-                max-width: 1000px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 20px;
-            }
+        .login-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-            .login-card {
-                width: 100%;
-                max-width: 320px;
-                background-color: #F8F8F8;
-                border-radius: 18px;
-                padding: 28px 24px 20px 24px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
-            }
+        .login-card {
+            width: 100%;
+            max-width: 320px;
+            background-color: #F8F8F8;
+            border-radius: 18px;
+            padding: 28px 24px 20px 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+        }
 
-            .logo-container {
-                text-align: center;
-                margin-bottom: 18px;
-            }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 18px;
+        }
 
-                .logo-container img {
-                    width: 150px;
-                    max-width: 100%;
-                    height: auto;
-                }
+        .logo-container img {
+            width: 150px;
+            max-width: 100%;
+            height: auto;
+        }
 
-            .login-title {
-                font-size: 18px;
-                font-weight: 700;
-                color: #111111;
-                margin-bottom: 22px;
-            }
+        .login-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 22px;
+        }
 
-            .form-group-custom {
-                margin-bottom: 18px;
-            }
+        .form-group-custom {
+            margin-bottom: 18px;
+        }
 
-            .form-label-custom {
-                display: block;
-                font-size: 13px;
-                font-weight: 600;
-                color: #1E1E1E;
-                margin-bottom: 6px;
-            }
+        .form-label-custom {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1E1E1E;
+            margin-bottom: 6px;
+        }
 
-            .input-icon-group {
-                display: flex;
-                align-items: center;
-                width: 100%;
-                height: 30px;
-                border: 1px solid #8D8D8D;
-                border-radius: 5px;
-                background-color: #FFFFFF;
-                overflow: hidden;
-            }
+        .input-icon-group {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 30px;
+            border: 1px solid #8D8D8D;
+            border-radius: 5px;
+            background-color: #FFFFFF;
+            overflow: hidden;
+        }
 
-            .input-icon {
-                width: 34px;
-                min-width: 34px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #7A7A7A;
-                font-size: 14px;
-                border-right: 1px solid #D7D7D7;
-                background-color: #FFFFFF;
-            }
+        .input-icon {
+            width: 34px;
+            min-width: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7A7A7A;
+            font-size: 14px;
+            border-right: 1px solid #D7D7D7;
+            background-color: #FFFFFF;
+        }
 
-            .input-custom {
-                border: none;
-                outline: none;
-                width: 100%;
-                height: 100%;
-                padding: 4px 10px;
-                font-size: 13px;
-                background-color: transparent;
-                color: #222222;
-            }
+        .input-custom {
+            border: none;
+            outline: none;
+            width: 100%;
+            height: 100%;
+            padding: 4px 10px;
+            font-size: 13px;
+            background-color: transparent;
+            color: #222222;
+        }
 
-            .btn-login {
-                width: 100%;
-                height: 32px;
-                border: none;
-                border-radius: 5px;
-                background-color: #3C227B;
-                color: #FFFFFF;
-                font-size: 13px;
-                font-weight: 600;
-                margin-top: 10px;
-            }
+        .btn-login {
+            width: 100%;
+            height: 32px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3C227B;
+            color: #FFFFFF;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
 
-            .login-footer {
-                text-align: center;
-                margin-top: 18px;
-                font-size: 13px;
-                color: #666666;
-            }
+        .login-footer {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #666666;
+        }
 
-                .login-footer a {
-                    color: #6B4BFF;
-                    text-decoration: none;
-                    font-weight: 500;
-                }
+        .login-footer a {
+            color: #6B4BFF;
+            text-decoration: none;
+            font-weight: 500;
+        }
 
-            .menu-icon-img {
-                width: 20px;
-                height: 20px;
-            }
+        .menu-icon-img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ALERTAS */
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .alert-custom {
+            min-width: 260px;
+            max-width: 320px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.18);
+            animation: slideIn 0.4s ease;
+        }
+
+        .alert-success {
+            background-color: #2EB85C;
+        }
+
+        .alert-danger {
+            background-color: #E55353;
+        }
+
+        .alert-warning {
+            background-color: #F9B115;
+        }
+
+        .alert-info {
+            background-color: #3399FF;
+        }
+
+        .alert-message {
+            flex: 1;
+            text-align: center;
+            line-height: 1.25;
+            padding-right: 8px;
+        }
+
+        .alert-close {
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            color: #FFFFFF;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        @@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
     </style>
 </head>
 <body>
+    <div id="alertContainer" class="alert-container"></div>
+
     <div class="login-wrapper">
         <div class="login-card">
-
-            
             <div class="logo-container">
                 <img src="/img/LogoOasis.png" alt="OASIS SHOP" />
             </div>
@@ -159,7 +239,7 @@
             <form asp-action="Login" method="post">
                 @Html.AntiForgeryToken()
 
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="d-none"></div>
 
                 <div class="form-group-custom">
                     <label asp-for="Documento">Documento de identidad</label>
@@ -169,6 +249,7 @@
                         </span>
                         <input asp-for="Documento" class="input-custom" />
                     </div>
+                    <span asp-validation-for="Documento" class="text-danger small"></span>
                 </div>
 
                 <div class="form-group-custom">
@@ -179,6 +260,7 @@
                         </span>
                         <input asp-for="Clave" type="password" class="input-custom" />
                     </div>
+                    <span asp-validation-for="Clave" class="text-danger small"></span>
                 </div>
 
                 <button type="submit" class="btn-login">Iniciar Sesión</button>
@@ -187,8 +269,66 @@
                     ¿No tienes cuenta? <a href="#">Contacta al administrador</a>
                 </div>
             </form>
-
         </div>
     </div>
+
+    <script>
+        function showAlert(tipo, mensaje) {
+            const container = document.getElementById("alertContainer");
+
+            const alert = document.createElement("div");
+            alert.className = `alert-custom alert-${tipo}`;
+
+            alert.innerHTML = `
+                <span class="alert-message">${mensaje}</span>
+                <button type="button" class="alert-close" onclick="closeAlert(this)">×</button>
+            `;
+
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                if (alert) {
+                    alert.style.animation = "fadeOut 0.4s ease forwards";
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 400);
+                }
+            }, 3000);
+        }
+
+        function closeAlert(element) {
+            const alert = element.parentElement;
+            alert.style.animation = "fadeOut 0.4s ease forwards";
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 400);
+        }
+    </script>
+
+    @if (TempData["AlertMessage"] != null && TempData["AlertType"] != null)
+    {
+        <script>
+            showAlert("@TempData["AlertType"]", "@TempData["AlertMessage"]");
+        </script>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        var errores = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+        if (errores.Any())
+        {
+            <script>
+                showAlert("danger", "@Html.Raw(string.Join(" ", errores).Replace("\"", "\\\""))");
+            </script>
+        }
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 </body>
 </html>
