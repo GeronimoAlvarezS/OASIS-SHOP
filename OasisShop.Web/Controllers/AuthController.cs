@@ -21,8 +21,6 @@ namespace OasisShop.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["AlertType"] = "warning";
-                TempData["AlertMessage"] = "Debes completar todos los campos obligatorios.";
                 return View("~/Views/Auth/Login.cshtml", model);
             }
 
@@ -33,15 +31,12 @@ namespace OasisShop.Web.Controllers
 
             if (usuario == null)
             {
-                TempData["AlertType"] = "danger";
-                TempData["AlertMessage"] = "Documento o clave incorrectos.";
+                TempData["LoginError"] = "Documento o clave incorrectos.";
                 return View("~/Views/Auth/Login.cshtml", model);
             }
 
             if (!usuario.Estado)
             {
-                TempData["AlertType"] = "info";
-                TempData["AlertMessage"] = "El usuario está inactivo.";
                 return View("~/Views/Auth/Login.cshtml", model);
             }
 
@@ -55,17 +50,12 @@ namespace OasisShop.Web.Controllers
 
             HttpContext.Session.SetString("Permisos", permisos);
 
-            TempData["AlertType"] = "success";
-            TempData["AlertMessage"] = "Inicio de sesión exitoso.";
-
             return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            TempData["AlertType"] = "info";
-            TempData["AlertMessage"] = "Has cerrado sesión correctamente.";
             return RedirectToAction("Login", "Auth");
         }
     }
