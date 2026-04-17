@@ -59,25 +59,28 @@
                     border-radius: 10px;
                 }
 
-                .sidebar.collapsed {
-                    width: 0;
-                    min-width: 0;
-                    padding-left: 0;
-                    padding-right: 0;
-                    overflow: hidden;
-                }
+            /* Cuando el menú está oculto */
+            .app-container.sidebar-hidden .sidebar {
+                width: 0;
+                min-width: 0;
+                padding-left: 0;
+                padding-right: 0;
+                overflow: hidden;
+            }
 
             .brand-title {
                 font-size: 28px;
                 font-weight: 800;
                 color: #FFFFFF;
                 margin-bottom: 8px;
+                white-space: nowrap;
             }
 
             .user-summary {
                 font-size: 14px;
                 color: #FFFFFF;
                 margin-bottom: 26px;
+                white-space: nowrap;
             }
 
             .menu-section-title {
@@ -85,6 +88,7 @@
                 font-weight: 700;
                 color: #8E8C9E;
                 margin: 18px 0 10px 10px;
+                white-space: nowrap;
             }
 
             .nav-custom {
@@ -108,6 +112,7 @@
                 font-size: 17px;
                 font-weight: 600;
                 transition: background-color .2s ease;
+                white-space: nowrap;
             }
 
                 .nav-link-custom:hover {
@@ -158,6 +163,9 @@
                 line-height: 1;
                 cursor: pointer;
                 user-select: none;
+                border: none;
+                background: transparent;
+                padding: 0;
             }
 
             .topbar-user-wrapper {
@@ -232,15 +240,16 @@
                     z-index: 1200;
                     width: 270px;
                     min-width: 270px;
+                    transition: transform 0.25s ease;
                 }
 
-                    .sidebar.collapsed {
-                        transform: translateX(-100%);
-                        width: 270px;
-                        min-width: 270px;
-                        padding-left: 12px;
-                        padding-right: 12px;
-                    }
+                .app-container.sidebar-hidden .sidebar {
+                    width: 270px;
+                    min-width: 270px;
+                    padding-left: 12px;
+                    padding-right: 12px;
+                    transform: translateX(-100%);
+                }
 
                 .topbar {
                     padding: 0 16px;
@@ -249,7 +258,7 @@
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container" id="appContainer">
         <aside class="sidebar" id="sidebar">
             <div class="brand-title">OASIS SHOP</div>
             <div class="user-summary">Bienvenido, @nombreCompleto</div>
@@ -384,10 +393,10 @@
 
         <main class="main-container">
             <div class="topbar">
-                <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+                <button type="button" class="menu-toggle" id="btnToggleSidebar">☰</button>
 
                 <div class="topbar-user-wrapper" id="userDropdownWrapper">
-                    <div class="topbar-user" onclick="toggleUserDropdown()">
+                    <div class="topbar-user" id="btnUserDropdown">
                         <span>@nombreCompleto</span>
                         <span class="arrow">▼</span>
                     </div>
@@ -408,22 +417,30 @@
     </div>
 
     <script>
-            function toggleSidebar() {
-                const sidebar = document.getElementById('sidebar');
-                sidebar.classList.toggle('collapsed');
-            }
+            document.addEventListener('DOMContentLoaded', function () {
+                const appContainer = document.getElementById('appContainer');
+                const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+                const userDropdownWrapper = document.getElementById('userDropdownWrapper');
+                const btnUserDropdown = document.getElementById('btnUserDropdown');
 
-            function toggleUserDropdown() {
-                const wrapper = document.getElementById('userDropdownWrapper');
-                wrapper.classList.toggle('open');
-            }
-
-            document.addEventListener('click', function (event) {
-                const wrapper = document.getElementById('userDropdownWrapper');
-
-                if (wrapper && !wrapper.contains(event.target)) {
-                    wrapper.classList.remove('open');
+                if (btnToggleSidebar) {
+                    btnToggleSidebar.addEventListener('click', function () {
+                        appContainer.classList.toggle('sidebar-hidden');
+                    });
                 }
+
+                if (btnUserDropdown) {
+                    btnUserDropdown.addEventListener('click', function (event) {
+                        event.stopPropagation();
+                        userDropdownWrapper.classList.toggle('open');
+                    });
+                }
+
+                document.addEventListener('click', function (event) {
+                    if (userDropdownWrapper && !userDropdownWrapper.contains(event.target)) {
+                        userDropdownWrapper.classList.remove('open');
+                    }
+                });
             });
     </script>
 
