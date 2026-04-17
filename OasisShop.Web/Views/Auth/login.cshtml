@@ -144,7 +144,7 @@
             height: 20px;
         }
 
-        /* ALERTAS */
+        /* ALERTA SOLO DANGER */
         .alert-container {
             position: fixed;
             top: 20px;
@@ -169,22 +169,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             border: 1px solid rgba(0,0,0,0.18);
             animation: slideIn 0.4s ease;
-        }
-
-        .alert-success {
-            background-color: #2EB85C;
-        }
-
-        .alert-danger {
             background-color: #E55353;
-        }
-
-        .alert-warning {
-            background-color: #F9B115;
-        }
-
-        .alert-info {
-            background-color: #3399FF;
         }
 
         .alert-message {
@@ -207,22 +192,22 @@
         }
 
         @@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
-@@keyframes fadeOut {
-    to {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-}
+        @@keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
     </style>
 </head>
 <body>
@@ -273,11 +258,11 @@
     </div>
 
     <script>
-        function showAlert(tipo, mensaje) {
+        function showAlert(mensaje) {
             const container = document.getElementById("alertContainer");
 
             const alert = document.createElement("div");
-            alert.className = `alert-custom alert-${tipo}`;
+            alert.className = "alert-custom";
 
             alert.innerHTML = `
                 <span class="alert-message">${mensaje}</span>
@@ -293,7 +278,7 @@
                         if (alert.parentNode) {
                             alert.remove();
                         }
-                    }, 400);
+                    }, 700);
                 }
             }, 3000);
         }
@@ -305,26 +290,15 @@
                 if (alert.parentNode) {
                     alert.remove();
                 }
-            }, 400);
+            }, 700);
         }
     </script>
 
-    @if (TempData["AlertMessage"] != null && TempData["AlertType"] != null)
+    @if (TempData["LoginError"] != null)
     {
         <script>
-            showAlert("@TempData["AlertType"]", "@TempData["AlertMessage"]");
+            showAlert("@TempData["LoginError"]");
         </script>
-    }
-
-    @if (!ViewData.ModelState.IsValid)
-    {
-        var errores = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-        if (errores.Any())
-        {
-            <script>
-                showAlert("danger", "@Html.Raw(string.Join(" ", errores).Replace("\"", "\\\""))");
-            </script>
-        }
     }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
