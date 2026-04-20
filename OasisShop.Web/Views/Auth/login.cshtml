@@ -139,9 +139,9 @@
                 object-fit: contain;
             }
 
-                .toggle-password:hover {
-                    color: #3C227B;
-                }
+            .toggle-password:hover {
+                color: #3C227B;
+            }
 
             .btn-login {
                 width: 100%;
@@ -197,7 +197,15 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
                 border: 1px solid rgba(0,0,0,0.18);
                 animation: slideIn 0.4s ease;
-                background-color: #E55353;
+                background-color: #C63637;
+            }
+
+            .alert-error {
+                background-color: #C63637;
+            }
+
+            .alert-warning {
+                background-color: #FFCE1B;
             }
 
             .alert-message {
@@ -294,11 +302,11 @@
     </div>
 
     <script>
-            function showAlert(mensaje) {
+            function showAlert(mensaje, tipo = "error") {
                 const container = document.getElementById("alertContainer");
 
                 const alert = document.createElement("div");
-                alert.className = "alert-custom";
+                alert.className = "alert-custom " + (tipo === "warning" ? "alert-warning" : "alert-error");
 
                 alert.innerHTML = `
                     <span class="alert-message">${mensaje}</span>
@@ -329,7 +337,7 @@
                 }, 700);
             }
 
-                        function togglePassword(inputId, button) {
+            function togglePassword(inputId, button) {
                 const input = document.getElementById(inputId);
 
                 if (!input) return;
@@ -351,7 +359,14 @@
     @if (TempData["LoginError"] != null)
     {
         <script>
-                showAlert("@TempData["LoginError"]");
+                showAlert("@TempData["LoginError"]", "error");
+        </script>
+    }
+
+    @if (TempData["LoginWarning"] != null)
+    {
+        <script>
+                showAlert("@TempData["LoginWarning"]", "warning");
         </script>
     }
 

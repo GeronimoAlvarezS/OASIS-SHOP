@@ -37,6 +37,7 @@ namespace OasisShop.Web.Controllers
 
             if (!usuario.Estado)
             {
+                TempData["LoginWarning"] = "Usted no se encuentra activo en el sistema. Comuníquese con el administrador.";
                 return View("~/Views/Auth/Login.cshtml", model);
             }
 
