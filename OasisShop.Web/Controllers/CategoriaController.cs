@@ -1,9 +1,7 @@
 ﻿using CapaDatos;
 using CapaEntidad;
-using CapaNegocio;
 using Microsoft.AspNetCore.Mvc;
 using OasisShop.Web.Models.ViewModels;
-using System.Linq;
 
 namespace OasisShop.Web.Controllers
 {
@@ -12,18 +10,46 @@ namespace OasisShop.Web.Controllers
         private readonly CategoriaDatos _categoriaServicio = new CategoriaDatos();
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1, string busqueda = "")
         {
+            int registrosPorPagina = 5;
+
             var listaEntidad = _categoriaServicio.Listar();
 
-            var listaViewModel = listaEntidad.Select(c => new CategoriaViewModel
+            if (!string.IsNullOrWhiteSpace(busqueda))
             {
-                IdCategoria = c.IdCategoria,
-                Descripcion = c.Descripcion,
-                Estado = c.Estado
-            }).ToList();
+                string filtro = busqueda.Trim().ToLower();
 
-            return View("~/Views/Categoria/Categoria.cshtml", listaViewModel);
+                listaEntidad = listaEntidad
+                    .Where(c =>
+                        (c.Descripcion ?? string.Empty).ToLower().Contains(filtro) ||
+                        (c.Estado ? "activo" : "inactivo").Contains(filtro) ||
+                        c.IdCategoria.ToString().Contains(filtro)
+                    )
+                    .ToList();
+            }
+
+            int totalRegistros = listaEntidad.Count();
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / registrosPorPagina);
+
+            var categoriasPaginadas = listaEntidad
+                .Skip((pagina - 1) * registrosPorPagina)
+                .Take(registrosPorPagina)
+                .Select(c => new CategoriaViewModel
+                {
+                    IdCategoria = c.IdCategoria,
+                    Descripcion = c.Descripcion,
+                    Estado = c.Estado
+                })
+                .ToList();
+
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas == 0 ? 1 : totalPaginas;
+            ViewBag.RegistrosPorPagina = registrosPorPagina;
+            ViewBag.TotalRegistros = totalRegistros;
+            ViewBag.Busqueda = busqueda;
+
+            return View("~/Views/Categoria/Categoria.cshtml", categoriasPaginadas);
         }
 
         [HttpPost]
