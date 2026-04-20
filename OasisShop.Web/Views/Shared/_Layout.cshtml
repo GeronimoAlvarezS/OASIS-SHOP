@@ -1,9 +1,32 @@
 ﻿@using Microsoft.AspNetCore.Http
+@using System
+@using System.Linq
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    var permisos = HttpContextAccessor.HttpContext.Session.GetString("Permisos") ?? string.Empty;
+    var permisosTexto = HttpContextAccessor.HttpContext.Session.GetString("Permisos") ?? string.Empty;
     var nombreCompleto = HttpContextAccessor.HttpContext.Session.GetString("NombreCompleto") ?? "Usuario";
+
+    var permisos = permisosTexto
+        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+        .Select(p => p.Trim().ToLower())
+        .ToList();
+
+    var controladorActual = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var accionActual = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+
+    string ClaseActiva(string controlador, string accion = "Index")
+    {
+        return controladorActual.Equals(controlador, StringComparison.OrdinalIgnoreCase)
+            && accionActual.Equals(accion, StringComparison.OrdinalIgnoreCase)
+            ? "active"
+            : string.Empty;
+    }
+
+    bool TienePermiso(string permiso)
+    {
+        return permisos.Contains(permiso.Trim().ToLower());
+    }
 }
 
 <!DOCTYPE html>
@@ -12,22 +35,38 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - OASIS SHOP</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <style>
             * {
                 box-sizing: border-box;
+                font-family: 'Fredoka', sans-serif;
             }
 
             html, body {
                 height: 100%;
                 margin: 0;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family: 'Fredoka', sans-serif;
                 background: #ECEDEF;
             }
 
             body {
                 overflow: hidden;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-weight: 700;
+            }
+
+            button,
+            .nav-link-custom,
+            .logout-btn {
+                font-weight: 400;
             }
 
             .app-container {
@@ -59,7 +98,6 @@
                     border-radius: 10px;
                 }
 
-            /* Cuando el menú está oculto */
             .app-container.sidebar-hidden .sidebar {
                 width: 0;
                 min-width: 0;
@@ -110,9 +148,10 @@
                 padding: 11px 14px;
                 border-radius: 8px;
                 font-size: 17px;
-                font-weight: 600;
+                font-weight: 500;
                 transition: background-color .2s ease;
                 white-space: nowrap;
+                overflow: hidden;
             }
 
                 .nav-link-custom:hover {
@@ -122,19 +161,34 @@
 
                 .nav-link-custom.active {
                     background: #4B43D1;
+                    color: #FFFFFF;
                 }
 
             .nav-icon {
                 width: 22px;
                 min-width: 22px;
-                text-align: center;
-                font-size: 18px;
+                height: 22px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+
+            .nav-img-icon {
+                width: 16px;
+                height: 16px;
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                display: block;
             }
 
             .nav-arrow {
                 margin-left: auto;
                 font-size: 18px;
-                font-weight: 700;
+                font-weight: 600;
+                line-height: 1;
             }
 
             .main-container {
@@ -163,13 +217,16 @@
                 line-height: 1;
                 cursor: pointer;
                 user-select: none;
-                border: none;
                 background: transparent;
+                border: none;
                 padding: 0;
             }
 
             .topbar-user-wrapper {
                 position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
             }
 
             .topbar-user {
@@ -178,25 +235,37 @@
                 gap: 10px;
                 color: #111111;
                 font-size: 16px;
-                font-weight: 600;
+                font-weight: 500;
+                background: transparent;
+                border: none;
                 cursor: pointer;
-                user-select: none;
+                padding: 0;
             }
 
-                .topbar-user .arrow {
-                    font-size: 13px;
-                    transition: transform 0.2s ease;
-                }
+            .topbar-user-name {
+                color: #111111;
+                font-size: 16px;
+                font-weight: 600;
+                line-height: 1;
+            }
+
+            .topbar-user .arrow {
+                font-size: 22px;
+                font-weight: 400;
+                line-height: 1;
+                display: inline-block;
+                transition: transform 0.2s ease;
+            }
 
             .topbar-user-wrapper.open .arrow {
-                transform: rotate(180deg);
+                transform: rotate(90deg);
             }
 
             .user-dropdown {
                 position: absolute;
-                top: 42px;
+                top: calc(100% + 10px);
                 right: 0;
-                min-width: 170px;
+                min-width: 180px;
                 display: none;
                 z-index: 2000;
             }
@@ -254,19 +323,38 @@
                 .topbar {
                     padding: 0 16px;
                 }
+
+                body, span, div, p, a, button {
+                    font-weight: 400 !important;
+                }
+
+                h1, h2, h3, h4, h5, h6 {
+                    font-weight: 700 !important;
+                }
+
+                .topbar-user,
+                .topbar-user span {
+                    font-weight: 400 !important;
+                }
+
+                    .topbar-user .arrow {
+                        font-size: 22px;
+                        font-weight: 300 !important;
+                        opacity: 0.7;
+                    }
             }
     </style>
 </head>
 <body>
     <div class="app-container" id="appContainer">
         <aside class="sidebar" id="sidebar">
-            <div class="brand-title">OASIS SHOP</div>
-            <div class="user-summary">Bienvenido, @nombreCompleto</div>
 
             <ul class="nav-custom">
                 <li class="nav-item-custom">
-                    <a class="nav-link-custom active" asp-controller="Home" asp-action="Index">
-                        <span class="nav-icon">🏠</span>
+                    <a class="nav-link-custom @ClaseActiva("Home")" asp-controller="Home" asp-action="Index">
+                        <span class="nav-icon">
+                            <img src="~/img/menuInicio.png" alt="Inicio" class="nav-img-icon" />
+                        </span>
                         <span>Inicio</span>
                     </a>
                 </li>
@@ -274,53 +362,63 @@
 
             <div class="menu-section-title">Gestión</div>
             <ul class="nav-custom">
-                @if (permisos.Contains("menuproductos"))
+                @if (TienePermiso("menuproductos"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Productos" asp-action="Index">
-                            <span class="nav-icon">📦</span>
+                        <a class="nav-link-custom @ClaseActiva("Productos")" asp-controller="Productos" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Productos.png" alt="Productos" class="nav-img-icon" />
+                            </span>
                             <span>Productos</span>
                         </a>
                     </li>
                 }
 
-                @if (permisos.Contains("menuventas"))
+                @if (TienePermiso("menuventas"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Ventas" asp-action="Index">
-                            <span class="nav-icon">💸</span>
+                        <a class="nav-link-custom @ClaseActiva("Ventas")" asp-controller="Ventas" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Ventas.png" alt="Ventas" class="nav-img-icon" />
+                            </span>
                             <span>Ventas</span>
                             <span class="nav-arrow">›</span>
                         </a>
                     </li>
                 }
 
-                @if (permisos.Contains("menucompras"))
+                @if (TienePermiso("menucompras"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Compras" asp-action="Index">
-                            <span class="nav-icon">🛒</span>
+                        <a class="nav-link-custom @ClaseActiva("Compras")" asp-controller="Compras" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Compras.png" alt="Compras" class="nav-img-icon" />
+                            </span>
                             <span>Compras</span>
                             <span class="nav-arrow">›</span>
                         </a>
                     </li>
                 }
 
-                @if (permisos.Contains("menuclientes"))
+                @if (TienePermiso("menuclientes"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Clientes" asp-action="Index">
-                            <span class="nav-icon">👥</span>
+                        <a class="nav-link-custom @ClaseActiva("Clientes")" asp-controller="Clientes" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Clientes.png" alt="Clientes" class="nav-img-icon" />
+                            </span>
                             <span>Clientes</span>
                         </a>
                     </li>
                 }
 
-                @if (permisos.Contains("menuproveedores"))
+                @if (TienePermiso("menuproveedores"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Proveedores" asp-action="Index">
-                            <span class="nav-icon">🏭</span>
+                        <a class="nav-link-custom @ClaseActiva("Proveedores")" asp-controller="Proveedores" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Proveedores.png" alt="Proveedores" class="nav-img-icon" />
+                            </span>
                             <span>Proveedores</span>
                         </a>
                     </li>
@@ -329,32 +427,26 @@
 
             <div class="menu-section-title">Reportes</div>
             <ul class="nav-custom">
-                @if (permisos.Contains("menucompras"))
+                @if (TienePermiso("menucompras"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Compras" asp-action="Index">
-                            <span class="nav-icon">🧾</span>
+                        <a class="nav-link-custom @ClaseActiva("ReporteCompras")" asp-controller="ReporteCompras" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/ReporteCompras.png" alt="Reporte Compras" class="nav-img-icon" />
+                            </span>
                             <span>Compras</span>
                         </a>
                     </li>
                 }
 
-                @if (permisos.Contains("menuventas"))
+                @if (TienePermiso("menuventas"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Ventas" asp-action="Index">
-                            <span class="nav-icon">📄</span>
+                        <a class="nav-link-custom @ClaseActiva("ReporteVentas")" asp-controller="ReporteVentas" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/ReporteVentas.png" alt="Reporte Ventas" class="nav-img-icon" />
+                            </span>
                             <span>Ventas</span>
-                        </a>
-                    </li>
-                }
-
-                @if (permisos.Contains("menureportes"))
-                {
-                    <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Reportes" asp-action="Index">
-                            <span class="nav-icon">📊</span>
-                            <span>Reportes</span>
                         </a>
                     </li>
                 }
@@ -362,32 +454,41 @@
 
             <div class="menu-section-title">Configuración</div>
             <ul class="nav-custom">
-                @if (permisos.Contains("menuusuarios"))
+                @if (TienePermiso("menuusuarios"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Usuario" asp-action="Index">
-                            <span class="nav-icon">👨‍👩‍👧‍👦</span>
+                        <a class="nav-link-custom @ClaseActiva("Usuario")" asp-controller="Usuario" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Usuarios.png" alt="Usuarios" class="nav-img-icon" />
+                            </span>
                             <span>Usuarios</span>
                         </a>
                     </li>
                 }
 
-                @if (permisos.Contains("menucategorias"))
+                @if (TienePermiso("menucategorias"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom" asp-controller="Categoria" asp-action="Index">
-                            <span class="nav-icon">◻️</span>
-                            <span>Categoria</span>
+                        <a class="nav-link-custom @ClaseActiva("Categoria")" asp-controller="Categoria" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Categoria.png" alt="Categoria" class="nav-img-icon" />
+                            </span>
+                            <span>Categoría</span>
                         </a>
                     </li>
                 }
 
-                <li class="nav-item-custom">
-                    <a class="nav-link-custom" href="#">
-                        <span class="nav-icon">🏪</span>
-                        <span>Negocio</span>
-                    </a>
-                </li>
+                @if (TienePermiso("menunegocio"))
+                {
+                    <li class="nav-item-custom">
+                        <a class="nav-link-custom @ClaseActiva("Negocio")" asp-controller="Negocio" asp-action="Index">
+                            <span class="nav-icon">
+                                <img src="~/img/Negocio.png" alt="Negocio" class="nav-img-icon" />
+                            </span>
+                            <span>Negocio</span>
+                        </a>
+                    </li>
+                }
             </ul>
         </aside>
 
@@ -396,15 +497,17 @@
                 <button type="button" class="menu-toggle" id="btnToggleSidebar">☰</button>
 
                 <div class="topbar-user-wrapper" id="userDropdownWrapper">
-                    <div class="topbar-user" id="btnUserDropdown">
+                    <button type="button" class="topbar-user" id="btnUserDropdown">
                         <span>@nombreCompleto</span>
-                        <span class="arrow">▼</span>
-                    </div>
+                        <span class="arrow">&gt;</span>
+                    </button>
 
                     <div class="user-dropdown">
                         <a asp-controller="Auth" asp-action="Logout" class="logout-btn">
                             <span>Cerrar sesión</span>
-                            <span>⇱</span>
+                            <span class="nav-icon">
+                                <img src="~/img/CerrarSesion.png" alt="Cerrar Sesión" class="nav-img-icon" />
+                            </span>
                         </a>
                     </div>
                 </div>
@@ -444,6 +547,7 @@
             });
     </script>
 
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
