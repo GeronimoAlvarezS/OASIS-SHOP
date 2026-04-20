@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CapaEntidad;
 using CapaNegocio;
+using System;
+using System.Linq;
 
 namespace OasisShop.Web.Controllers
 {
@@ -9,10 +11,43 @@ namespace OasisShop.Web.Controllers
         private readonly UsuarioServicio _usuarioServicio = new UsuarioServicio();
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1, string busqueda = "")
         {
+            int registrosPorPagina = 5;
+
             var lista = _usuarioServicio.Listar();
-            return View("~/Views/Usuario/Usuario.cshtml", lista);
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                string filtro = busqueda.Trim().ToLower();
+
+                lista = lista
+                    .Where(u =>
+                        (u.Documento ?? string.Empty).ToLower().Contains(filtro) ||
+                        (u.NombreCompleto ?? string.Empty).ToLower().Contains(filtro) ||
+                        (u.Correo ?? string.Empty).ToLower().Contains(filtro) ||
+                        (u.oRol != null && (u.oRol.Descripcion ?? string.Empty).ToLower().Contains(filtro)) ||
+                        (u.Estado ? "activo" : "inactivo").Contains(filtro) ||
+                        u.IdUsuario.ToString().Contains(filtro)
+                    )
+                    .ToList();
+            }
+
+            int totalRegistros = lista.Count();
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / registrosPorPagina);
+
+            var usuariosPaginados = lista
+                .Skip((pagina - 1) * registrosPorPagina)
+                .Take(registrosPorPagina)
+                .ToList();
+
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas == 0 ? 1 : totalPaginas;
+            ViewBag.RegistrosPorPagina = registrosPorPagina;
+            ViewBag.TotalRegistros = totalRegistros;
+            ViewBag.Busqueda = busqueda;
+
+            return View("~/Views/Usuario/Usuario.cshtml", usuariosPaginados);
         }
 
         [HttpPost]
