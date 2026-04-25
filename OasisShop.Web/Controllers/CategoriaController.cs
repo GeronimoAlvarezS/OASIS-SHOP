@@ -2,6 +2,8 @@
 using CapaEntidad;
 using Microsoft.AspNetCore.Mvc;
 using OasisShop.Web.Models.ViewModels;
+using System;
+using System.Linq;
 
 namespace OasisShop.Web.Controllers
 {
@@ -22,6 +24,7 @@ namespace OasisShop.Web.Controllers
 
                 listaEntidad = listaEntidad
                     .Where(c =>
+                        (c.Nombre ?? string.Empty).ToLower().Contains(filtro) ||
                         (c.Descripcion ?? string.Empty).ToLower().Contains(filtro) ||
                         (c.Estado ? "activo" : "inactivo").Contains(filtro) ||
                         c.IdCategoria.ToString().Contains(filtro)
@@ -38,6 +41,7 @@ namespace OasisShop.Web.Controllers
                 .Select(c => new CategoriaViewModel
                 {
                     IdCategoria = c.IdCategoria,
+                    Nombre = c.Nombre,
                     Descripcion = c.Descripcion,
                     Estado = c.Estado
                 })
@@ -66,7 +70,8 @@ namespace OasisShop.Web.Controllers
             var categoria = new Categoria
             {
                 IdCategoria = model.IdCategoria,
-                Descripcion = model.Descripcion,
+                Nombre = model.Nombre.Trim(),
+                Descripcion = model.Descripcion.Trim(),
                 Estado = model.Estado
             };
 
