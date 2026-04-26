@@ -267,7 +267,7 @@
     }
 
     .modal-usuario-custom .modal-dialog {
-        max-width: 410px;
+        max-width: 430px;
     }
 
     .modal-usuario-custom .modal-content {
@@ -385,7 +385,7 @@
 
     .details-item {
         text-align: center;
-        margin-bottom: 26px;
+        margin-bottom: 22px;
     }
 
     .details-label {
@@ -402,6 +402,35 @@
         color: #4B5563;
         min-height: 18px;
         word-break: break-word;
+    }
+
+    .details-permissions {
+        margin-bottom: 22px;
+    }
+
+    .permisos-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        max-width: 330px;
+        margin: 8px auto 0 auto;
+    }
+
+    .permiso-chip {
+        display: block;
+        background: transparent;
+        border: 1px solid #C9CBD1;
+        border-radius: 6px;
+        padding: 6px 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #4B5563;
+        font-family: inherit;
+        text-align: center;
+        line-height: 1.2;
+        word-break: normal;
+        white-space: normal;
+        min-height: auto;
     }
 
     .details-footer {
@@ -671,18 +700,10 @@
                     <div class="modal-group">
                         <label class="modal-label" for="CrearClave">Contraseña</label>
                         <div class="password-wrapper">
-                            <input type="password"
-                                   class="modal-input password-input"
-                                   id="CrearClave"
-                                   name="Clave"
-                                   required />
+                            <input type="password" class="modal-input password-input" id="CrearClave" name="Clave" required />
 
-                            <button type="button"
-                                    class="toggle-password"
-                                    onclick="togglePassword('CrearClave', this)">
-                                <img src="~/img/MostrarContrasena.png"
-                                     alt="Mostrar contraseña"
-                                     class="icon-ojo" />
+                            <button type="button" class="toggle-password" onclick="togglePassword('CrearClave', this)">
+                                <img src="~/img/MostrarContrasena.png" alt="Mostrar contraseña" class="icon-ojo" />
                             </button>
                         </div>
                     </div>
@@ -690,17 +711,10 @@
                     <div class="modal-group">
                         <label class="modal-label" for="CrearConfirmarClave">Confirmar Contraseña</label>
                         <div class="password-wrapper">
-                            <input type="password"
-                                   class="modal-input password-input"
-                                   id="CrearConfirmarClave"
-                                   required />
+                            <input type="password" class="modal-input password-input" id="CrearConfirmarClave" required />
 
-                            <button type="button"
-                                    class="toggle-password"
-                                    onclick="togglePassword('CrearConfirmarClave', this)">
-                                <img src="~/img/MostrarContrasena.png"
-                                     alt="Mostrar contraseña"
-                                     class="icon-ojo" />
+                            <button type="button" class="toggle-password" onclick="togglePassword('CrearConfirmarClave', this)">
+                                <img src="~/img/MostrarContrasena.png" alt="Mostrar contraseña" class="icon-ojo" />
                             </button>
                         </div>
 
@@ -770,12 +784,8 @@
                         <div class="password-wrapper">
                             <input type="password" class="modal-input password-input" id="EditarClave" name="Clave" required />
 
-                            <button type="button"
-                                    class="toggle-password"
-                                    onclick="togglePassword('EditarClave', this)">
-                                <img src="~/img/MostrarContrasena.png"
-                                     alt="Mostrar contraseña"
-                                     class="icon-ojo" />
+                            <button type="button" class="toggle-password" onclick="togglePassword('EditarClave', this)">
+                                <img src="~/img/MostrarContrasena.png" alt="Mostrar contraseña" class="icon-ojo" />
                             </button>
                         </div>
                     </div>
@@ -783,17 +793,10 @@
                     <div class="modal-group">
                         <label class="modal-label" for="EditarConfirmarClave">Confirmar Contraseña</label>
                         <div class="password-wrapper">
-                            <input type="password"
-                                   class="modal-input password-input"
-                                   id="EditarConfirmarClave"
-                                   required />
+                            <input type="password" class="modal-input password-input" id="EditarConfirmarClave" required />
 
-                            <button type="button"
-                                    class="toggle-password"
-                                    onclick="togglePassword('EditarConfirmarClave', this)">
-                                <img src="~/img/MostrarContrasena.png"
-                                     alt="Mostrar contraseña"
-                                     class="icon-ojo" />
+                            <button type="button" class="toggle-password" onclick="togglePassword('EditarConfirmarClave', this)">
+                                <img src="~/img/MostrarContrasena.png" alt="Mostrar contraseña" class="icon-ojo" />
                             </button>
                         </div>
 
@@ -863,6 +866,11 @@
                     <div class="details-item">
                         <span class="details-label">Rol</span>
                         <span class="details-value" id="detalleRol"></span>
+                    </div>
+
+                    <div class="details-item details-permissions">
+                        <span class="details-label">Permisos</span>
+                        <div id="detallePermisos" class="permisos-container"></div>
                     </div>
 
                     <div class="details-item">
@@ -1027,8 +1035,58 @@
             document.getElementById('detalleRol').innerText = rol;
             document.getElementById('detalleEstado').innerText = estado;
 
+            mostrarPermisosPorRol(rol);
+
             const modal = new bootstrap.Modal(document.getElementById('modalDetalleUsuario'));
             modal.show();
+        }
+
+        function mostrarPermisosPorRol(rol) {
+            const contenedor = document.getElementById('detallePermisos');
+
+            if (!contenedor) return;
+
+            contenedor.innerHTML = '';
+
+            const rolNormalizado = (rol || '').trim().toUpperCase();
+
+            let permisos = [];
+
+            if (rolNormalizado === 'ADMINISTRADOR') {
+                permisos = [
+                    'Inicio',
+                    'Productos',
+                    'Ventas',
+                    'Compras',
+                    'Clientes',
+                    'Proveedores',
+                    'Reporte de Compras',
+                    'Reporte de Ventas',
+                    'Usuarios',
+                    'Categoría',
+                    'Negocio'
+                ];
+            } else if (rolNormalizado === 'EMPLEADO') {
+                permisos = [
+                    'Inicio',
+                    'Productos',
+                    'Ventas',
+                    'Compras',
+                    'Clientes',
+                    'Proveedores',
+                    'Reporte de Compras',
+                    'Reporte de Ventas'
+                ];
+            } else {
+                permisos = ['Sin permisos asignados'];
+            }
+
+            permisos.forEach(function (permiso) {
+                const span = document.createElement('span');
+                span.className = 'permiso-chip';
+                span.innerText = permiso;
+                contenedor.appendChild(span);
+            });
         }
 
         function validarCrearUsuario() {
@@ -1061,23 +1119,23 @@
             const editarClave = document.getElementById('EditarClave');
             const editarConfirmar = document.getElementById('EditarConfirmarClave');
 
-                    if (txtBuscar && formBusquedaUsuarios) {
-            let temporizadorBusqueda;
-            let ultimoValor = txtBuscar.value;
+            if (txtBuscar && formBusquedaUsuarios) {
+                let temporizadorBusqueda;
+                let ultimoValor = txtBuscar.value;
 
-            txtBuscar.addEventListener('input', function () {
-                clearTimeout(temporizadorBusqueda);
+                txtBuscar.addEventListener('input', function () {
+                    clearTimeout(temporizadorBusqueda);
 
-                const valorActual = this.value;
+                    const valorActual = this.value;
 
-                temporizadorBusqueda = setTimeout(function () {
-                    if (valorActual !== ultimoValor) {
-                        ultimoValor = valorActual;
-                        formBusquedaUsuarios.submit();
-                    }
-                }, 1000);
-            });
-        }
+                    temporizadorBusqueda = setTimeout(function () {
+                        if (valorActual !== ultimoValor) {
+                            ultimoValor = valorActual;
+                            formBusquedaUsuarios.submit();
+                        }
+                    }, 1000);
+                });
+            }
 
             if (crearClave && crearConfirmar) {
                 crearClave.addEventListener('input', function () {

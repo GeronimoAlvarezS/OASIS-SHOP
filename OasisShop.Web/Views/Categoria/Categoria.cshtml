@@ -478,6 +478,13 @@
         font-weight: 500;
         color: #6B7280;
     }
+
+    .descripcion-col {
+        white-space: normal;
+        word-wrap: break-word;
+        word-break: break-word;
+        max-width: 400px;
+    }
 </style>
 
 <div id="alertContainer" class="alert-container"></div>
@@ -536,7 +543,7 @@
                                 <input type="checkbox" class="row-check" />
                             </td>
                             <td>@item.Nombre</td>
-                            <td>@item.Descripcion</td>
+                            <td class="descripcion-col">@item.Descripcion</td>
                             <td>@(item.Estado ? "Activo" : "Inactivo")</td>
                             <td class="actions-cell">
                                 <button type="button"
