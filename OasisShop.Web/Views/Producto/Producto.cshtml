@@ -1,0 +1,1060 @@
+﻿@model IEnumerable<CapaEntidad.Producto>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Productos";
+
+    var totalProductos = ViewBag.TotalRegistros != null ? (int)ViewBag.TotalRegistros : (Model?.Count() ?? 0);
+    string busquedaActual = ViewBag.Busqueda != null ? ViewBag.Busqueda.ToString() : string.Empty;
+    var categorias = ViewBag.Categorias as List<CapaEntidad.Categoria>;
+}
+
+@functions {
+    public string JsValue(object value)
+    {
+        return System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(value?.ToString() ?? "");
+    }
+
+    public string PrecioInput(decimal valor)
+    {
+        return valor.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    public string PrecioMoneda(decimal valor)
+    {
+        return valor.ToString("C0", new System.Globalization.CultureInfo("es-CO"));
+    }
+}
+
+<style>
+    .products-page {
+        padding: 18px 20px 28px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0;
+        color: #1F2937;
+    }
+
+    .page-count {
+        font-size: 14px;
+        color: #666666;
+        font-weight: 600;
+    }
+
+    .toolbar-card {
+        background: #F5F5F5;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .btn-primary-custom {
+        background: #241E65;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 7px;
+        padding: 10px 16px;
+        font-weight: 600;
+        min-width: 145px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-primary-custom:hover {
+            background: #1B174D;
+            color: #FFFFFF;
+        }
+
+    .btn-export-excel {
+        background: #F5F5F5;
+        color: #666666;
+        border: 1px solid #9CA3AF;
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        min-width: 100px;
+        min-height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 2px 3px rgba(0,0,0,0.25);
+        margin-left: 10px;
+        margin-top:10px;
+    }
+
+        .btn-export-excel:hover {
+            background: #E5E7EB;
+            color: #1F2937;
+        }
+
+    .search-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    .search-form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .search-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .search-input {
+        width: 220px;
+        height: 32px;
+        border: 1px solid #8F8F8F;
+        border-radius: 7px;
+        padding: 4px 10px 4px 32px;
+        font-size: 13px;
+        background: #F5F5F5;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4B43D1;
+            box-shadow: 0 0 0 2px rgba(75, 67, 209, 0.2);
+        }
+
+    .table-card {
+        background: #F5F5F5;
+        border-radius: 8px;
+        overflow-x: auto;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        min-width: 1050px;
+    }
+
+        .table-custom thead th {
+            background: #DCDDDF;
+            color: #676767;
+            font-weight: 500;
+            text-align: center;
+            padding: 12px 8px;
+            border: 1px solid #BFC1C6;
+        }
+
+        .table-custom tbody td {
+            background: #F5F5F5;
+            color: #5A5A5A;
+            padding: 10px 8px;
+            border: 1px solid #C9CBD1;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+    .descripcion-col {
+        max-width: 220px;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.3;
+    }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    .btn-action {
+        border: none;
+        border-radius: 4px;
+        padding: 6px 10px;
+        color: #FFFFFF;
+        font-size: 12px;
+        font-weight: 400;
+        margin: 0 2px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-edit {
+        background: #4B43D1;
+    }
+
+    .btn-detail {
+        background: #31C95B;
+    }
+
+        .btn-edit:hover,
+        .btn-detail:hover {
+            opacity: 0.92;
+        }
+
+    .icon-btn {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .alert-custom {
+        min-width: 280px;
+        max-width: 340px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: #FFFFFF;
+        font-weight: 400;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0,0,0,0.18);
+        animation: slideIn 0.4s ease;
+    }
+
+    .alert-success-custom {
+        background-color: #22C55E;
+    }
+
+    .alert-danger-custom {
+        background-color: #C63637;
+    }
+
+    .alert-warning-custom {
+        background-color: #FFCE1B;
+    }
+
+    .alert-message {
+        flex: 1;
+        text-align: center;
+        line-height: 1.25;
+        padding-right: 8px;
+    }
+
+    .alert-close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        color: #FFFFFF;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+
+    .modal-producto-custom .modal-dialog {
+        max-width: 430px;
+    }
+
+    .modal-producto-custom .modal-content {
+        border: none;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #ECEEF3;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal-header-crear,
+    .modal-header-editar,
+    .modal-header-detalle {
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 22px;
+        position: relative;
+    }
+
+    .modal-header-crear {
+        background: #1E1B4B;
+    }
+
+    .modal-header-editar {
+        background: #3F3CBB;
+    }
+
+    .modal-header-detalle {
+        background: #22C55E;
+    }
+
+    .modal-title-custom {
+        color: #FFFFFF;
+        font-size: 20px;
+        font-weight: 650;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .btn-close-custom {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #FFFFFF;
+        font-size: 28px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .modal-body-producto {
+        padding: 14px 18px 16px 18px;
+    }
+
+    .modal-label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1F2937;
+    }
+
+    .modal-input,
+    .modal-select {
+        width: 100%;
+        height: 30px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 4px 10px;
+        font-size: 14px;
+        color: #333333;
+        outline: none;
+        box-shadow: none;
+    }
+
+    .modal-textarea {
+        width: 100%;
+        min-height: 65px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 6px 10px;
+        font-size: 14px;
+        color: #333333;
+        outline: none;
+        resize: vertical;
+    }
+
+        .modal-input:focus,
+        .modal-select:focus,
+        .modal-textarea:focus {
+            border-color: #6366F1;
+            box-shadow: 0 0 0 0.14rem rgba(99, 102, 241, 0.18);
+        }
+
+    .modal-group {
+        margin-bottom: 10px;
+    }
+
+    .modal-footer-custom {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 4px;
+    }
+
+    .btn-save-modal {
+        border: none;
+        border-radius: 6px;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 7px 18px;
+        min-width: 70px;
+        background: #22C55E;
+    }
+
+        .btn-save-modal:hover {
+            background: #16A34A;
+        }
+
+    .details-container {
+        padding: 8px 8px 0 8px;
+    }
+
+    .details-item {
+        text-align: center;
+        margin-bottom: 22px;
+    }
+
+    .details-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .details-value {
+        display: block;
+        font-size: 14px;
+        color: #4B5563;
+        min-height: 18px;
+        word-break: break-word;
+    }
+
+    .details-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 8px 2px 0 2px;
+    }
+
+    .btn-close-detail {
+        border: none;
+        border-radius: 6px;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 7px 18px;
+        min-width: 70px;
+        background: #22C55E;
+    }
+
+        .btn-close-detail:hover {
+            background: #16A34A;
+        }
+
+    .pagination-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+    }
+
+    .pagination-custom {
+        list-style: none;
+        display: flex;
+        gap: 6px;
+        padding: 0;
+        margin: 0;
+        align-items: center;
+    }
+
+        .pagination-custom li a,
+        .pagination-custom li span {
+            display: block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: #E5E7EB;
+            color: #111827;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .pagination-custom li.active a {
+            background: #1E1B4B;
+            color: #FFFFFF;
+        }
+
+        .pagination-custom li a:hover {
+            background: #3F3CBB;
+            color: #FFFFFF;
+        }
+
+        .pagination-custom li.disabled span {
+            opacity: 0.6;
+            cursor: default;
+        }
+</style>
+
+<div id="alertContainer" class="alert-container"></div>
+
+<div class="products-page">
+    <div class="page-header">
+        <h1 class="page-title">Productos</h1>
+        <div class="page-count">@totalProductos Productos registrados</div>
+    </div>
+
+    <div class="toolbar-card">
+        <button type="button"
+                class="btn-primary-custom"
+                data-bs-toggle="modal"
+                data-bs-target="#modalCrearProducto"
+                onclick="limpiarFormularioCrearProducto()">
+            <img src="~/img/Agregar.png" alt="Crear producto" class="icon-btn" />
+            <span>Crear producto</span>
+        </button>
+
+    </div>
+
+    <a class="btn-export-excel"
+           href="@Url.Action("ExportarExcel", "Producto", new { busqueda = busquedaActual })"
+           onclick="showAlert('Exportando listado de productos...', 'success')">
+        Exportar Excel
+    </a>
+
+    <div class="search-row">
+        <form method="get" asp-controller="Producto" asp-action="Index" class="search-form" id="formBusquedaProductos">
+            <div class="search-container">
+                <img src="~/img/buscar.png" alt="Buscar" class="search-icon" />
+                <input type="text"
+                       class="search-input"
+                       id="txtBuscar"
+                       name="busqueda"
+                       value="@busquedaActual"
+                       placeholder="Buscar producto..." />
+            </div>
+        </form>
+    </div>
+
+    <div class="table-card">
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" /></th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Venta</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody id="tablaProductos">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><input type="checkbox" /></td>
+                            <td>@item.Codigo</td>
+                            <td>@item.Nombre</td>
+                            <td class="descripcion-col">@item.Descripcion</td>
+                            @{
+                                var nombreCategoria = categorias?
+                                    .FirstOrDefault(c => c.IdCategoria == item.oCategoria?.IdCategoria)?
+                                    .Nombre ?? "Sin categoría";
+                            }
+
+                            <td>@nombreCategoria</td>
+                            <td>@item.Stock</td>
+                            <td>@PrecioMoneda(item.PrecioCompra)</td>
+                            <td>@PrecioMoneda(item.PrecioVenta)</td>
+                            <td>@(item.Estado ? "Activo" : "Inactivo")</td>
+                            <td class="actions-cell">
+                                <button type="button"
+                                        class="btn-action btn-edit"
+                                        onclick="editarProducto(
+                                    '@item.IdProducto',
+                                    '@JsValue(item.Codigo)',
+                                    '@JsValue(item.Nombre)',
+                                    '@JsValue(item.Descripcion)',
+                                    '@(item.oCategoria != null ? item.oCategoria.IdCategoria.ToString() : "")',
+                                    '@item.Stock',
+                                    '@PrecioInput(item.PrecioCompra)',
+                                    '@PrecioInput(item.PrecioVenta)',
+                                    '@item.Estado.ToString().ToLower()'
+                                    )">
+                                    <img src="~/img/Editar.png" alt="Editar" class="icon-btn" />
+                                    <span>Editar</span>
+                                </button>
+
+                                <button type="button"
+                                        class="btn-action btn-detail"
+                                        onclick="verDetalleProducto(
+                                    '@JsValue(item.Codigo)',
+                                    '@JsValue(item.Nombre)',
+                                    '@JsValue(item.Descripcion)',
+                                    '@JsValue(nombreCategoria)',
+                                    '@item.Stock',
+                                    '@JsValue(PrecioMoneda(item.PrecioCompra))',
+                                    '@JsValue(PrecioMoneda(item.PrecioVenta))',
+                                    '@(item.Estado ? "Activo" : "Inactivo")'
+                                    )">
+                                    <img src="~/img/Detalles.png" alt="Detalles" class="icon-btn" />
+                                    <span>Detalles</span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10">No hay productos registrados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container">
+        <ul class="pagination-custom">
+            @if (ViewBag.PaginaActual > 1)
+            {
+                <li>
+                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual - 1, busqueda = busquedaActual })">Anterior</a>
+                </li>
+            }
+            else
+            {
+                <li class="disabled"><span>Anterior</span></li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+            {
+                <li class="@(i == ViewBag.PaginaActual ? "active" : "")">
+                    <a href="@Url.Action("Index", new { pagina = i, busqueda = busquedaActual })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+            {
+                <li>
+                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual + 1, busqueda = busquedaActual })">Siguiente</a>
+                </li>
+            }
+            else
+            {
+                <li class="disabled"><span>Siguiente</span></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- MODAL CREAR -->
+<div class="modal fade modal-producto-custom" id="modalCrearProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header-crear">
+                <h5 class="modal-title-custom">CREAR PRODUCTO</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">×</button>
+            </div>
+
+            <form method="post" asp-controller="Producto" asp-action="Guardar">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body modal-body-producto">
+                    <input type="hidden" id="CrearIdProducto" name="IdProducto" value="0" />
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearCodigo">Código</label>
+                        <input type="text"
+                               class="modal-input"
+                               id="CrearCodigo"
+                               name="Codigo"
+                               required
+                               maxlength="20"
+                               autocomplete="off" />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearNombre">Nombre</label>
+                        <input type="text"
+                               class="modal-input"
+                               id="CrearNombre"
+                               name="Nombre"
+                               required
+                               maxlength="50"
+                               autocomplete="off" />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearDescripcion">Descripción</label>
+                        <textarea class="modal-textarea"
+                                  id="CrearDescripcion"
+                                  name="Descripcion"
+                                  required
+                                  maxlength="500"></textarea>
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearIdCategoria">Categoría</label>
+                        <select class="modal-select" id="CrearIdCategoria" name="IdCategoria" required>
+                            <option value="">SELECCIONE</option>
+                            @if (categorias != null)
+                            {
+                                foreach (var categoria in categorias)
+                                {
+                                    <option value="@categoria.IdCategoria">@categoria.Nombre</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearStock">Stock inicial</label>
+                        <input type="number"
+                               class="modal-input"
+                               id="CrearStock"
+                               name="Stock"
+                               min="0"
+                               value="0"
+                               required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearPrecioCompra">Precio de compra</label>
+                        <input type="number"
+                               class="modal-input"
+                               id="CrearPrecioCompra"
+                               name="PrecioCompra"
+                               min="0"
+                               step="0.01"
+                               value="0"
+                               required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearPrecioVenta">Precio de venta</label>
+                        <input type="number"
+                               class="modal-input"
+                               id="CrearPrecioVenta"
+                               name="PrecioVenta"
+                               min="0"
+                               step="0.01"
+                               value="0"
+                               required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearEstado">Estado</label>
+                        <select class="modal-select" id="CrearEstado" name="Estado" required>
+                            <option value="">SELECCIONE</option>
+                            <option value="true" selected>Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer-custom">
+                        <button type="submit" class="btn-save-modal">Crear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal fade modal-producto-custom" id="modalEditarProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header-editar">
+                <h5 class="modal-title-custom">EDITAR PRODUCTO</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">×</button>
+            </div>
+
+            <form method="post" asp-controller="Producto" asp-action="Guardar">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body modal-body-producto">
+                    <input type="hidden" id="EditarIdProducto" name="IdProducto" value="0" />
+
+                    <div class="modal-group">
+                        <label class="modal-label">Código</label>
+                        <input type="text" class="modal-input" id="EditarCodigo" name="Codigo" required maxlength="20" />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Nombre</label>
+                        <input type="text" class="modal-input" id="EditarNombre" name="Nombre" required maxlength="50" />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Descripción</label>
+                        <textarea class="modal-textarea" id="EditarDescripcion" name="Descripcion" required maxlength="500"></textarea>
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Categoría</label>
+                        <select class="modal-select" id="EditarIdCategoria" name="IdCategoria" required>
+                            <option value="">SELECCIONE</option>
+                            @if (categorias != null)
+                            {
+                                foreach (var categoria in categorias)
+                                {
+                                    <option value="@categoria.IdCategoria">@categoria.Nombre</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Stock inicial</label>
+                        <input type="number" class="modal-input" id="EditarStock" name="Stock" min="0" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Precio de compra</label>
+                        <input type="number" class="modal-input" id="EditarPrecioCompra" name="PrecioCompra" min="0" step="0.01" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Precio de venta</label>
+                        <input type="number" class="modal-input" id="EditarPrecioVenta" name="PrecioVenta" min="0" step="0.01" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Estado</label>
+                        <select class="modal-select" id="EditarEstado" name="Estado" required>
+                            <option value="">SELECCIONE</option>
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer-custom">
+                        <button type="submit" class="btn-save-modal">Editar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- MODAL DETALLES -->
+<div class="modal fade modal-producto-custom" id="modalDetalleProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:430px;">
+        <div class="modal-content">
+            <div class="modal-header-detalle">
+                <h5 class="modal-title-custom">DETALLES</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">×</button>
+            </div>
+
+            <div class="modal-body modal-body-producto">
+                <div class="details-container">
+
+                    <div class="details-item">
+                        <span class="details-label">Código</span>
+                        <span class="details-value" id="detalleCodigo">---</span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Nombre</span>
+                        <span class="details-value" id="detalleNombre">---</span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Descripción</span>
+                        <span class="details-value" id="detalleDescripcion">---</span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Categoría</span>
+                        <span class="details-value" id="detalleCategoria">---</span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Stock inicial</span>
+                        <span class="details-value" id="detalleStock">---</span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Precio compra</span>
+                        <span class="details-value" id="detallePrecioCompra">$ 0</span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Precio venta</span>
+                        <span class="details-value" id="detallePrecioVenta">$ 0</span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Estado</span>
+                        <span class="details-value" id="detalleEstado">---</span>
+                    </div>
+
+                    <div class="details-footer">
+                        <button type="button" class="btn-close-detail" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["MensajeOk"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showAlert("@TempData["MensajeOk"]", "success");
+        });
+    </script>
+}
+
+@if (TempData["MensajeError"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showAlert("@TempData["MensajeError"]", "danger");
+        });
+    </script>
+}
+
+@section Scripts {
+    <script>
+        function showAlert(mensaje, tipo = "danger") {
+            const container = document.getElementById("alertContainer");
+
+            const alert = document.createElement("div");
+            let alertClass = "alert-danger-custom";
+
+            if (tipo === "success") {
+                alertClass = "alert-success-custom";
+            } else if (tipo === "warning") {
+                alertClass = "alert-warning-custom";
+            }
+
+            alert.className = `alert-custom ${alertClass}`;
+
+            alert.innerHTML = `
+                <span class="alert-message">${mensaje}</span>
+                <button type="button" class="alert-close" onclick="closeAlert(this)">×</button>
+            `;
+
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                if (alert) {
+                    alert.style.animation = "fadeOut 0.4s ease forwards";
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 700);
+                }
+            }, 3000);
+        }
+
+        function closeAlert(element) {
+            const alert = element.parentElement;
+            alert.style.animation = "fadeOut 0.4s ease forwards";
+
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 700);
+        }
+
+        function limpiarFormularioCrearProducto() {
+            document.getElementById('CrearIdProducto').value = 0;
+            document.getElementById('CrearCodigo').value = '';
+            document.getElementById('CrearNombre').value = '';
+            document.getElementById('CrearDescripcion').value = '';
+            document.getElementById('CrearIdCategoria').value = '';
+            document.getElementById('CrearStock').value = '0';
+            document.getElementById('CrearPrecioCompra').value = '0';
+            document.getElementById('CrearPrecioVenta').value = '0';
+            document.getElementById('CrearEstado').value = 'true';
+        }
+
+        function editarProducto(id, codigo, nombre, descripcion, idCategoria, stock, precioCompra, precioVenta, estado) {
+
+            document.getElementById('EditarIdProducto').value = id;
+            document.getElementById('EditarCodigo').value = codigo;
+            document.getElementById('EditarNombre').value = nombre;
+            document.getElementById('EditarDescripcion').value = descripcion;
+            document.getElementById('EditarIdCategoria').value = idCategoria;
+            document.getElementById('EditarStock').value = stock;
+            document.getElementById('EditarPrecioCompra').value = precioCompra;
+            document.getElementById('EditarPrecioVenta').value = precioVenta;
+            document.getElementById('EditarEstado').value = estado;
+
+            new bootstrap.Modal(document.getElementById('modalEditarProducto')).show();
+        }
+
+                function verDetalleProducto(codigo, nombre, descripcion, categoria, stock, precioCompra, precioVenta, estado) {
+
+            document.getElementById('detalleCodigo').innerText = codigo;
+            document.getElementById('detalleNombre').innerText = nombre;
+            document.getElementById('detalleDescripcion').innerText = descripcion;
+            document.getElementById('detalleCategoria').innerText = categoria;
+            document.getElementById('detalleStock').innerText = stock;
+            document.getElementById('detallePrecioCompra').innerText = precioCompra;
+            document.getElementById('detallePrecioVenta').innerText = precioVenta;
+            document.getElementById('detalleEstado').innerText = estado;
+
+            new bootstrap.Modal(document.getElementById('modalDetalleProducto')).show();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const txtBuscar = document.getElementById('txtBuscar');
+            const formBusquedaProductos = document.getElementById('formBusquedaProductos');
+
+            if (txtBuscar && formBusquedaProductos) {
+                let temporizadorBusqueda;
+                let ultimoValor = txtBuscar.value;
+
+                txtBuscar.addEventListener('input', function () {
+                    clearTimeout(temporizadorBusqueda);
+
+                    const valorActual = this.value;
+
+                    temporizadorBusqueda = setTimeout(function () {
+                        if (valorActual !== ultimoValor) {
+                            ultimoValor = valorActual;
+                            formBusquedaProductos.submit();
+                        }
+                    }, 1000);
+                });
+            }
+        });
+    </script>
+}
