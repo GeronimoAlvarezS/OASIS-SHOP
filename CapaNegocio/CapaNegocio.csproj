@@ -87,6 +87,7 @@
     <Compile Include="ProveedorServicio.cs" />
     <Compile Include="ReporteServicio.cs" />
     <Compile Include="RolServicio.cs" />
+    <Compile Include="Seguridad.cs" />
     <Compile Include="UsuarioServicio.cs" />
     <Compile Include="VentaServicio.cs" />
     <Compile Include="ProductoServicio.cs" />

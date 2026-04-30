@@ -31,20 +31,7 @@ namespace CapaDatos
                     {
                         while (dr.Read())
                         {
-                            lista.Add(new Usuario()
-                            {
-                                IdUsuario = Convert.ToInt32(dr["IdUsuario"]),
-                                Documento = dr["Documento"].ToString(),
-                                NombreCompleto = dr["NombreCompleto"].ToString(),
-                                Correo = dr["Correo"].ToString(),
-                                Clave = dr["Clave"].ToString(),
-                                Estado = Convert.ToBoolean(dr["Estado"]),
-                                oRol = new Rol()
-                                {
-                                    IdRol = Convert.ToInt32(dr["IdRol"]),
-                                    Descripcion = dr["Descripcion"].ToString()
-                                }
-                            });
+                            lista.Add(MapearUsuario(dr));
                         }
                     }
                 }
@@ -55,6 +42,43 @@ namespace CapaDatos
             }
 
             return lista;
+        }
+
+        public Usuario ObtenerPorDocumento(string documento)
+        {
+            Usuario objUsuario = null;
+
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+            {
+                try
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.AppendLine("select top 1 u.IdUsuario,u.Documento,u.NombreCompleto,u.Correo,u.Clave,u.Estado,r.IdRol,r.Descripcion");
+                    query.AppendLine("from usuario u");
+                    query.AppendLine("inner join rol r on r.IdRol = u.IdRol");
+                    query.AppendLine("where u.Documento = @Documento");
+
+                    SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
+                    cmd.Parameters.AddWithValue("@Documento", documento);
+                    cmd.CommandType = CommandType.Text;
+
+                    oconexion.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            objUsuario = MapearUsuario(dr);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    objUsuario = null;
+                }
+            }
+
+            return objUsuario;
         }
 
         public Usuario ObtenerPorCredenciales(string documento, string clave)
@@ -82,20 +106,7 @@ namespace CapaDatos
                     {
                         if (dr.Read())
                         {
-                            objUsuario = new Usuario()
-                            {
-                                IdUsuario = Convert.ToInt32(dr["IdUsuario"]),
-                                Documento = dr["Documento"].ToString(),
-                                NombreCompleto = dr["NombreCompleto"].ToString(),
-                                Correo = dr["Correo"].ToString(),
-                                Clave = dr["Clave"].ToString(),
-                                Estado = Convert.ToBoolean(dr["Estado"]),
-                                oRol = new Rol()
-                                {
-                                    IdRol = Convert.ToInt32(dr["IdRol"]),
-                                    Descripcion = dr["Descripcion"].ToString()
-                                }
-                            };
+                            objUsuario = MapearUsuario(dr);
                         }
                     }
                 }
@@ -106,6 +117,32 @@ namespace CapaDatos
             }
 
             return objUsuario;
+        }
+
+        public bool ActualizarClave(int idUsuario, string claveHash)
+        {
+            bool respuesta = false;
+
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+            {
+                try
+                {
+                    SqlCommand cmd = new SqlCommand("update usuario set Clave = @Clave where IdUsuario = @IdUsuario", oconexion);
+                    cmd.Parameters.AddWithValue("@Clave", claveHash);
+                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+                    cmd.CommandType = CommandType.Text;
+
+                    oconexion.Open();
+
+                    respuesta = cmd.ExecuteNonQuery() > 0;
+                }
+                catch (Exception)
+                {
+                    respuesta = false;
+                }
+            }
+
+            return respuesta;
         }
 
         public int Registrar(Usuario obj, out string Mensaje)
@@ -213,6 +250,24 @@ namespace CapaDatos
             }
 
             return respuesta;
+        }
+
+        private Usuario MapearUsuario(SqlDataReader dr)
+        {
+            return new Usuario()
+            {
+                IdUsuario = Convert.ToInt32(dr["IdUsuario"]),
+                Documento = dr["Documento"].ToString(),
+                NombreCompleto = dr["NombreCompleto"].ToString(),
+                Correo = dr["Correo"].ToString(),
+                Clave = dr["Clave"].ToString(),
+                Estado = Convert.ToBoolean(dr["Estado"]),
+                oRol = new Rol()
+                {
+                    IdRol = Convert.ToInt32(dr["IdRol"]),
+                    Descripcion = dr["Descripcion"].ToString()
+                }
+            };
         }
     }
 }

@@ -1,0 +1,863 @@
+﻿@model IEnumerable<OasisShop.Web.Models.ViewModels.ClienteViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Clientes";
+    var totalClientes = Model != null ? Model.Count() : 0;
+}
+
+<style>
+    .clientes-page {
+        padding: 18px 20px 28px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0;
+        color: #1F2937;
+    }
+
+    .page-count {
+        font-size: 14px;
+        color: #666666;
+        font-weight: 600;
+    }
+
+    .toolbar-card {
+        background: #F5F5F5;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 36px;
+    }
+
+    .btn-primary-custom {
+        background: #241E65;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 7px;
+        padding: 10px 16px;
+        font-weight: 400;
+        min-width: 135px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+    }
+
+        .btn-primary-custom:hover {
+            background: #1B174D;
+            color: #FFFFFF;
+        }
+
+    .icon-btn {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .search-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    .search-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .search-input {
+        width: 220px;
+        height: 32px;
+        border: 1px solid #8F8F8F;
+        border-radius: 7px;
+        padding: 4px 10px 4px 32px;
+        font-size: 13px;
+        background: #F5F5F5;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4B43D1;
+            box-shadow: 0 0 0 2px rgba(75, 67, 209, 0.2);
+        }
+
+    .table-card {
+        background: #F5F5F5;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .table-custom thead th {
+            background: #DCDDDF;
+            color: #676767;
+            font-weight: 500;
+            text-align: center;
+            padding: 12px 8px;
+            border: 1px solid #BFC1C6;
+        }
+
+        .table-custom tbody td {
+            background: #F5F5F5;
+            color: #5A5A5A;
+            padding: 10px 8px;
+            border: 1px solid #C9CBD1;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    .btn-action {
+        border: none;
+        border-radius: 4px;
+        padding: 6px 10px;
+        color: #FFFFFF;
+        font-size: 12px;
+        font-weight: 400;
+        margin: 0 2px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-edit {
+        background: #4B43D1;
+    }
+
+    .btn-detail {
+        background: #31C95B;
+    }
+
+        .btn-edit:hover,
+        .btn-detail:hover {
+            opacity: 0.92;
+        }
+
+    .empty-message {
+        display: none;
+        padding: 14px;
+        text-align: center;
+        font-size: 13px;
+        color: #6B7280;
+    }
+
+    .modal-usuario-custom .modal-dialog {
+        max-width: 430px;
+    }
+
+    .modal-usuario-custom .modal-content {
+        border: none;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #ECEEF3;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal-header-crear,
+    .modal-header-editar,
+    .modal-header-detalle {
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 22px;
+        position: relative;
+    }
+
+    .modal-header-crear {
+        background: #1E1B4B;
+    }
+
+    .modal-header-editar {
+        background: #3F3CBB;
+    }
+
+    .modal-header-detalle {
+        background: #22C55E;
+    }
+
+    .modal-title-custom {
+        color: #FFFFFF;
+        font-size: 20px;
+        font-weight: 650;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .btn-close-custom {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #FFFFFF;
+        font-size: 28px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .modal-body-usuario {
+        padding: 14px 18px 16px 18px;
+        min-height: 390px;
+    }
+
+    .modal-group {
+        margin-bottom: 10px;
+    }
+
+    .modal-label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1F2937;
+    }
+
+    .modal-input,
+    .modal-select {
+        width: 100%;
+        height: 30px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 4px 10px;
+        font-size: 14px;
+        color: #333333;
+        outline: none;
+        box-shadow: none;
+    }
+
+        .modal-input:focus,
+        .modal-select:focus {
+            border-color: #6366F1;
+            box-shadow: 0 0 0 0.14rem rgba(99, 102, 241, 0.18);
+        }
+
+    .modal-footer-custom {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 50px;
+    }
+
+    .btn-save-modal {
+        border: none;
+        border-radius: 6px;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 7px 18px;
+        min-width: 70px;
+        background: #22C55E;
+    }
+
+        .btn-save-modal:hover {
+            background: #16A34A;
+        }
+
+    .details-container {
+        padding: 8px 8px 0 8px;
+    }
+
+    .details-item {
+        text-align: center;
+        margin-bottom: 22px;
+    }
+
+    .details-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .details-value {
+        display: block;
+        font-size: 14px;
+        color: #4B5563;
+        min-height: 18px;
+        word-break: break-word;
+    }
+
+    .details-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 8px 2px 0 2px;
+    }
+
+    .btn-close-detail {
+        border: none;
+        border-radius: 6px;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 7px 18px;
+        min-width: 70px;
+        background: #22C55E;
+    }
+
+        .btn-close-detail:hover {
+            background: #16A34A;
+        }
+
+    .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .alert-custom {
+        min-width: 280px;
+        max-width: 340px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: #FFFFFF;
+        font-weight: 400;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0,0,0,0.18);
+        animation: slideIn 0.4s ease;
+    }
+
+    .alert-success-custom {
+        background-color: #22C55E;
+    }
+
+    .alert-danger-custom {
+        background-color: #C63637;
+    }
+
+    .alert-warning-custom {
+        background-color: #FFCE1B;
+    }
+
+    .alert-message {
+        flex: 1;
+        text-align: center;
+        line-height: 1.25;
+        padding-right: 8px;
+    }
+
+    .alert-close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        color: #FFFFFF;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+</style>
+
+<div id="alertContainer" class="alert-container"></div>
+
+<div class="clientes-page">
+    <div class="page-header">
+        <h1 class="page-title">Clientes</h1>
+        <div class="page-count">@totalClientes Clientes registrados</div>
+    </div>
+
+    <div class="toolbar-card">
+        <button type="button"
+                class="btn-primary-custom"
+                data-bs-toggle="modal"
+                data-bs-target="#modalCrearCliente"
+                onclick="limpiarFormularioCrearCliente()">
+            <img src="~/img/Agregar.png" alt="Crear cliente" class="icon-btn" />
+            <span>Crear cliente</span>
+        </button>
+    </div>
+
+    <div class="search-row">
+        <div class="search-container">
+            <img src="~/img/buscar.png" alt="Buscar" class="search-icon" />
+            <input type="text"
+                   class="search-input"
+                   id="txtBuscar"
+                   placeholder="Buscar cliente..." />
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Documento</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Ventas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody id="tablaClientes">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.IdCliente</td>
+                            <td>@item.Documento</td>
+                            <td>@item.NombreCompleto</td>
+                            <td>@item.Correo</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Telefono) ? "No registrado" : item.Telefono)</td>
+                            <td>@(item.Estado ? "Activo" : "Inactivo")</td>
+                            <td>@(item.TieneVentas ? item.TotalVentas + " venta(s)" : "Sin ventas")</td>
+                            <td class="actions-cell">
+                                <button type="button"
+                                        class="btn-action btn-edit"
+                                        onclick="editarCliente('@item.IdCliente','@item.Documento','@item.NombreCompleto','@item.Correo','@item.Telefono','@item.Estado.ToString().ToLower()')">
+                                    <img src="~/img/Editar.png" alt="Editar" class="icon-btn" />
+                                    <span>Editar</span>
+                                </button>
+
+                                <button type="button"
+                                        class="btn-action btn-detail"
+                                        onclick="verDetalleCliente('@item.Documento','@item.NombreCompleto','@item.Correo','@item.Telefono','@(item.Estado ? "Activo" : "Inactivo")','@item.TieneVentas.ToString().ToLower()','@item.TotalVentas')">
+                                    <img src="~/img/Detalles.png" alt="Detalles" class="icon-btn" />
+                                    <span>Detalles</span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8">No hay clientes registrados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div id="mensajeSinResultados" class="empty-message">
+            No se encontraron clientes que coincidan con la búsqueda.
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-usuario-custom" id="modalCrearCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header-crear">
+                <h5 class="modal-title-custom">CREAR CLIENTE</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">×</button>
+            </div>
+
+            <form id="formCrearCliente" method="post" asp-controller="Cliente" asp-action="Guardar">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body modal-body-usuario">
+                    <input type="hidden" id="CrearIdCliente" name="IdCliente" value="0" />
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearDocumento">Documento</label>
+                        <input type="text" class="modal-input" id="CrearDocumento" name="Documento" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearNombreCompleto">Nombre Completo</label>
+                        <input type="text" class="modal-input" id="CrearNombreCompleto" name="NombreCompleto" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearCorreo">Correo</label>
+                        <input type="email" class="modal-input" id="CrearCorreo" name="Correo" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearTelefono">Teléfono</label>
+                        <input type="text" class="modal-input" id="CrearTelefono" name="Telefono" />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="CrearEstado">Estado</label>
+                        <select class="modal-select" id="CrearEstado" name="Estado" required>
+                            <option value="">SELECCIONE</option>
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer-custom">
+                        <button type="submit" class="btn-save-modal">Crear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-usuario-custom" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header-editar">
+                <h5 class="modal-title-custom">EDITAR CLIENTE</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">×</button>
+            </div>
+
+            <form id="formEditarCliente" method="post" asp-controller="Cliente" asp-action="Guardar">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body modal-body-usuario">
+                    <input type="hidden" id="EditarIdCliente" name="IdCliente" value="0" />
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="EditarDocumento">Documento</label>
+                        <input type="text" class="modal-input" id="EditarDocumento" name="Documento" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="EditarNombreCompleto">Nombre Completo</label>
+                        <input type="text" class="modal-input" id="EditarNombreCompleto" name="NombreCompleto" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="EditarCorreo">Correo</label>
+                        <input type="email" class="modal-input" id="EditarCorreo" name="Correo" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="EditarTelefono">Teléfono</label>
+                        <input type="text" class="modal-input" id="EditarTelefono" name="Telefono" />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label" for="EditarEstado">Estado</label>
+                        <select class="modal-select" id="EditarEstado" name="Estado" required>
+                            <option value="">SELECCIONE</option>
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer-custom">
+                        <button type="submit" class="btn-save-modal">Editar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-usuario-custom" id="modalDetalleCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:430px;">
+        <div class="modal-content">
+            <div class="modal-header-detalle">
+                <h5 class="modal-title-custom">DETALLES</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">×</button>
+            </div>
+
+            <div class="modal-body modal-body-usuario">
+                <div class="details-container">
+                    <div class="details-item">
+                        <span class="details-label">Documento</span>
+                        <span class="details-value" id="detalleDocumento"></span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Nombre Completo</span>
+                        <span class="details-value" id="detalleNombre"></span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Correo</span>
+                        <span class="details-value" id="detalleCorreo"></span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Teléfono</span>
+                        <span class="details-value" id="detalleTelefono"></span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Estado</span>
+                        <span class="details-value" id="detalleEstado"></span>
+                    </div>
+
+                    <div class="details-item">
+                        <span class="details-label">Ventas asociadas</span>
+                        <span class="details-value" id="detalleRelacionVentas"></span>
+                    </div>
+
+                    <div class="details-footer">
+                        <button type="button" class="btn-close-detail" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function limpiarFormularioCrearCliente() {
+            document.getElementById("CrearIdCliente").value = 0;
+            document.getElementById("CrearDocumento").value = "";
+            document.getElementById("CrearNombreCompleto").value = "";
+            document.getElementById("CrearCorreo").value = "";
+            document.getElementById("CrearTelefono").value = "";
+            document.getElementById("CrearEstado").value = "";
+        }
+
+        function editarCliente(id, documento, nombre, correo, telefono, estado) {
+            document.getElementById("EditarIdCliente").value = id;
+            document.getElementById("EditarDocumento").value = documento;
+            document.getElementById("EditarNombreCompleto").value = nombre;
+            document.getElementById("EditarCorreo").value = correo;
+            document.getElementById("EditarTelefono").value = telefono || "";
+            document.getElementById("EditarEstado").value = estado === "true" ? "true" : "false";
+
+            let modal = new bootstrap.Modal(document.getElementById("modalEditarCliente"));
+            modal.show();
+        }
+
+        function verDetalleCliente(documento, nombre, correo, telefono, estado, tieneVentas, totalVentas) {
+            document.getElementById("detalleDocumento").innerText = documento;
+            document.getElementById("detalleNombre").innerText = nombre;
+            document.getElementById("detalleCorreo").innerText = correo;
+            document.getElementById("detalleTelefono").innerText = telefono || "No registrado";
+            document.getElementById("detalleEstado").innerText = estado;
+
+            document.getElementById("detalleRelacionVentas").innerText =
+                tieneVentas === "true"
+                    ? "Cliente vinculado a " + totalVentas + " venta(s)"
+                    : "Este cliente no tiene ventas registradas";
+
+            let modal = new bootstrap.Modal(document.getElementById("modalDetalleCliente"));
+            modal.show();
+        }
+
+        function validarCrearCliente() {
+            const documento = document.getElementById("CrearDocumento").value.trim();
+            const nombre = document.getElementById("CrearNombreCompleto").value.trim();
+            const correo = document.getElementById("CrearCorreo").value.trim();
+            const estado = document.getElementById("CrearEstado").value;
+
+            if (documento === "" || nombre === "" || correo === "" || estado === "") {
+                showAlert("Todos los campos obligatorios deben completarse", "warning");
+                return false;
+            }
+
+            return true;
+        }
+
+        function validarEditarCliente() {
+            const documento = document.getElementById("EditarDocumento").value.trim();
+            const nombre = document.getElementById("EditarNombreCompleto").value.trim();
+            const correo = document.getElementById("EditarCorreo").value.trim();
+            const estado = document.getElementById("EditarEstado").value;
+
+            if (documento === "" || nombre === "" || correo === "" || estado === "") {
+                showAlert("Todos los campos obligatorios deben completarse", "warning");
+                return false;
+            }
+
+            return true;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const formCrear = document.getElementById("formCrearCliente");
+            const formEditar = document.getElementById("formEditarCliente");
+
+            if (formCrear) {
+                formCrear.addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    if (!validarCrearCliente()) {
+                        return;
+                    }
+
+                    guardarClienteAjax(formCrear, "modalCrearCliente");
+                });
+            }
+
+            if (formEditar) {
+                formEditar.addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    if (!validarEditarCliente()) {
+                        return;
+                    }
+
+                    guardarClienteAjax(formEditar, "modalEditarCliente");
+                });
+            }
+
+            const buscador = document.getElementById("txtBuscar");
+
+            if (buscador) {
+                buscador.addEventListener("keyup", function () {
+                    const filtro = this.value.toLowerCase();
+                    const filas = document.querySelectorAll("#tablaClientes tr");
+                    let encontrados = 0;
+
+                    filas.forEach(function (fila) {
+                        const texto = fila.innerText.toLowerCase();
+
+                        if (texto.includes(filtro)) {
+                            fila.style.display = "";
+                            encontrados++;
+                        } else {
+                            fila.style.display = "none";
+                        }
+                    });
+
+                    const mensajeSinResultados = document.getElementById("mensajeSinResultados");
+
+                    if (mensajeSinResultados) {
+                        mensajeSinResultados.style.display =
+                            encontrados === 0 ? "block" : "none";
+                    }
+                });
+            }
+        });
+
+        function guardarClienteAjax(formulario, modalId) {
+            const formData = new FormData(formulario);
+
+            fetch(formulario.action, {
+                method: "POST",
+                body: formData
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        showAlert(data.mensaje, "success");
+
+                        const modalElement = document.getElementById(modalId);
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+
+                        if (modal) {
+                            modal.hide();
+                        }
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 900);
+                    } else {
+                        showAlert(data.mensaje, "danger");
+                    }
+                })
+                .catch(function () {
+                    showAlert("Ocurrió un error al procesar la solicitud.", "danger");
+                });
+        }
+
+        function showAlert(mensaje, tipo) {
+            const container = document.getElementById("alertContainer");
+
+            if (!container) {
+                alert(mensaje);
+                return;
+            }
+
+            const alert = document.createElement("div");
+            let alertClass = "alert-danger-custom";
+
+            if (tipo === "success") {
+                alertClass = "alert-success-custom";
+            } else if (tipo === "warning") {
+                alertClass = "alert-warning-custom";
+            }
+
+            alert.className = "alert-custom " + alertClass;
+
+            alert.innerHTML =
+                '<span class="alert-message">' + mensaje + '</span>' +
+                '<button type="button" class="alert-close" onclick="closeAlert(this)">×</button>';
+
+            container.appendChild(alert);
+
+            setTimeout(function () {
+                if (alert) {
+                    alert.style.animation = "fadeOut 0.4s ease forwards";
+
+                    setTimeout(function () {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 700);
+                }
+            }, 3000);
+        }
+
+        function closeAlert(element) {
+            const alert = element.parentElement;
+
+            alert.style.animation = "fadeOut 0.4s ease forwards";
+
+            setTimeout(function () {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 700);
+        }
+    </script>
+}

@@ -1,5 +1,6 @@
 ﻿using CapaDatos;
 using CapaEntidad;
+using CapaNegocio;
 using System.Collections.Generic;
 
 namespace CapaNegocio
@@ -15,65 +16,86 @@ namespace CapaNegocio
 
         public Usuario ObtenerPorCredenciales(string documento, string clave)
         {
-            return objcd_usuario.ObtenerPorCredenciales(documento, clave);
+            Usuario usuario = objcd_usuario.ObtenerPorDocumento(documento);
+
+            if (usuario == null)
+            {
+                return null;
+            }
+
+            bool claveValida = Seguridad.VerificarPassword(clave, usuario.Clave);
+
+            if (!claveValida && usuario.Clave == clave)
+            {
+                usuario.Clave = Seguridad.HashPassword(clave);
+                objcd_usuario.ActualizarClave(usuario.IdUsuario, usuario.Clave);
+                return usuario;
+            }
+
+            if (!claveValida)
+            {
+                return null;
+            }
+
+            return usuario;
         }
 
         public int Registrar(Usuario obj, out string Mensaje)
         {
             Mensaje = string.Empty;
 
-            if (obj.Documento == "")
+            if (string.IsNullOrWhiteSpace(obj.Documento))
             {
                 Mensaje += "Es necesario el documento del usuario\n";
             }
 
-            if (obj.NombreCompleto == "")
+            if (string.IsNullOrWhiteSpace(obj.NombreCompleto))
             {
                 Mensaje += "Es necesario el nombre completo del usuario\n";
             }
 
-            if (obj.Clave == "")
+            if (string.IsNullOrWhiteSpace(obj.Clave))
             {
-                Mensaje += "Es necesario la clave del usuario\n";
+                Mensaje += "Es necesaria la clave del usuario\n";
             }
 
             if (Mensaje != string.Empty)
             {
                 return 0;
             }
-            else
-            {
-                return objcd_usuario.Registrar(obj, out Mensaje);
-            }
+
+            obj.Clave = Seguridad.HashPassword(obj.Clave);
+
+            return objcd_usuario.Registrar(obj, out Mensaje);
         }
 
         public bool Editar(Usuario obj, out string Mensaje)
         {
             Mensaje = string.Empty;
 
-            if (obj.Documento == "")
+            if (string.IsNullOrWhiteSpace(obj.Documento))
             {
                 Mensaje += "Es necesario el documento del usuario\n";
             }
 
-            if (obj.NombreCompleto == "")
+            if (string.IsNullOrWhiteSpace(obj.NombreCompleto))
             {
                 Mensaje += "Es necesario el nombre completo del usuario\n";
             }
 
-            if (obj.Clave == "")
+            if (string.IsNullOrWhiteSpace(obj.Clave))
             {
-                Mensaje += "Es necesario la clave del usuario\n";
+                Mensaje += "Es necesaria la clave del usuario\n";
             }
 
             if (Mensaje != string.Empty)
             {
                 return false;
             }
-            else
-            {
-                return objcd_usuario.Editar(obj, out Mensaje);
-            }
+
+            obj.Clave = Seguridad.HashPassword(obj.Clave);
+
+            return objcd_usuario.Editar(obj, out Mensaje);
         }
 
         public bool Eliminar(Usuario obj, out string Mensaje)
