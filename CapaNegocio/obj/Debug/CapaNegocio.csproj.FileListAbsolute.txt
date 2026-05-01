@@ -53,3 +53,32 @@ C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calida
 C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\System.Numerics.Vectors.xml
 C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\System.Security.Cryptography.Xml.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\CapaNegocio.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\CapaNegocio.pdb
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\CapaDatos.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\CapaEntidad.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\EPPlus.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\EPPlus.Interfaces.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\QRCoder.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Buffers.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.ComponentModel.Annotations.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Memory.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Security.Cryptography.Xml.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\CapaDatos.pdb
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\CapaEntidad.pdb
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\EPPlus.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\Microsoft.IO.RecyclableMemoryStream.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\QRCoder.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Buffers.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Memory.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\bin\Debug\System.Security.Cryptography.Xml.xml
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\obj\Debug\CapaNegocio.csproj.AssemblyReference.cache
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\obj\Debug\CapaNegocio.csproj.CoreCompileInputs.cache
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\obj\Debug\CapaNego.81B9D119.Up2Date
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\obj\Debug\CapaNegocio.dll
+C:\Users\Samuel\Documents\GitHub\OASIS-SHOP\CapaNegocio\obj\Debug\CapaNegocio.pdb
