@@ -1,0 +1,1404 @@
+﻿@model OasisShop.Web.Models.ViewModels.CompraViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Registrar compras";
+}
+
+@functions {
+    public string PrecioInput(decimal valor)
+    {
+        return valor.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    public string PrecioMoneda(decimal valor)
+    {
+        return valor.ToString("C0", new System.Globalization.CultureInfo("es-CO"));
+    }
+
+    public string JsValue(object value)
+    {
+        return System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(value?.ToString() ?? "");
+    }
+}
+
+<style>
+    .compras-page {
+        padding: 18px 20px 28px;
+        background: #ECEEF3;
+        min-height: calc(100vh - 60px);
+    }
+
+    .page-header {
+        margin-bottom: 48px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0;
+        color: #111111;
+    }
+
+    .compra-main-layout {
+        max-width: 980px;
+    }
+
+    .add-product-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 95px;
+        gap: 56px;
+        align-items: end;
+        margin-bottom: 46px;
+    }
+
+    .field-title {
+        display: block;
+        color: #111111;
+        font-size: 15px;
+        font-weight: 550;
+        margin-bottom: 4px;
+        padding-left: 22px;
+    }
+
+    .search-product-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-product-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    .search-product-input {
+        width: 100%;
+        height: 38px;
+        border: 1px solid #8F8F8F;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 6px 12px 6px 42px;
+        font-size: 14px;
+        color: #333333;
+        font-weight: 550;
+        outline: none;
+    }
+
+        .search-product-input::placeholder {
+            color: #6F6F6F;
+            font-weight: 400;
+        }
+
+        .search-product-input:focus {
+            border-color: #4B43D1;
+            box-shadow: 0 0 0 2px rgba(75, 67, 209, 0.18);
+        }
+
+    .btn-add-product {
+        background: #241E65;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 6px;
+        height: 38px;
+        padding: 0 14px;
+        font-size: 14px;
+        font-weight: 400;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-width: 95px;
+    }
+
+        .btn-add-product:hover {
+            background: #1B174D;
+            color: #FFFFFF;
+        }
+
+    .btn-add-icon {
+        font-size: 30px;
+        line-height: 1;
+        font-weight: 900;
+        margin-top: -2px;
+    }
+
+    .table-card-compra {
+        background: transparent;
+        border-radius: 7px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    .table-compra {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        min-width: 600px;
+    }
+
+        .table-compra thead th {
+            background: #DCDDDF;
+            color: #676767;
+            font-weight: 700;
+            text-align: center;
+            padding: 13px 8px;
+            border-right: 1px solid #AEB1B8;
+        }
+
+            .table-compra thead th:last-child {
+                border-right: none;
+            }
+
+        .table-compra tbody td {
+            background: #F8F8F8;
+            color: #5A5A5A;
+            padding: 12px 8px;
+            border-top: 1px solid #D8D9DD;
+            border-right: 1px solid #BFC1C6;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 500;
+        }
+
+            .table-compra tbody td:last-child {
+                border-right: none;
+            }
+
+        .table-compra tbody tr:nth-child(even) td {
+            background: #DCDDDF;
+        }
+
+    .td-cantidad {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cantidad-display {
+        display: inline-block;
+        min-width: 36px;
+        height: 22px;
+        line-height: 22px;
+        text-align: center;
+        border: 1px solid #9CA3AF;
+        border-radius: 8px;
+        background: #FFFFFF;
+        font-size: 11px;
+        color: #333333;
+    }
+
+    .btn-delete-product {
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .delete-icon {
+        width: 17px;
+        height: 17px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .empty-detail-row {
+        text-align: center;
+        color: #666666;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 22px 8px !important;
+        background: #F8F8F8 !important;
+    }
+
+    .summary-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 16px;
+    }
+
+    .summary-card {
+        width: 280px;
+        background: #FFFFFF;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+        overflow: hidden;
+        padding: 7px;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 6px;
+        color: #111111;
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    .summary-divider {
+        height: 1px;
+        background: #A8A8A8;
+        margin: 4px 6px;
+    }
+
+    .summary-value {
+        font-weight: 400;
+        color: #111111;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
+    .summary-number {
+        font-weight: 600;
+        color: #1E1B4B;
+        font-size: 14px;
+        white-space: nowrap;
+        user-select: text;
+    }
+
+    .discount-box {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        padding: 2px 6px;
+        background: #F5F5F5;
+    }
+
+    .summary-input {
+        width: 55px;
+        height: 25px;
+        border: none;
+        outline: none;
+        background: #FFFFFF;
+        text-align: center;
+        font-size: 14px;
+        color: #111111;
+    }
+
+    .summary-input-money {
+        width: 110px;
+        height: 28px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        outline: none;
+        padding: 4px 8px;
+        text-align: right;
+        font-size: 14px;
+        background: #FFFFFF;
+        color: #111111;
+    }
+
+    .btn-register-compra {
+        width: calc(100% - 12px);
+        margin: 0 7px 8px;
+        background: #4B43D1;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 3px;
+        height: 28px;
+        font-size: 13px;
+        font-weight: 450;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-register-compra:hover {
+            background: #3F3CBB;
+            color: #FFFFFF;
+        }
+
+    .btn-copy-compra {
+        width: calc(100% - 12px);
+        margin: 0 7px 8px;
+        background: #22C55E;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 3px;
+        height: 28px;
+        font-size: 13px;
+        font-weight: 450;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-copy-compra:hover {
+            background: #16A34A;
+            color: #FFFFFF;
+        }
+
+    .btn-clean-compra {
+        width: calc(100% - 12px);
+        margin: 0 7px 8px;
+        background: #F59E0B;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 3px;
+        height: 28px;
+        font-size: 13px;
+        font-weight: 450;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-clean-compra:hover {
+            background: #D97706;
+            color: #FFFFFF;
+        }
+
+    .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .alert-custom {
+        min-width: 280px;
+        max-width: 340px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: #FFFFFF;
+        font-weight: 400;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0,0,0,0.18);
+        animation: slideIn 0.4s ease;
+    }
+
+    .alert-success-custom {
+        background-color: #22C55E;
+    }
+
+    .alert-danger-custom {
+        background-color: #C63637;
+    }
+
+    .alert-warning-custom {
+        background-color: #FFCE1B;
+        color: #111111;
+    }
+
+        .alert-warning-custom .alert-close {
+            color: #111111;
+        }
+
+    .alert-message {
+        flex: 1;
+        text-align: center;
+        line-height: 1.25;
+        padding-right: 8px;
+    }
+
+    .alert-close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        color: inherit;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+
+    .modal-compra-custom .modal-dialog {
+        max-width: 430px;
+    }
+
+    .modal-compra-custom .modal-content {
+        border: none;
+        border-radius: 18px;
+        overflow: visible;
+        background: #ECEEF3;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal-header-compra {
+        background: #1E1B4B;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 22px;
+        position: relative;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .modal-title-compra {
+        color: #FFFFFF;
+        font-size: 18px;
+        font-weight: 750;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .btn-close-compra {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #FFFFFF;
+        font-size: 30px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .modal-body-compra {
+        padding: 22px 22px 16px 22px;
+        min-height: 525px;
+        overflow: visible;
+    }
+
+    .modal-group {
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+        .modal-group:first-of-type {
+            margin-top: 8px;
+        }
+
+    .modal-label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #111111;
+    }
+
+    .modal-input,
+    .modal-select,
+    .modal-search {
+        width: 100%;
+        height: 31px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 4px 10px;
+        font-size: 14px;
+        color: #333333;
+        outline: none;
+        box-shadow: none;
+    }
+
+        .modal-input[readonly] {
+            background: #FFFFFF;
+            cursor: default;
+        }
+
+        .modal-input:focus,
+        .modal-select:focus,
+        .modal-search:focus {
+            border-color: #6366F1;
+            box-shadow: 0 0 0 0.14rem rgba(99, 102, 241, 0.18);
+        }
+
+        .modal-search::placeholder {
+            color: #777777;
+            font-weight: 500;
+        }
+
+    .custom-select-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .custom-select-box {
+        width: 100%;
+        height: 31px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 4px 10px;
+        font-size: 14px;
+        color: #333333;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+    }
+
+    .custom-select-text {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .custom-arrow {
+        font-size: 13px;
+        color: #666666;
+        margin-left: 8px;
+    }
+
+    .custom-options {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 35px;
+        width: 100%;
+        max-height: 210px;
+        overflow-y: auto;
+        background: #FFFFFF;
+        border: 1px solid #00A6C8;
+        z-index: 99999;
+        padding: 4px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+    }
+
+        .custom-options.show {
+            display: block;
+        }
+
+    .custom-search-label {
+        display: block;
+        font-size: 12px;
+        color: #333333;
+        margin: 2px 0 4px;
+        text-align: left;
+        font-weight: 400;
+    }
+
+    .custom-search {
+        width: 100%;
+        height: 28px;
+        border: 1px solid #8E8E8E;
+        margin-bottom: 4px;
+        padding: 3px 6px;
+        outline: none;
+        font-size: 14px;
+        background: #FFFFFF;
+    }
+
+        .custom-search:focus {
+            border-color: #00A6C8;
+        }
+
+    .custom-option {
+        padding: 7px 8px;
+        text-align: center;
+        font-size: 14px;
+        cursor: pointer;
+        color: #111111;
+        background: #FFFFFF;
+        line-height: 1.25;
+    }
+
+        .custom-option:hover,
+        .custom-option.active {
+            background: #00A6C8;
+            color: #FFFFFF;
+        }
+
+    .modal-footer-compra {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 4px;
+    }
+
+    .btn-save-compra-modal {
+        border: none;
+        border-radius: 6px;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 7px 20px;
+        min-width: 76px;
+        background: #22C55E;
+    }
+
+        .btn-save-compra-modal:hover {
+            background: #16A34A;
+        }
+
+    @@media (max-width: 992px) {
+        .compra-main-layout {
+            max-width: 100%;
+        }
+
+        .add-product-header {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn-add-product {
+            width: 100%;
+        }
+
+        .summary-wrapper {
+            justify-content: flex-end;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .compras-page {
+            padding: 14px 12px 22px;
+        }
+
+        .page-header {
+            margin-bottom: 26px;
+        }
+
+        .page-title {
+            font-size: 21px;
+        }
+
+        .summary-card {
+            width: 100%;
+        }
+
+        .summary-wrapper {
+            justify-content: stretch;
+        }
+
+        .modal-body-compra {
+            min-height: auto;
+        }
+    }
+</style>
+
+<div id="alertContainer" class="alert-container"></div>
+
+<div class="compras-page">
+    <div class="page-header">
+        <h1 class="page-title">Registrar compras</h1>
+    </div>
+
+    <div class="compra-main-layout">
+
+        <!-- HEADER -->
+        <div class="add-product-header">
+            <div>
+                <label class="field-title">Agregar compra</label>
+
+                <div class="search-product-container">
+                    <img src="~/img/buscar.png" class="search-product-icon" />
+                    <input type="text"
+                           id="txtBuscarProducto"
+                           class="search-product-input"
+                           placeholder="Buscar producto (Código o nombre)" />
+                </div>
+            </div>
+
+            <button type="button"
+                    class="btn-add-product"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalAgregarProducto"
+                    onclick="prepararModalAgregarProducto()">
+                <span class="btn-add-icon">+</span>
+                <span>Agregar</span>
+            </button>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-card-compra">
+            <div class="table-responsive">
+                <table class="table-compra">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio de Compra</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaDetalleCompra">
+                        <tr>
+                            <td colspan="5" class="empty-detail-row">
+                                No se han agregado productos a la compra.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TARJETA DE TOTALES -->
+        <div class="summary-wrapper">
+            <div class="summary-card">
+
+                <div class="summary-line">
+                    <span>N° compra:</span>
+                    <span id="txtNumeroCompra" class="summary-number">Pendiente</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Subtotal:</span>
+                    <span id="txtSubtotal" class="summary-value">$0</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Descuento:</span>
+                    <div class="discount-box">
+                        <input type="number"
+                               id="txtDescuento"
+                               class="summary-input"
+                               min="0"
+                               max="100"
+                               value="0"
+                               oninput="actualizarTotales()" />
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-line">
+                    <span>Total a pagar:</span>
+                    <span id="txtTotalPagar" class="summary-value">$0</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Monto pagado:</span>
+                    <input type="number"
+                           id="txtMontoPagado"
+                           class="summary-input-money"
+                           value="0"
+                           oninput="actualizarCambio()" />
+                </div>
+
+                <div class="summary-line">
+                    <span>Monto cambio:</span>
+                    <span id="txtMontoCambio" class="summary-value">$0</span>
+                </div>
+
+                <!-- BOTONES -->
+                <button class="btn-register-compra"
+                        onclick="registrarCompra()">
+                    Registrar compra
+                </button>
+
+                <button type="button"
+                        id="btnCopiarNumeroCompra"
+                        class="btn-copy-compra"
+                        onclick="copiarNumeroCompra()">
+                    Copiar número de compra
+                </button>
+
+                <!-- 🔥 BOTÓN LIMPIAR (NUEVO) -->
+                <button type="button"
+                        class="btn-clean-compra"
+                        onclick="limpiarCompra()">
+                    Limpiar compra
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade modal-compra-custom" id="modalAgregarProducto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header-compra">
+                <h5 class="modal-title-compra">REGISTRO DE COMPRA</h5>
+                <button class="btn-close-compra" data-bs-dismiss="modal">×</button>
+            </div>
+
+            <div class="modal-body modal-body-compra">
+
+                <!-- PROVEEDOR -->
+                <div class="modal-group">
+                    <label class="modal-label">Nombre del proveedor</label>
+
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select-box" onclick="toggleDropdown('proveedorOptions')">
+                            <span id="proveedorTexto" class="custom-select-text">SELECCIONE</span>
+                            <span class="custom-arrow">▼</span>
+                        </div>
+
+                        <div id="proveedorOptions" class="custom-options">
+                            <label class="custom-search-label">Buscar proveedor</label>
+                            <input type="text"
+                                   class="custom-search"
+                                   onkeyup="filtrarOpciones(this,'proveedorItem')" />
+
+                            @foreach (var p in Model.Proveedores)
+                            {
+                                <div class="custom-option proveedorItem"
+                                     onclick="seleccionarProveedorCustom('@p.IdProveedor','@p.RazonSocial','@p.Documento')">
+                                    @p.RazonSocial
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Documento / NIT</label>
+                    <input id="ModalDocumentoProveedor" class="modal-input" readonly />
+                </div>
+
+                <!-- PRODUCTO -->
+                <div class="modal-group">
+                    <label class="modal-label">Nombre del producto</label>
+
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select-box" onclick="toggleDropdown('productoOptions')">
+                            <span id="productoTexto" class="custom-select-text">SELECCIONE</span>
+                            <span class="custom-arrow">▼</span>
+                        </div>
+
+                        <div id="productoOptions" class="custom-options">
+                            <label class="custom-search-label">Buscar producto</label>
+                            <input type="text"
+                                   class="custom-search"
+                                   onkeyup="filtrarOpciones(this,'productoItem')" />
+
+                            @foreach (var p in Model.Productos)
+                            {
+                                <div class="custom-option productoItem"
+                                     onclick="seleccionarProductoCustom('@p.IdProducto','@p.Nombre','@p.Codigo')">
+                                    @p.Nombre
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Código del producto</label>
+                    <input id="ModalCodigoProducto" class="modal-input" readonly />
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Precio de compra</label>
+                    <input id="ModalPrecioCompra" class="modal-input" type="number" />
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Precio de venta</label>
+                    <input id="ModalPrecioVenta" class="modal-input" type="number" />
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Cantidad</label>
+                    <input id="ModalCantidad" class="modal-input" type="number" value="0" />
+                </div>
+
+                <div class="modal-footer-compra">
+                    <button class="btn-save-compra-modal"
+                            onclick="agregarProductoDetalle()">
+                        Crear
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let detalleCompra = [];
+
+        let idProveedorCompra = 0;
+        let documentoProveedorCompra = "";
+
+        let idProductoSeleccionado = 0;
+        let codigoProductoSeleccionado = "";
+        let nombreProductoSeleccionado = "";
+
+        let numeroCompraRegistrada = "";
+
+        const numeroDocumentoCompra = "@Model.NumeroDocumento";
+        const tipoDocumentoCompra = "@Model.TipoDocumento";
+
+        document.addEventListener("DOMContentLoaded", function () {
+            actualizarTotales();
+        });
+
+        function toggleDropdown(idDropdown) {
+            const dropdown = document.getElementById(idDropdown);
+
+            document.querySelectorAll(".custom-options").forEach(function (item) {
+                if (item.id !== idDropdown) {
+                    item.classList.remove("show");
+                }
+            });
+
+            dropdown.classList.toggle("show");
+
+            const inputBusqueda = dropdown.querySelector(".custom-search");
+
+            if (inputBusqueda) {
+                inputBusqueda.value = "";
+                filtrarOpciones(inputBusqueda, idDropdown === "proveedorOptions" ? "proveedorItem" : "productoItem");
+
+                setTimeout(function () {
+                    inputBusqueda.focus();
+                }, 100);
+            }
+        }
+
+        function filtrarOpciones(input, claseItem) {
+            const filtro = input.value.toLowerCase();
+            const opciones = document.querySelectorAll("." + claseItem);
+
+            opciones.forEach(function (opcion) {
+                const texto = opcion.innerText.toLowerCase();
+                opcion.style.display = texto.includes(filtro) ? "block" : "none";
+            });
+        }
+
+        function seleccionarProveedorCustom(idProveedor, razonSocial, documento) {
+            idProveedorCompra = parseInt(idProveedor) || 0;
+            documentoProveedorCompra = documento || "";
+
+            document.getElementById("proveedorTexto").innerText = razonSocial || "SELECCIONE";
+            document.getElementById("ModalDocumentoProveedor").value = documentoProveedorCompra;
+
+            document.getElementById("proveedorOptions").classList.remove("show");
+        }
+
+        function seleccionarProductoCustom(idProducto, nombreProducto, codigoProducto) {
+            idProductoSeleccionado = parseInt(idProducto) || 0;
+            nombreProductoSeleccionado = nombreProducto || "";
+            codigoProductoSeleccionado = codigoProducto || "";
+
+            document.getElementById("productoTexto").innerText = nombreProductoSeleccionado || "SELECCIONE";
+            document.getElementById("ModalCodigoProducto").value = codigoProductoSeleccionado;
+
+            document.getElementById("productoOptions").classList.remove("show");
+        }
+
+        document.addEventListener("click", function (event) {
+            if (!event.target.closest(".custom-select-wrapper")) {
+                document.querySelectorAll(".custom-options").forEach(function (item) {
+                    item.classList.remove("show");
+                });
+            }
+        });
+
+        function prepararModalAgregarProducto() {
+            idProductoSeleccionado = 0;
+            codigoProductoSeleccionado = "";
+            nombreProductoSeleccionado = "";
+
+            document.getElementById("productoTexto").innerText = "SELECCIONE";
+            document.getElementById("ModalCodigoProducto").value = "";
+            document.getElementById("ModalPrecioCompra").value = "";
+            document.getElementById("ModalPrecioVenta").value = "";
+            document.getElementById("ModalCantidad").value = "0";
+
+            if (idProveedorCompra > 0) {
+                document.getElementById("ModalDocumentoProveedor").value = documentoProveedorCompra;
+            }
+        }
+
+        function agregarProductoDetalle() {
+            const precioCompra = parseFloat(document.getElementById("ModalPrecioCompra").value);
+            const precioVenta = parseFloat(document.getElementById("ModalPrecioVenta").value);
+            const cantidad = parseInt(document.getElementById("ModalCantidad").value);
+
+            if (!idProveedorCompra) {
+                showAlert("Debe seleccionar un proveedor.", "warning");
+                return;
+            }
+
+            if (!documentoProveedorCompra) {
+                showAlert("No se encontró el documento o NIT del proveedor.", "warning");
+                return;
+            }
+
+            if (!idProductoSeleccionado) {
+                showAlert("Debe seleccionar un producto.", "warning");
+                return;
+            }
+
+            if (!codigoProductoSeleccionado) {
+                showAlert("No se encontró el código del producto.", "warning");
+                return;
+            }
+
+            if (isNaN(precioCompra) || precioCompra <= 0) {
+                showAlert("El precio de compra debe ser mayor a cero.", "warning");
+                return;
+            }
+
+            if (isNaN(precioVenta) || precioVenta <= 0) {
+                showAlert("El precio de venta debe ser mayor a cero.", "warning");
+                return;
+            }
+
+            if (precioVenta <= precioCompra) {
+                showAlert("El precio de venta debe ser mayor al precio de compra.", "danger");
+                return;
+            }
+
+            if (isNaN(cantidad) || cantidad <= 0) {
+                showAlert("La cantidad debe ser mayor a cero.", "warning");
+                return;
+            }
+
+            const existente = detalleCompra.find(x => x.idProducto === idProductoSeleccionado);
+
+            if (existente) {
+                existente.cantidad += cantidad;
+                existente.precioCompra = precioCompra;
+                existente.precioVenta = precioVenta;
+                existente.montoTotal = existente.cantidad * precioCompra;
+
+                showAlert("Producto actualizado en el detalle.", "success");
+            } else {
+                detalleCompra.push({
+                    idProducto: idProductoSeleccionado,
+                    codigoProducto: codigoProductoSeleccionado,
+                    nombreProducto: nombreProductoSeleccionado,
+                    precioCompra: precioCompra,
+                    precioVenta: precioVenta,
+                    cantidad: cantidad,
+                    montoTotal: cantidad * precioCompra
+                });
+
+                showAlert("Producto agregado correctamente.", "success");
+            }
+
+            renderizarTabla();
+            actualizarTotales();
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById("modalAgregarProducto"));
+
+            if (modal) {
+                modal.hide();
+            }
+        }
+
+        function renderizarTabla() {
+            const tabla = document.getElementById("tablaDetalleCompra");
+            tabla.innerHTML = "";
+
+            if (detalleCompra.length === 0) {
+                tabla.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-detail-row">
+                            No se han agregado productos a la compra.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            detalleCompra.forEach(function (item) {
+                tabla.innerHTML += `
+                    <tr>
+                        <td>${item.nombreProducto}</td>
+                        <td>${formatoMoneda(item.precioCompra)}</td>
+                        <td class="td-cantidad">
+                            <span class="cantidad-display">${item.cantidad}</span>
+                        </td>
+                        <td>${formatoMoneda(item.montoTotal)}</td>
+                        <td>
+                            <button class="btn-delete-product"
+                                    onclick="eliminarProducto(${item.idProducto})">
+                                <img src="/img/Eliminar.png" class="delete-icon" />
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function eliminarProducto(idProducto) {
+            detalleCompra = detalleCompra.filter(x => x.idProducto !== idProducto);
+
+            renderizarTabla();
+            actualizarTotales();
+
+            showAlert("Producto eliminado correctamente.", "success");
+        }
+
+        function obtenerSubtotal() {
+            return detalleCompra.reduce((acc, item) => acc + item.montoTotal, 0);
+        }
+
+        function obtenerDescuento() {
+            const inputDescuento = document.getElementById("txtDescuento");
+            let descuento = parseInt(inputDescuento?.value || "0");
+
+            if (isNaN(descuento) || descuento < 0) {
+                descuento = 0;
+            }
+
+            if (descuento > 100) {
+                descuento = 100;
+            }
+
+            if (inputDescuento) {
+                inputDescuento.value = descuento;
+            }
+
+            return descuento;
+        }
+
+        function obtenerTotalPagar() {
+            const subtotal = obtenerSubtotal();
+            const descuento = obtenerDescuento();
+            const valorDescuento = subtotal * (descuento / 100);
+
+            return subtotal - valorDescuento;
+        }
+
+        function actualizarTotales() {
+            const subtotal = obtenerSubtotal();
+            const totalPagar = obtenerTotalPagar();
+
+            document.getElementById("txtSubtotal").innerText = formatoMoneda(subtotal);
+            document.getElementById("txtTotalPagar").innerText = formatoMoneda(totalPagar);
+
+            actualizarCambio();
+        }
+
+        function actualizarCambio() {
+            const totalPagar = obtenerTotalPagar();
+            const inputMontoPagado = document.getElementById("txtMontoPagado");
+            const montoPagado = parseFloat(inputMontoPagado?.value || "0");
+
+            let cambio = montoPagado - totalPagar;
+
+            if (isNaN(cambio) || cambio < 0) {
+                cambio = 0;
+            }
+
+            const txtMontoCambio = document.getElementById("txtMontoCambio");
+
+            if (txtMontoCambio) {
+                txtMontoCambio.innerText = formatoMoneda(cambio);
+            }
+        }
+
+        function registrarCompra() {
+            if (!idProveedorCompra) {
+                showAlert("Debe seleccionar un proveedor.", "warning");
+                return;
+            }
+
+            if (!documentoProveedorCompra) {
+                showAlert("No se encontró el documento o NIT del proveedor.", "warning");
+                return;
+            }
+
+            if (detalleCompra.length === 0) {
+                showAlert("Debe agregar al menos un producto.", "warning");
+                return;
+            }
+
+            const subTotal = obtenerSubtotal();
+            const descuento = obtenerDescuento();
+            const montoTotal = obtenerTotalPagar();
+            const inputMontoPagado = document.getElementById("txtMontoPagado");
+            const montoPagado = parseFloat(inputMontoPagado?.value || "0");
+
+            if (isNaN(montoPagado) || montoPagado <= 0) {
+                showAlert("Debe ingresar el monto pagado.", "warning");
+                return;
+            }
+
+            if (montoPagado < montoTotal) {
+                showAlert("El monto pagado no puede ser menor al total a pagar.", "warning");
+                return;
+            }
+
+            const montoCambio = montoPagado - montoTotal;
+
+            const compra = {
+                idProveedor: idProveedorCompra,
+                documentoProveedor: documentoProveedorCompra,
+                tipoDocumento: tipoDocumentoCompra || "COMPRA",
+                numeroDocumento: numeroDocumentoCompra || "AUTO",
+                subTotal: subTotal,
+                descuento: descuento,
+                montoTotal: montoTotal,
+                montoPagado: montoPagado,
+                montoCambio: montoCambio,
+                detalleCompra: detalleCompra
+            };
+
+            fetch("/Compra/Registrar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(compra)
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.resultado) {
+                    const numeroCompra = data.numeroDocumento || extraerNumeroCompra(data.mensaje);
+
+                    numeroCompraRegistrada = numeroCompra || "";
+
+                    showAlert(data.mensaje || "Compra registrada correctamente.", "success");
+
+                    if (numeroCompraRegistrada) {
+                        document.getElementById("txtNumeroCompra").innerText = numeroCompraRegistrada;
+                        document.getElementById("btnCopiarNumeroCompra").style.display = "flex";
+                    }
+                } else {
+                    showAlert(data.mensaje || "No se pudo registrar la compra.", "danger");
+                }
+            })
+            .catch(() => {
+                showAlert("Error en la conexión con el servidor.", "danger");
+            });
+        }
+
+        function extraerNumeroCompra(mensaje) {
+            if (!mensaje) {
+                return "";
+            }
+
+            const coincidencia = mensaje.match(/COMP-\d+/);
+            return coincidencia ? coincidencia[0] : "";
+        }
+
+        function copiarNumeroCompra() {
+            const numeroCompra = document.getElementById("txtNumeroCompra").innerText;
+
+            if (!numeroCompra || numeroCompra === "Pendiente") {
+                showAlert("No hay número de compra para copiar.", "warning");
+                return;
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(numeroCompra)
+                    .then(function () {
+                        showAlert("Número de compra copiado al portapapeles.", "success");
+                    })
+                    .catch(function () {
+                        copiarNumeroCompraFallback(numeroCompra);
+                    });
+            } else {
+                copiarNumeroCompraFallback(numeroCompra);
+            }
+        }
+
+        function copiarNumeroCompraFallback(numeroCompra) {
+            const inputTemporal = document.createElement("input");
+            inputTemporal.value = numeroCompra;
+            document.body.appendChild(inputTemporal);
+            inputTemporal.select();
+            document.execCommand("copy");
+            document.body.removeChild(inputTemporal);
+
+            showAlert("Número de compra copiado al portapapeles.", "success");
+        }
+
+        function limpiarCompra() {
+            detalleCompra = [];
+
+            idProveedorCompra = 0;
+            documentoProveedorCompra = "";
+
+            idProductoSeleccionado = 0;
+            codigoProductoSeleccionado = "";
+            nombreProductoSeleccionado = "";
+
+            numeroCompraRegistrada = "";
+
+            document.getElementById("txtNumeroCompra").innerText = "Pendiente";
+            document.getElementById("btnCopiarNumeroCompra").style.display = "none";
+
+            document.getElementById("proveedorTexto").innerText = "SELECCIONE";
+            document.getElementById("productoTexto").innerText = "SELECCIONE";
+
+            document.getElementById("ModalDocumentoProveedor").value = "";
+            document.getElementById("ModalCodigoProducto").value = "";
+            document.getElementById("ModalPrecioCompra").value = "";
+            document.getElementById("ModalPrecioVenta").value = "";
+            document.getElementById("ModalCantidad").value = "0";
+
+            document.getElementById("txtDescuento").value = 0;
+            document.getElementById("txtMontoPagado").value = 0;
+            document.getElementById("txtMontoCambio").innerText = formatoMoneda(0);
+
+            renderizarTabla();
+            actualizarTotales();
+
+            showAlert("Compra limpiada correctamente.", "success");
+        }
+
+        function formatoMoneda(valor) {
+            return new Intl.NumberFormat("es-CO", {
+                style: "currency",
+                currency: "COP",
+                minimumFractionDigits: 0
+            }).format(valor || 0);
+        }
+
+        function showAlert(mensaje, tipo = "danger") {
+            const container = document.getElementById("alertContainer");
+
+            const alert = document.createElement("div");
+            let alertClass = tipo === "success"
+                ? "alert-success-custom"
+                : tipo === "warning"
+                    ? "alert-warning-custom"
+                    : "alert-danger-custom";
+
+            alert.className = `alert-custom ${alertClass}`;
+            alert.innerHTML = `
+                <span class="alert-message">${mensaje}</span>
+                <button class="alert-close" onclick="closeAlert(this)">×</button>
+            `;
+
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.style.animation = "fadeOut 0.4s ease forwards";
+                setTimeout(() => alert.remove(), 700);
+            }, 3000);
+        }
+
+        function closeAlert(element) {
+            const alert = element.parentElement;
+            alert.style.animation = "fadeOut 0.4s ease forwards";
+            setTimeout(() => alert.remove(), 700);
+        }
+    </script>
+}

@@ -1,14 +1,13 @@
 ﻿using CapaDatos;
 using CapaEntidad;
+using System;
+using System.Text.RegularExpressions;
 
 namespace CapaNegocio
 {
     public class CN_Negocio
     {
-
-
         private NegocioDatos objcd_negocio = new NegocioDatos();
-
 
         public Negocio ObtenerDatos()
         {
@@ -19,31 +18,65 @@ namespace CapaNegocio
         {
             Mensaje = string.Empty;
 
-            if (obj.Nombre == "")
+            if (obj == null)
             {
-                Mensaje += "Es necesario el nombre\n";
+                Mensaje = "No se recibieron los datos del negocio.";
+                return false;
             }
 
-            if (obj.RUC == "")
+            // 🔹 Validaciones básicas
+            if (string.IsNullOrWhiteSpace(obj.Nombre))
             {
-                Mensaje += "Es necesario el numero de RUC\n";
+                Mensaje += "Es necesario el nombre del negocio\n";
             }
 
-            if (obj.Direccion == "")
+            if (string.IsNullOrWhiteSpace(obj.RUC))
             {
-                Mensaje += "Es necesario la direccion\n";
+                Mensaje += "Es necesario el número del RUT\n";
+            }
+            else if (!Regex.IsMatch(obj.RUC.Trim(), @"^\d{1,3}(\.\d{3})*-[0-9A-Za-z]$"))
+            {
+                Mensaje += "El formato del RUT no es válido. Ejemplo válido: 800.244.387-4\n";
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Direccion))
+            {
+                Mensaje += "Es necesario la dirección\n";
+            }
+
+            if (obj.IdDepartamento <= 0)
+            {
+                Mensaje += "Debe seleccionar un departamento válido\n";
+            }
+
+            if (obj.IdCiudad <= 0)
+            {
+                Mensaje += "Debe seleccionar una ciudad válida\n";
             }
 
             if (Mensaje != string.Empty)
             {
                 return false;
             }
-            else
+
+            obj.Nombre = obj.Nombre.Trim();
+            obj.RUC = obj.RUC.Trim().ToUpper();
+            obj.Direccion = obj.Direccion.Trim();
+
+            if (obj.oDepartamento == null)
             {
-                return objcd_negocio.GuardarDatos(obj, out Mensaje);
+                obj.oDepartamento = new Departamento();
             }
 
+            if (obj.oCiudad == null)
+            {
+                obj.oCiudad = new Ciudad();
+            }
 
+            obj.oDepartamento.IdDepartamento = obj.IdDepartamento;
+            obj.oCiudad.IdCiudad = obj.IdCiudad;
+
+            return objcd_negocio.GuardarDatos(obj, out Mensaje);
         }
 
         public byte[] ObtenerLogo(out bool obtenido)
@@ -51,12 +84,23 @@ namespace CapaNegocio
             return objcd_negocio.ObtenerLogo(out obtenido);
         }
 
-
         public bool ActualizarLogo(byte[] imagen, out string mensaje)
         {
+            mensaje = string.Empty;
+
+            if (imagen == null || imagen.Length == 0)
+            {
+                mensaje = "Debe seleccionar una imagen válida.";
+                return false;
+            }
+
+            if (imagen.Length > 2 * 1024 * 1024)
+            {
+                mensaje = "El logo no puede superar los 2MB.";
+                return false;
+            }
+
             return objcd_negocio.ActualizarLogo(imagen, out mensaje);
         }
-
-
     }
 }

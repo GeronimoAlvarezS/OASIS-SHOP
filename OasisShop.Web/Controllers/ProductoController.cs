@@ -66,6 +66,40 @@ namespace OasisShop.Web.Controllers
         {
             string mensaje = string.Empty;
 
+            if (obj == null)
+            {
+                TempData["MensajeError"] = "No se recibió la información del producto.";
+                return RedirectToAction("Index");
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Codigo))
+            {
+                TempData["MensajeError"] = "Debe ingresar el código del producto.";
+                return RedirectToAction("Index");
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Nombre))
+            {
+                TempData["MensajeError"] = "Debe ingresar el nombre del producto.";
+                return RedirectToAction("Index");
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Descripcion))
+            {
+                TempData["MensajeError"] = "Debe ingresar la descripción del producto.";
+                return RedirectToAction("Index");
+            }
+
+            if (IdCategoria <= 0)
+            {
+                TempData["MensajeError"] = "Debe seleccionar una categoría válida.";
+                return RedirectToAction("Index");
+            }
+
+            obj.Codigo = obj.Codigo.Trim();
+            obj.Nombre = obj.Nombre.Trim();
+            obj.Descripcion = obj.Descripcion.Trim();
+
             obj.oCategoria = new Categoria()
             {
                 IdCategoria = IdCategoria
@@ -73,6 +107,10 @@ namespace OasisShop.Web.Controllers
 
             if (obj.IdProducto == 0)
             {
+                obj.Stock = 0;
+                obj.PrecioCompra = 0;
+                obj.PrecioVenta = 0;
+
                 int idProductoGenerado = _productoServicio.Registrar(obj, out mensaje);
 
                 if (idProductoGenerado != 0)
@@ -82,6 +120,19 @@ namespace OasisShop.Web.Controllers
             }
             else
             {
+                Producto productoActual = _productoServicio.Listar()
+                    .FirstOrDefault(p => p.IdProducto == obj.IdProducto);
+
+                if (productoActual == null)
+                {
+                    TempData["MensajeError"] = "No se encontró el producto que desea editar.";
+                    return RedirectToAction("Index");
+                }
+
+                obj.Stock = productoActual.Stock;
+                obj.PrecioCompra = productoActual.PrecioCompra;
+                obj.PrecioVenta = productoActual.PrecioVenta;
+
                 bool resultado = _productoServicio.Editar(obj, out mensaje);
 
                 if (resultado)
@@ -136,7 +187,6 @@ namespace OasisShop.Web.Controllers
             {
                 var hoja = workbook.Worksheets.Add("Productos");
 
-                // Título
                 hoja.Cell(1, 1).Value = "LISTADO DE PRODUCTOS";
                 hoja.Range("A1:H1").Merge();
 
@@ -155,7 +205,6 @@ namespace OasisShop.Web.Controllers
                 hoja.Range("A2:H2").Style.Font.Italic = true;
                 hoja.Range("A2:H2").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Right;
 
-                // Encabezados
                 hoja.Cell(4, 1).Value = "Código";
                 hoja.Cell(4, 2).Value = "Nombre";
                 hoja.Cell(4, 3).Value = "Descripción";
@@ -178,8 +227,6 @@ namespace OasisShop.Web.Controllers
                     hoja.Cell(fila, 1).Value = item.Codigo;
                     hoja.Cell(fila, 2).Value = item.Nombre;
                     hoja.Cell(fila, 3).Value = item.Descripcion;
-
-                    // 🔥 MODIFICACIÓN CLAVE
                     hoja.Cell(fila, 4).Value =
                         !string.IsNullOrWhiteSpace(item.oCategoria?.Nombre)
                             ? item.oCategoria.Nombre

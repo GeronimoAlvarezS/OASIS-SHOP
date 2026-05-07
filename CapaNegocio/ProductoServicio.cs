@@ -37,30 +37,14 @@ namespace CapaNegocio
                 Mensaje += "Es necesario seleccionar una categoría válida\n";
             }
 
-            if (obj.Stock < 0)
-            {
-                Mensaje += "El stock inicial no puede ser negativo\n";
-            }
-
-            if (obj.PrecioCompra <= 0)
-            {
-                Mensaje += "El precio de compra debe ser mayor a cero\n";
-            }
-
-            if (obj.PrecioVenta <= 0)
-            {
-                Mensaje += "El precio de venta debe ser mayor a cero\n";
-            }
-
-            if (obj.PrecioVenta < obj.PrecioCompra)
-            {
-                Mensaje += "El precio de venta no puede ser menor al precio de compra\n";
-            }
-
             if (Mensaje != string.Empty)
             {
                 return 0;
             }
+
+            obj.Stock = 0;
+            obj.PrecioCompra = 0;
+            obj.PrecioVenta = 0;
 
             return objcd_Producto.Registrar(obj, out Mensaje);
         }
@@ -92,26 +76,6 @@ namespace CapaNegocio
             if (obj.oCategoria == null || obj.oCategoria.IdCategoria == 0)
             {
                 Mensaje += "Es necesario seleccionar una categoría válida\n";
-            }
-
-            if (obj.Stock < 0)
-            {
-                Mensaje += "El stock no puede ser negativo\n";
-            }
-
-            if (obj.PrecioCompra <= 0)
-            {
-                Mensaje += "El precio de compra debe ser mayor a cero\n";
-            }
-
-            if (obj.PrecioVenta <= 0)
-            {
-                Mensaje += "El precio de venta debe ser mayor a cero\n";
-            }
-
-            if (obj.PrecioVenta < obj.PrecioCompra)
-            {
-                Mensaje += "El precio de venta no puede ser menor al precio de compra\n";
             }
 
             if (Mensaje != string.Empty)

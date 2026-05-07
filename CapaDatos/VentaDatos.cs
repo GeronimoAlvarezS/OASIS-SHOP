@@ -4,9 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CapaDatos
 {
@@ -19,20 +17,18 @@ namespace CapaDatos
 
             using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
             {
-
                 try
                 {
                     StringBuilder query = new StringBuilder();
                     query.AppendLine("select count(*) + 1 from VENTA");
+
                     SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.CommandType = CommandType.Text;
 
                     oconexion.Open();
-
                     idcorrelativo = Convert.ToInt32(cmd.ExecuteScalar());
-
                 }
-                catch (Exception ex)
+                catch
                 {
                     idcorrelativo = 0;
                 }
@@ -55,19 +51,17 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("@cantidad", cantidad);
                     cmd.Parameters.AddWithValue("@idproducto", idproducto);
                     cmd.CommandType = CommandType.Text;
-                    oconexion.Open();
 
-                    respuesta = cmd.ExecuteNonQuery() > 0 ? true : false;
+                    oconexion.Open();
+                    respuesta = cmd.ExecuteNonQuery() > 0;
                 }
-                catch (Exception ex)
+                catch
                 {
                     respuesta = false;
                 }
             }
             return respuesta;
-
         }
-
 
         public bool SumarStock(int idproducto, int cantidad)
         {
@@ -79,36 +73,37 @@ namespace CapaDatos
                 {
                     StringBuilder query = new StringBuilder();
                     query.AppendLine("update producto set stock = stock + @cantidad where idproducto = @idproducto");
+
                     SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@cantidad", cantidad);
                     cmd.Parameters.AddWithValue("@idproducto", idproducto);
                     cmd.CommandType = CommandType.Text;
-                    oconexion.Open();
 
-                    respuesta = cmd.ExecuteNonQuery() > 0 ? true : false;
+                    oconexion.Open();
+                    respuesta = cmd.ExecuteNonQuery() > 0;
                 }
-                catch (Exception ex)
+                catch
                 {
                     respuesta = false;
                 }
             }
             return respuesta;
-
         }
 
-
-
+        // 🔥 REGISTRAR VENTA (ACTUALIZADO)
         public bool Registrar(Venta obj, DataTable DetalleVenta, out string Mensaje)
         {
             bool Respuesta = false;
             Mensaje = string.Empty;
+
             try
             {
                 using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand("usp_RegistrarVenta", oconexion);
+
                     cmd.Parameters.AddWithValue("IdUsuario", obj.oUsuario.IdUsuario);
-                    cmd.Parameters.AddWithValue("TipoDocumento", obj.TipoDocumento);
+                    cmd.Parameters.AddWithValue("IdTipoFactura", obj.IdTipoFactura);
                     cmd.Parameters.AddWithValue("NumeroDocumento", obj.NumeroDocumento);
                     cmd.Parameters.AddWithValue("DocumentoCliente", obj.DocumentoCliente);
                     cmd.Parameters.AddWithValue("NombreCliente", obj.NombreCliente);
@@ -116,8 +111,10 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("MontoCambio", obj.MontoCambio);
                     cmd.Parameters.AddWithValue("MontoTotal", obj.MontoTotal);
                     cmd.Parameters.AddWithValue("DetalleVenta", DetalleVenta);
+
                     cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     oconexion.Open();
@@ -126,7 +123,6 @@ namespace CapaDatos
                     Respuesta = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
                     Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
                 }
-
             }
             catch (Exception ex)
             {
@@ -137,61 +133,67 @@ namespace CapaDatos
             return Respuesta;
         }
 
-
-        public Venta ObtenerVenta(string numero) {
-
+        public Venta ObtenerVenta(string numero)
+        {
             Venta obj = new Venta();
 
-            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString)) {
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+            {
                 try
                 {
                     oconexion.Open();
-                    StringBuilder query = new StringBuilder();
 
+                    StringBuilder query = new StringBuilder();
                     query.AppendLine("select v.IdVenta,u.NombreCompleto,");
                     query.AppendLine("v.DocumentoCliente,v.NombreCliente,");
-                    query.AppendLine("v.TipoDocumento,v.NumeroDocumento,");
+                    query.AppendLine("tf.IdTipoFactura,tf.Nombre as TipoFactura,");
+                    query.AppendLine("v.NumeroDocumento,");
                     query.AppendLine("v.MontoPago,v.MontoCambio,v.MontoTotal,");
                     query.AppendLine("convert(char(10),v.FechaRegistro,103)[FechaRegistro]");
                     query.AppendLine("from VENTA v");
                     query.AppendLine("inner join USUARIO u on u.IdUsuario = v.IdUsuario");
+                    query.AppendLine("inner join TIPO_FACTURA tf on tf.IdTipoFactura = v.IdTipoFactura");
                     query.AppendLine("where v.NumeroDocumento = @numero");
 
                     SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@numero", numero);
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
 
-                    using (SqlDataReader dr = cmd.ExecuteReader()) {
-
-                        while (dr.Read()) {
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
                             obj = new Venta()
                             {
-                                IdVenta = int.Parse(dr["IdVenta"].ToString()),
+                                IdVenta = Convert.ToInt32(dr["IdVenta"]),
                                 oUsuario = new Usuario() { NombreCompleto = dr["NombreCompleto"].ToString() },
                                 DocumentoCliente = dr["DocumentoCliente"].ToString(),
                                 NombreCliente = dr["NombreCliente"].ToString(),
-                                TipoDocumento = dr["TipoDocumento"].ToString(),
                                 NumeroDocumento = dr["NumeroDocumento"].ToString(),
-                                MontoPago = Convert.ToDecimal(dr["MontoPago"].ToString()),
-                                MontoCambio = Convert.ToDecimal(dr["MontoCambio"].ToString()),
-                                MontoTotal = Convert.ToDecimal(dr["MontoTotal"].ToString()),
-                                FechaRegistro = dr["FechaRegistro"].ToString()
+                                MontoPago = Convert.ToDecimal(dr["MontoPago"]),
+                                MontoCambio = Convert.ToDecimal(dr["MontoCambio"]),
+                                MontoTotal = Convert.ToDecimal(dr["MontoTotal"]),
+                                FechaRegistro = dr["FechaRegistro"].ToString(),
+                                IdTipoFactura = Convert.ToInt32(dr["IdTipoFactura"]),
+                                oTipoFactura = new TipoFactura()
+                                {
+                                    IdTipoFactura = Convert.ToInt32(dr["IdTipoFactura"]),
+                                    Nombre = dr["TipoFactura"].ToString()
+                                }
                             };
                         }
                     }
-
                 }
-                catch {
+                catch
+                {
                     obj = new Venta();
                 }
-
             }
             return obj;
-
         }
 
-
-        public List<Detalle_Venta> ObtenerDetalleVenta(int idVenta) {
+        public List<Detalle_Venta> ObtenerDetalleVenta(int idVenta)
+        {
             List<Detalle_Venta> oLista = new List<Detalle_Venta>();
 
             using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
@@ -199,15 +201,15 @@ namespace CapaDatos
                 try
                 {
                     oconexion.Open();
+
                     StringBuilder query = new StringBuilder();
                     query.AppendLine("select p.Nombre,dv.PrecioVenta,dv.Cantidad,dv.SubTotal from DETALLE_VENTA dv");
                     query.AppendLine("inner join PRODUCTO p on p.IdProducto = dv.IdProducto");
-                    query.AppendLine(" where dv.IdVenta = @idventa");
+                    query.AppendLine("where dv.IdVenta = @idventa");
 
                     SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@idventa", idVenta);
-                    cmd.CommandType = System.Data.CommandType.Text;
-
+                    cmd.CommandType = CommandType.Text;
 
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
@@ -216,22 +218,57 @@ namespace CapaDatos
                             oLista.Add(new Detalle_Venta()
                             {
                                 oProducto = new Producto() { Nombre = dr["Nombre"].ToString() },
-                                PrecioVenta = Convert.ToDecimal(dr["PrecioVenta"].ToString()),
-                                Cantidad = Convert.ToInt32(dr["Cantidad"].ToString()),
-                                SubTotal = Convert.ToDecimal(dr["SubTotal"].ToString()),
+                                PrecioVenta = Convert.ToDecimal(dr["PrecioVenta"]),
+                                Cantidad = Convert.ToInt32(dr["Cantidad"]),
+                                SubTotal = Convert.ToDecimal(dr["SubTotal"]),
                             });
                         }
                     }
-
                 }
-                catch {
+                catch
+                {
                     oLista = new List<Detalle_Venta>();
                 }
             }
             return oLista;
         }
 
+        public List<TipoFactura> ListarTipoFactura()
+        {
+            List<TipoFactura> lista = new List<TipoFactura>();
 
+            using (SqlConnection oconexion = new SqlConnection(ConnectionHelper.ConnectionString))
+            {
+                try
+                {
+                    string query = "SELECT IdTipoFactura, Nombre, Descripcion, Estado FROM TIPO_FACTURA WHERE Estado = 1";
 
+                    SqlCommand cmd = new SqlCommand(query, oconexion);
+                    cmd.CommandType = CommandType.Text;
+
+                    oconexion.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            lista.Add(new TipoFactura()
+                            {
+                                IdTipoFactura = Convert.ToInt32(dr["IdTipoFactura"]),
+                                Nombre = dr["Nombre"].ToString(),
+                                Descripcion = dr["Descripcion"].ToString(),
+                                Estado = Convert.ToBoolean(dr["Estado"])
+                            });
+                        }
+                    }
+                }
+                catch
+                {
+                    lista = new List<TipoFactura>();
+                }
+            }
+
+            return lista;
+        }
     }
 }

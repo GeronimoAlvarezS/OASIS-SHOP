@@ -68,12 +68,12 @@
         border: none;
         border-radius: 7px;
         padding: 10px 16px;
-        font-weight: 600;
-        min-width: 145px;
+        font-weight: 400;
+        min-width: 150px;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        text-decoration: none;
+        font-size: 15px;
     }
 
         .btn-primary-custom:hover {
@@ -97,7 +97,7 @@
         text-decoration: none;
         box-shadow: 0 2px 3px rgba(0,0,0,0.25);
         margin-left: 10px;
-        margin-top:10px;
+        margin-top: 10px;
     }
 
         .btn-export-excel:hover {
@@ -310,7 +310,7 @@
     .modal-producto-custom .modal-content {
         border: none;
         border-radius: 22px;
-        overflow: hidden;
+        overflow: visible;
         background: #ECEEF3;
         box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
     }
@@ -328,14 +328,17 @@
 
     .modal-header-crear {
         background: #1E1B4B;
+        border-radius: 22px 22px 0 0;
     }
 
     .modal-header-editar {
         background: #3F3CBB;
+        border-radius: 22px 22px 0 0;
     }
 
     .modal-header-detalle {
         background: #22C55E;
+        border-radius: 22px 22px 0 0;
     }
 
     .modal-title-custom {
@@ -361,6 +364,7 @@
 
     .modal-body-producto {
         padding: 14px 18px 16px 18px;
+        overflow: visible;
     }
 
     .modal-label {
@@ -407,6 +411,7 @@
 
     .modal-group {
         margin-bottom: 10px;
+        position: relative;
     }
 
     .modal-footer-custom {
@@ -428,6 +433,89 @@
 
         .btn-save-modal:hover {
             background: #16A34A;
+        }
+
+    .custom-select-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .custom-select-box {
+        width: 100%;
+        height: 30px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 4px 10px;
+        font-size: 14px;
+        color: #333333;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+    }
+
+    .custom-select-text {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .custom-arrow {
+        font-size: 13px;
+        color: #666666;
+        margin-left: 8px;
+    }
+
+    .custom-options {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 34px;
+        width: 100%;
+        max-height: 210px;
+        overflow-y: auto;
+        background: #FFFFFF;
+        border: 1px solid #00A6C8;
+        z-index: 99999;
+        padding: 4px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+    }
+
+        .custom-options.show {
+            display: block;
+        }
+
+    .custom-search {
+        width: 100%;
+        height: 28px;
+        border: 1px solid #8E8E8E;
+        margin-bottom: 4px;
+        padding: 3px 6px;
+        outline: none;
+        font-size: 14px;
+        background: #FFFFFF;
+    }
+
+        .custom-search:focus {
+            border-color: #00A6C8;
+        }
+
+    .custom-option {
+        padding: 7px 8px;
+        text-align: center;
+        font-size: 14px;
+        cursor: pointer;
+        color: #111111;
+        background: #FFFFFF;
+        line-height: 1.25;
+    }
+
+        .custom-option:hover,
+        .custom-option.active {
+            background: #00A6C8;
+            color: #FFFFFF;
         }
 
     .details-container {
@@ -536,19 +624,18 @@
             <img src="~/img/Agregar.png" alt="Crear producto" class="icon-btn" />
             <span>Crear producto</span>
         </button>
-
     </div>
 
     <a class="btn-export-excel"
-           href="@Url.Action("ExportarExcel", "Producto", new { busqueda = busquedaActual })"
-           onclick="showAlert('Exportando listado de productos...', 'success')">
+           id="btnExportarExcel"
+           href="javascript:void(0);">
         Exportar Excel
     </a>
 
     <div class="search-row">
         <form method="get" asp-controller="Producto" asp-action="Index" class="search-form" id="formBusquedaProductos">
             <div class="search-container">
-                <img src="~/img/buscar.png" alt="Buscar" class="search-icon" />
+                <img src="~/img/buscar.png" class="search-icon" />
                 <input type="text"
                        class="search-input"
                        id="txtBuscar"
@@ -559,11 +646,12 @@
         </form>
     </div>
 
+    <!-- TABLA -->
     <div class="table-card">
         <table class="table-custom">
             <thead>
                 <tr>
-                    <th><input type="checkbox" /></th>
+                    <th></th>
                     <th>Código</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
@@ -581,42 +669,38 @@
                 {
                     foreach (var item in Model)
                     {
+                        var nombreCategoria = categorias?
+                        .FirstOrDefault(c => c.IdCategoria == item.oCategoria?.IdCategoria)?.Nombre ?? "Sin categoría";
+
                         <tr>
                             <td><input type="checkbox" /></td>
                             <td>@item.Codigo</td>
                             <td>@item.Nombre</td>
                             <td class="descripcion-col">@item.Descripcion</td>
-                            @{
-                                var nombreCategoria = categorias?
-                                    .FirstOrDefault(c => c.IdCategoria == item.oCategoria?.IdCategoria)?
-                                    .Nombre ?? "Sin categoría";
-                            }
-
                             <td>@nombreCategoria</td>
                             <td>@item.Stock</td>
                             <td>@PrecioMoneda(item.PrecioCompra)</td>
                             <td>@PrecioMoneda(item.PrecioVenta)</td>
                             <td>@(item.Estado ? "Activo" : "Inactivo")</td>
+
                             <td class="actions-cell">
-                                <button type="button"
-                                        class="btn-action btn-edit"
+
+                                <!-- EDITAR -->
+                                <button class="btn-action btn-edit"
                                         onclick="editarProducto(
                                     '@item.IdProducto',
                                     '@JsValue(item.Codigo)',
                                     '@JsValue(item.Nombre)',
                                     '@JsValue(item.Descripcion)',
-                                    '@(item.oCategoria != null ? item.oCategoria.IdCategoria.ToString() : "")',
-                                    '@item.Stock',
-                                    '@PrecioInput(item.PrecioCompra)',
-                                    '@PrecioInput(item.PrecioVenta)',
-                                    '@item.Estado.ToString().ToLower()'
-                                    )">
-                                    <img src="~/img/Editar.png" alt="Editar" class="icon-btn" />
-                                    <span>Editar</span>
+                                    '@(item.oCategoria?.IdCategoria)',
+                                    '@item.Estado.ToString().ToLower()')">
+
+                                    <img src="~/img/Editar.png" class="icon-btn" />
+                                    Editar
                                 </button>
 
-                                <button type="button"
-                                        class="btn-action btn-detail"
+                                <!-- DETALLE -->
+                                <button class="btn-action btn-detail"
                                         onclick="verDetalleProducto(
                                     '@JsValue(item.Codigo)',
                                     '@JsValue(item.Nombre)',
@@ -625,10 +709,10 @@
                                     '@item.Stock',
                                     '@JsValue(PrecioMoneda(item.PrecioCompra))',
                                     '@JsValue(PrecioMoneda(item.PrecioVenta))',
-                                    '@(item.Estado ? "Activo" : "Inactivo")'
-                                    )">
-                                    <img src="~/img/Detalles.png" alt="Detalles" class="icon-btn" />
-                                    <span>Detalles</span>
+                                    '@(item.Estado ? "Activo" : "Inactivo")')">
+
+                                    <img src="~/img/Detalles.png" class="icon-btn" />
+                                    Detalles
                                 </button>
                             </td>
                         </tr>
@@ -644,17 +728,22 @@
         </table>
     </div>
 
+    <!-- PAGINACIÓN -->
     <div class="pagination-container">
         <ul class="pagination-custom">
             @if (ViewBag.PaginaActual > 1)
             {
                 <li>
-                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual - 1, busqueda = busquedaActual })">Anterior</a>
+                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual - 1, busqueda = busquedaActual })">
+                        Anterior
+                    </a>
                 </li>
             }
             else
             {
-                <li class="disabled"><span>Anterior</span></li>
+                <li class="disabled">
+                    <span>Anterior</span>
+                </li>
             }
 
             @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
@@ -667,263 +756,198 @@
             @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
             {
                 <li>
-                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual + 1, busqueda = busquedaActual })">Siguiente</a>
+                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual + 1, busqueda = busquedaActual })">
+                        Siguiente
+                    </a>
                 </li>
             }
             else
             {
-                <li class="disabled"><span>Siguiente</span></li>
+                <li class="disabled">
+                    <span>Siguiente</span>
+                </li>
             }
         </ul>
     </div>
 </div>
 
-<!-- MODAL CREAR -->
-<div class="modal fade modal-producto-custom" id="modalCrearProducto" tabindex="-1" aria-hidden="true">
+<!-- ================= MODAL CREAR ================= -->
+<div class="modal fade modal-producto-custom" id="modalCrearProducto">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+
             <div class="modal-header-crear">
                 <h5 class="modal-title-custom">CREAR PRODUCTO</h5>
-                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">×</button>
+                <button class="btn-close-custom" data-bs-dismiss="modal">×</button>
             </div>
 
-            <form method="post" asp-controller="Producto" asp-action="Guardar">
+            <form method="post" asp-action="Guardar">
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body modal-body-producto">
-                    <input type="hidden" id="CrearIdProducto" name="IdProducto" value="0" />
 
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearCodigo">Código</label>
-                        <input type="text"
-                               class="modal-input"
-                               id="CrearCodigo"
-                               name="Codigo"
-                               required
-                               maxlength="20"
-                               autocomplete="off" />
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearNombre">Nombre</label>
-                        <input type="text"
-                               class="modal-input"
-                               id="CrearNombre"
-                               name="Nombre"
-                               required
-                               maxlength="50"
-                               autocomplete="off" />
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearDescripcion">Descripción</label>
-                        <textarea class="modal-textarea"
-                                  id="CrearDescripcion"
-                                  name="Descripcion"
-                                  required
-                                  maxlength="500"></textarea>
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearIdCategoria">Categoría</label>
-                        <select class="modal-select" id="CrearIdCategoria" name="IdCategoria" required>
-                            <option value="">SELECCIONE</option>
-                            @if (categorias != null)
-                            {
-                                foreach (var categoria in categorias)
-                                {
-                                    <option value="@categoria.IdCategoria">@categoria.Nombre</option>
-                                }
-                            }
-                        </select>
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearStock">Stock inicial</label>
-                        <input type="number"
-                               class="modal-input"
-                               id="CrearStock"
-                               name="Stock"
-                               min="0"
-                               value="0"
-                               required />
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearPrecioCompra">Precio de compra</label>
-                        <input type="number"
-                               class="modal-input"
-                               id="CrearPrecioCompra"
-                               name="PrecioCompra"
-                               min="0"
-                               step="0.01"
-                               value="0"
-                               required />
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearPrecioVenta">Precio de venta</label>
-                        <input type="number"
-                               class="modal-input"
-                               id="CrearPrecioVenta"
-                               name="PrecioVenta"
-                               min="0"
-                               step="0.01"
-                               value="0"
-                               required />
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label" for="CrearEstado">Estado</label>
-                        <select class="modal-select" id="CrearEstado" name="Estado" required>
-                            <option value="">SELECCIONE</option>
-                            <option value="true" selected>Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <div class="modal-footer-custom">
-                        <button type="submit" class="btn-save-modal">Crear</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL EDITAR -->
-<div class="modal fade modal-producto-custom" id="modalEditarProducto" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header-editar">
-                <h5 class="modal-title-custom">EDITAR PRODUCTO</h5>
-                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">×</button>
-            </div>
-
-            <form method="post" asp-controller="Producto" asp-action="Guardar">
-                @Html.AntiForgeryToken()
-
-                <div class="modal-body modal-body-producto">
-                    <input type="hidden" id="EditarIdProducto" name="IdProducto" value="0" />
+                    <input type="hidden" name="Stock" value="0" />
+                    <input type="hidden" name="PrecioCompra" value="0" />
+                    <input type="hidden" name="PrecioVenta" value="0" />
 
                     <div class="modal-group">
                         <label class="modal-label">Código</label>
-                        <input type="text" class="modal-input" id="EditarCodigo" name="Codigo" required maxlength="20" />
+                        <input class="modal-input" name="Codigo" required />
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Nombre</label>
-                        <input type="text" class="modal-input" id="EditarNombre" name="Nombre" required maxlength="50" />
+                        <input class="modal-input" name="Nombre" required />
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Descripción</label>
-                        <textarea class="modal-textarea" id="EditarDescripcion" name="Descripcion" required maxlength="500"></textarea>
+                        <textarea class="modal-textarea" name="Descripcion"></textarea>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Categoría</label>
-                        <select class="modal-select" id="EditarIdCategoria" name="IdCategoria" required>
-                            <option value="">SELECCIONE</option>
-                            @if (categorias != null)
+                        <select class="modal-select" name="IdCategoria" required>
+                            <option value="">Seleccione</option>
+                            @foreach (var c in categorias)
                             {
-                                foreach (var categoria in categorias)
-                                {
-                                    <option value="@categoria.IdCategoria">@categoria.Nombre</option>
-                                }
+                                <option value="@c.IdCategoria">@c.Nombre</option>
                             }
                         </select>
                     </div>
 
                     <div class="modal-group">
-                        <label class="modal-label">Stock inicial</label>
-                        <input type="number" class="modal-input" id="EditarStock" name="Stock" min="0" required />
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label">Precio de compra</label>
-                        <input type="number" class="modal-input" id="EditarPrecioCompra" name="PrecioCompra" min="0" step="0.01" required />
-                    </div>
-
-                    <div class="modal-group">
-                        <label class="modal-label">Precio de venta</label>
-                        <input type="number" class="modal-input" id="EditarPrecioVenta" name="PrecioVenta" min="0" step="0.01" required />
-                    </div>
-
-                    <div class="modal-group">
                         <label class="modal-label">Estado</label>
-                        <select class="modal-select" id="EditarEstado" name="Estado" required>
-                            <option value="">SELECCIONE</option>
+                        <select class="modal-select" name="Estado">
                             <option value="true">Activo</option>
                             <option value="false">Inactivo</option>
                         </select>
                     </div>
 
                     <div class="modal-footer-custom">
-                        <button type="submit" class="btn-save-modal">Editar</button>
+                        <button class="btn-save-modal">Crear</button>
                     </div>
+
                 </div>
             </form>
         </div>
     </div>
 </div>
-<!-- MODAL DETALLES -->
-<div class="modal fade modal-producto-custom" id="modalDetalleProducto" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width:430px;">
+
+<!-- ================= MODAL EDITAR ================= -->
+<div class="modal fade modal-producto-custom" id="modalEditarProducto">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+
+            <div class="modal-header-editar">
+                <h5 class="modal-title-custom">EDITAR PRODUCTO</h5>
+                <button class="btn-close-custom" data-bs-dismiss="modal">×</button>
+            </div>
+
+            <form method="post" asp-action="Guardar">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body modal-body-producto">
+
+                    <input type="hidden" id="EditarIdProducto" name="IdProducto" />
+
+                    <input type="hidden" name="Stock" value="0" />
+                    <input type="hidden" name="PrecioCompra" value="0" />
+                    <input type="hidden" name="PrecioVenta" value="0" />
+
+                    <div class="modal-group">
+                        <label class="modal-label">Código</label>
+                        <input id="EditarCodigo" class="modal-input" name="Codigo" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Nombre</label>
+                        <input id="EditarNombre" class="modal-input" name="Nombre" required />
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Descripción</label>
+                        <textarea id="EditarDescripcion" class="modal-textarea" name="Descripcion"></textarea>
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Categoría</label>
+                        <select id="EditarIdCategoria" class="modal-select" name="IdCategoria"></select>
+                    </div>
+
+                    <div class="modal-group">
+                        <label class="modal-label">Estado</label>
+                        <select id="EditarEstado" class="modal-select" name="Estado"></select>
+                    </div>
+
+                    <div class="modal-footer-custom">
+                        <button class="btn-save-modal">Editar</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODAL DETALLE ================= -->
+<div class="modal fade modal-producto-custom" id="modalDetalleProducto">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
             <div class="modal-header-detalle">
-                <h5 class="modal-title-custom">DETALLES</h5>
-                <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">×</button>
+                <h5 class="modal-title-custom">DETALLE</h5>
+                <button class="btn-close-custom" data-bs-dismiss="modal">×</button>
             </div>
 
             <div class="modal-body modal-body-producto">
-                <div class="details-container">
 
+                <div class="details-container">
                     <div class="details-item">
                         <span class="details-label">Código</span>
-                        <span class="details-value" id="detalleCodigo">---</span>
+                        <span id="detalleCodigo" class="details-value"></span>
                     </div>
 
                     <div class="details-item">
                         <span class="details-label">Nombre</span>
-                        <span class="details-value" id="detalleNombre">---</span>
+                        <span id="detalleNombre" class="details-value"></span>
                     </div>
 
                     <div class="details-item">
                         <span class="details-label">Descripción</span>
-                        <span class="details-value" id="detalleDescripcion">---</span>
+                        <span id="detalleDescripcion" class="details-value"></span>
                     </div>
 
                     <div class="details-item">
                         <span class="details-label">Categoría</span>
-                        <span class="details-value" id="detalleCategoria">---</span>
+                        <span id="detalleCategoria" class="details-value"></span>
                     </div>
 
                     <div class="details-item">
-                        <span class="details-label">Stock inicial</span>
-                        <span class="details-value" id="detalleStock">---</span>
+                        <span class="details-label">Stock</span>
+                        <span id="detalleStock" class="details-value"></span>
                     </div>
 
                     <div class="details-item">
-                        <span class="details-label">Precio compra</span>
-                        <span class="details-value" id="detallePrecioCompra">$ 0</span>
+                        <span class="details-label">Precio Compra</span>
+                        <span id="detallePrecioCompra" class="details-value"></span>
                     </div>
 
                     <div class="details-item">
-                        <span class="details-label">Precio venta</span>
-                        <span class="details-value" id="detallePrecioVenta">$ 0</span>
+                        <span class="details-label">Precio Venta</span>
+                        <span id="detallePrecioVenta" class="details-value"></span>
                     </div>
 
                     <div class="details-item">
                         <span class="details-label">Estado</span>
-                        <span class="details-value" id="detalleEstado">---</span>
+                        <span id="detalleEstado" class="details-value"></span>
                     </div>
 
                     <div class="details-footer">
-                        <button type="button" class="btn-close-detail" data-bs-dismiss="modal">Cerrar</button>
+                        <button class="btn-close-detail" data-bs-dismiss="modal">Cerrar</button>
                     </div>
-
                 </div>
+
             </div>
         </div>
     </div>
@@ -949,6 +973,21 @@
 
 @section Scripts {
     <script>
+        const categorias = [
+            @if (categorias != null)
+            {
+                    foreach (var categoria in categorias)
+                    {
+                            <text>
+                                    {
+                                        id: "@categoria.IdCategoria",
+                                        nombre: "@JsValue(categoria.Nombre)"
+                                    },
+                            </text>
+                    }
+            }
+        ];
+
         function showAlert(mensaje, tipo = "danger") {
             const container = document.getElementById("alertContainer");
 
@@ -993,68 +1032,187 @@
             }, 700);
         }
 
+        function cargarCategoriasEditar(idCategoriaSeleccionada) {
+            const selectCategoria = document.getElementById("EditarIdCategoria");
+
+            if (!selectCategoria) return;
+
+            selectCategoria.innerHTML = `<option value="">SELECCIONE</option>`;
+
+            categorias.forEach(categoria => {
+                const option = document.createElement("option");
+                option.value = categoria.id;
+                option.textContent = categoria.nombre;
+
+                if (categoria.id === idCategoriaSeleccionada) {
+                    option.selected = true;
+                }
+
+                selectCategoria.appendChild(option);
+            });
+        }
+
+        function cargarEstadosEditar(estadoSeleccionado) {
+            const selectEstado = document.getElementById("EditarEstado");
+
+            if (!selectEstado) return;
+
+            selectEstado.innerHTML = `
+                <option value="">SELECCIONE</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            `;
+
+            selectEstado.value = estadoSeleccionado;
+        }
+
         function limpiarFormularioCrearProducto() {
-            document.getElementById('CrearIdProducto').value = 0;
-            document.getElementById('CrearCodigo').value = '';
-            document.getElementById('CrearNombre').value = '';
-            document.getElementById('CrearDescripcion').value = '';
-            document.getElementById('CrearIdCategoria').value = '';
-            document.getElementById('CrearStock').value = '0';
-            document.getElementById('CrearPrecioCompra').value = '0';
-            document.getElementById('CrearPrecioVenta').value = '0';
-            document.getElementById('CrearEstado').value = 'true';
+            const codigo = document.querySelector('#modalCrearProducto [name="Codigo"]');
+            const nombre = document.querySelector('#modalCrearProducto [name="Nombre"]');
+            const descripcion = document.querySelector('#modalCrearProducto [name="Descripcion"]');
+            const categoria = document.querySelector('#modalCrearProducto [name="IdCategoria"]');
+            const estado = document.querySelector('#modalCrearProducto [name="Estado"]');
+
+            if (codigo) codigo.value = "";
+            if (nombre) nombre.value = "";
+            if (descripcion) descripcion.value = "";
+            if (categoria) categoria.value = "";
+            if (estado) estado.value = "true";
         }
 
-        function editarProducto(id, codigo, nombre, descripcion, idCategoria, stock, precioCompra, precioVenta, estado) {
+        function editarProducto(id, codigo, nombre, descripcion, idCategoria, estado) {
+            document.getElementById("EditarIdProducto").value = id;
+            document.getElementById("EditarCodigo").value = codigo;
+            document.getElementById("EditarNombre").value = nombre;
+            document.getElementById("EditarDescripcion").value = descripcion;
 
-            document.getElementById('EditarIdProducto').value = id;
-            document.getElementById('EditarCodigo').value = codigo;
-            document.getElementById('EditarNombre').value = nombre;
-            document.getElementById('EditarDescripcion').value = descripcion;
-            document.getElementById('EditarIdCategoria').value = idCategoria;
-            document.getElementById('EditarStock').value = stock;
-            document.getElementById('EditarPrecioCompra').value = precioCompra;
-            document.getElementById('EditarPrecioVenta').value = precioVenta;
-            document.getElementById('EditarEstado').value = estado;
+            cargarCategoriasEditar(idCategoria);
+            cargarEstadosEditar(estado);
 
-            new bootstrap.Modal(document.getElementById('modalEditarProducto')).show();
+            new bootstrap.Modal(document.getElementById("modalEditarProducto")).show();
         }
 
-                function verDetalleProducto(codigo, nombre, descripcion, categoria, stock, precioCompra, precioVenta, estado) {
+        function verDetalleProducto(codigo, nombre, descripcion, categoria, stock, precioCompra, precioVenta, estado) {
+            document.getElementById("detalleCodigo").innerText = codigo || "---";
+            document.getElementById("detalleNombre").innerText = nombre || "---";
+            document.getElementById("detalleDescripcion").innerText = descripcion || "---";
+            document.getElementById("detalleCategoria").innerText = categoria || "Sin categoría";
+            document.getElementById("detalleStock").innerText = stock || "0";
+            document.getElementById("detallePrecioCompra").innerText = precioCompra || "$ 0";
+            document.getElementById("detallePrecioVenta").innerText = precioVenta || "$ 0";
+            document.getElementById("detalleEstado").innerText = estado || "---";
 
-            document.getElementById('detalleCodigo').innerText = codigo;
-            document.getElementById('detalleNombre').innerText = nombre;
-            document.getElementById('detalleDescripcion').innerText = descripcion;
-            document.getElementById('detalleCategoria').innerText = categoria;
-            document.getElementById('detalleStock').innerText = stock;
-            document.getElementById('detallePrecioCompra').innerText = precioCompra;
-            document.getElementById('detallePrecioVenta').innerText = precioVenta;
-            document.getElementById('detalleEstado').innerText = estado;
-
-            new bootstrap.Modal(document.getElementById('modalDetalleProducto')).show();
+            new bootstrap.Modal(document.getElementById("modalDetalleProducto")).show();
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const txtBuscar = document.getElementById('txtBuscar');
-            const formBusquedaProductos = document.getElementById('formBusquedaProductos');
+        // =========================
+        // 🔥 LOADING (IGUAL A DETALLE COMPRA)
+        // =========================
+        function mostrarLoading(mensaje) {
+            ocultarLoading();
 
-            if (txtBuscar && formBusquedaProductos) {
-                let temporizadorBusqueda;
-                let ultimoValor = txtBuscar.value;
+            const overlay = document.createElement("div");
+            overlay.id = "detalle-loading-overlay";
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.background = "rgba(255,255,255,0.65)";
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = "9998";
 
-                txtBuscar.addEventListener('input', function () {
-                    clearTimeout(temporizadorBusqueda);
+            const spinner = document.createElement("div");
+            spinner.style.width = "42px";
+            spinner.style.height = "42px";
+            spinner.style.border = "4px solid #d6d6d6";
+            spinner.style.borderTop = "4px solid #4d47c3";
+            spinner.style.borderRadius = "50%";
+            spinner.style.animation = "spinDetalleCompra 1s linear infinite";
 
-                    const valorActual = this.value;
+            const texto = document.createElement("div");
+            texto.innerText = mensaje || "Cargando...";
+            texto.style.marginTop = "12px";
+            texto.style.fontSize = "13px";
+            texto.style.fontWeight = "600";
+            texto.style.color = "#111111";
 
-                    temporizadorBusqueda = setTimeout(function () {
-                        if (valorActual !== ultimoValor) {
-                            ultimoValor = valorActual;
-                            formBusquedaProductos.submit();
+            overlay.appendChild(spinner);
+            overlay.appendChild(texto);
+            document.body.appendChild(overlay);
+
+            agregarAnimacionSpinner();
+        }
+
+        function ocultarLoading() {
+            const overlay = document.getElementById("detalle-loading-overlay");
+            if (overlay) overlay.remove();
+        }
+
+        function agregarAnimacionSpinner() {
+            if (document.getElementById("detalle-spinner-style")) return;
+
+            const style = document.createElement("style");
+            style.id = "detalle-spinner-style";
+            style.innerHTML = `
+                @@keyframes spinDetalleCompra {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+                document.addEventListener("DOMContentLoaded", function () {
+
+            const btnExcel = document.getElementById("btnExportarExcel");
+
+            if (btnExcel) {
+                btnExcel.addEventListener("click", async function () {
+
+                    btnExcel.style.pointerEvents = "none";
+                    btnExcel.style.opacity = "0.7";
+                    btnExcel.innerText = "Generando...";
+
+                    mostrarLoading("Generar reporte de Excel...");
+
+                    try {
+                        const response = await fetch('@Url.Action("ExportarExcel", "Producto", new { busqueda = busquedaActual })');
+
+                        if (!response.ok) {
+                            throw new Error("Error al generar el Excel");
                         }
-                    }, 1000);
+
+                        const blob = await response.blob();
+
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+
+                        // nombre del archivo
+                        a.download = "Productos.xlsx";
+
+                        document.body.appendChild(a);
+                        a.click();
+
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+
+                    } catch (error) {
+                        showAlert("Error al generar el Excel", "danger");
+                    } finally {
+                        ocultarLoading();
+
+                        btnExcel.style.pointerEvents = "auto";
+                        btnExcel.style.opacity = "1";
+                        btnExcel.innerText = "Exportar Excel";
+                    }
                 });
             }
+
         });
     </script>
 }

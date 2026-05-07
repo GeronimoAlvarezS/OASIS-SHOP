@@ -1,0 +1,818 @@
+﻿@model OasisShop.Web.Models.ViewModels.DetalleDeCompraViewModel
+
+@{
+    ViewData["Title"] = "Detalle de compras";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .detalle-compra-page {
+        padding: 22px 28px 28px 28px;
+        background-color: #f5f6fa;
+        min-height: calc(100vh - 70px);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .detalle-compra-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #111111;
+        margin-bottom: 12px;
+    }
+
+    .detalle-search-card {
+        margin-bottom: 14px;
+    }
+
+    .detalle-search-form {
+        width: 100%;
+        max-width: 590px;
+        position: relative;
+    }
+
+    .detalle-search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        pointer-events: none;
+        opacity: 0.65;
+    }
+
+    .detalle-search-input {
+        width: 100%;
+        height: 43px;
+        border: 1px solid #a9adb5;
+        border-radius: 6px;
+        background: #ffffff;
+        padding: 0 14px 0 45px;
+        font-size: 14px;
+        font-weight: 400;
+        color: #111111;
+        outline: none;
+    }
+
+        .detalle-search-input:focus {
+            border-color: #4d47c3;
+            box-shadow: 0 0 0 3px rgba(77, 71, 195, 0.12);
+        }
+
+        .detalle-search-input::placeholder {
+            color: #6f7480;
+            font-weight: 600;
+        }
+
+    .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .alert-custom {
+        min-width: 280px;
+        max-width: 340px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: #FFFFFF;
+        font-weight: 400;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0,0,0,0.18);
+        animation: slideIn 0.4s ease;
+    }
+
+    .alert-success-custom {
+        background-color: #22C55E;
+    }
+
+    .alert-danger-custom {
+        background-color: #C63637;
+    }
+
+    .alert-warning-custom {
+        background-color: #FFCE1B;
+        color: #111827;
+    }
+
+    .alert-message {
+        flex: 1;
+        text-align: center;
+        line-height: 1.25;
+        padding-right: 8px;
+    }
+
+    .alert-close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1;
+        color: #FFFFFF;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .alert-warning-custom .alert-close {
+        color: #111827;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+
+    .detalle-main-grid {
+        display: grid;
+        grid-template-columns: 1fr 0.84fr;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .detalle-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e7e7e7;
+        box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+        overflow: hidden;
+    }
+
+    .detalle-card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 13px 18px 8px 18px;
+    }
+
+    .detalle-card-icon {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .detalle-card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111111;
+        margin: 0;
+    }
+
+    .detalle-card-body {
+        padding: 24px 18px 18px 18px;
+        border-top: 1px solid #f1f1f1;
+        margin: 0 18px;
+    }
+
+    .detalle-info-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0;
+        min-height: 52px;
+        align-items: center;
+    }
+
+    .detalle-info-item {
+        text-align: center;
+        padding: 3px 10px;
+    }
+
+        .detalle-info-item + .detalle-info-item {
+            border-left: 1px solid #ececec;
+        }
+
+    .detalle-label {
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 7px;
+        font-weight: 400;
+    }
+
+    .detalle-value {
+        font-size: 12px;
+        color: #111111;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+    .detalle-productos-card {
+        margin-bottom: 18px;
+        padding-bottom: 22px;
+    }
+
+    .detalle-table-container {
+        padding: 0 18px 16px 18px;
+        overflow-x: auto;
+    }
+
+    .detalle-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 620px;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+        .detalle-table thead th {
+            background: #d8d8d8;
+            color: #555555;
+            padding: 8px 10px;
+            font-size: 12px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+            .detalle-table thead th:first-child {
+                border-radius: 10px 0 0 0;
+            }
+
+            .detalle-table thead th:last-child {
+                border-radius: 0 10px 0 0;
+            }
+
+        .detalle-table tbody td {
+            background: #ffffff;
+            color: #111111;
+            padding: 10px 10px;
+            font-size: 12px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 1px solid #ededed;
+        }
+
+        .detalle-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .detalle-cantidad-pill {
+        display: inline-flex;
+        min-width: 38px;
+        height: 19px;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #9da3ae;
+        border-radius: 12px;
+        padding: 0 8px;
+        font-size: 11px;
+        font-weight: 600;
+        background: #ffffff;
+        color: #111111;
+    }
+
+    .detalle-bottom-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-top: 8px;
+        padding: 0 42px 0 52px;
+    }
+
+    .detalle-totales {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-left: 0;
+    }
+
+    .detalle-total-card {
+        background: #ffffff;
+        border: 1px solid #e7e7e7;
+        border-radius: 8px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.13);
+        width: 145px;
+        min-height: 64px;
+        padding: 10px 12px;
+        text-align: center;
+    }
+
+    .detalle-total-label {
+        font-size: 11px;
+        color: #111111;
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+
+    .detalle-total-value {
+        font-size: 12px;
+        color: #111111;
+        font-weight: 400;
+    }
+
+    .detalle-pdf-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        min-height: 64px;
+        padding-right: 28px;
+    }
+
+    .btn-descargar-pdf {
+        background: #4d47c3;
+        color: #ffffff;
+        border: none;
+        border-radius: 7px;
+        padding: 10px 24px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .2s ease, transform .1s ease;
+        cursor: pointer;
+        min-width: 132px;
+        margin-right: 18px;
+    }
+
+        .btn-descargar-pdf:hover {
+            background: #3f3aa7;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+    .detalle-empty-state {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px dashed #c7cbd4;
+        padding: 28px;
+        text-align: center;
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 18px;
+    }
+
+    @@media (max-width: 992px) {
+        .detalle-main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detalle-bottom-row {
+            flex-direction: column;
+            padding: 0 26px;
+        }
+
+        .detalle-pdf-container {
+            width: 100%;
+            justify-content: flex-end;
+            padding-right: 0;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .detalle-compra-page {
+            padding: 18px;
+        }
+
+        .detalle-search-form {
+            max-width: 100%;
+        }
+
+        .detalle-totales {
+            width: 100%;
+        }
+
+        .detalle-total-card {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-descargar-pdf {
+            width: 100%;
+            margin-right: 0;
+        }
+
+        .detalle-pdf-container {
+            justify-content: stretch;
+            width: 100%;
+        }
+    }
+
+    @@media print {
+        .detalle-search-card,
+        .btn-descargar-pdf {
+            display: none !important;
+        }
+
+        .detalle-compra-page {
+            background: #ffffff;
+            padding: 0;
+        }
+
+        .detalle-card,
+        .detalle-total-card {
+            box-shadow: none;
+        }
+    }
+</style>
+
+<div class="detalle-compra-page">
+
+    <h2 class="detalle-compra-title">Detalle de compras</h2>
+
+    <!-- CONTENEDOR DE ALERTAS -->
+    <div id="alertContainer" class="alert-container"></div>
+
+    <!-- ALERTAS DESDE CONTROLLER -->
+    @if (TempData["MensajeError"] != null)
+    {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    showAlert("@TempData["MensajeError"]", "danger");
+                });
+        </script>
+    }
+
+    @if (TempData["MensajeOk"] != null)
+    {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    showAlert("@TempData["MensajeOk"]", "success");
+                });
+        </script>
+    }
+
+    @if (TempData["MensajeWarning"] != null)
+    {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    showAlert("@TempData["MensajeWarning"]", "warning");
+                });
+        </script>
+    }
+
+    <!-- BUSCADOR -->
+    <div class="detalle-search-card">
+        <form asp-controller="DetalleDeCompra"
+              asp-action="Index"
+              method="get"
+              class="detalle-search-form"
+              id="formBusquedaCompra">
+
+            <img src="~/img/Buscar.png" class="detalle-search-icon" alt="Buscar" />
+
+            <input type="text"
+                   name="numeroCompra"
+                   id="txtBuscarCompra"
+                   class="detalle-search-input"
+                   value="@(ViewBag.NumeroCompraBuscado ?? "")"
+                   placeholder="Buscar compra (Número de compra)"
+                   autocomplete="off" />
+        </form>
+    </div>
+
+    @if (Model != null && Model.IdCompra > 0)
+    {
+        <!-- INFORMACIÓN -->
+        <div class="detalle-main-grid">
+
+            <!-- INFO COMPRA -->
+            <div class="detalle-card">
+                <div class="detalle-card-header">
+                    <img src="~/img/InformacionDetalle.png" class="detalle-card-icon" />
+                    <h3 class="detalle-card-title">Información de la compra</h3>
+                </div>
+
+                <div class="detalle-card-body">
+                    <div class="detalle-info-row">
+
+                        <div class="detalle-info-item">
+                            <div class="detalle-label">Fecha</div>
+                            <div class="detalle-value">@Model.FechaRegistro</div>
+                        </div>
+
+                        <div class="detalle-info-item">
+                            <div class="detalle-label">Comprador</div>
+                            <div class="detalle-value">@Model.NombreUsuario</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFO PROVEEDOR -->
+            <div class="detalle-card">
+                <div class="detalle-card-header">
+                    <img src="~/img/UsuarioDetalle.png" class="detalle-card-icon" />
+                    <h3 class="detalle-card-title">Información del proveedor</h3>
+                </div>
+
+                <div class="detalle-card-body">
+                    <div class="detalle-info-row">
+
+                        <div class="detalle-info-item">
+                            <div class="detalle-label">Documento/NIT</div>
+                            <div class="detalle-value">@Model.DocumentoProveedor</div>
+                        </div>
+
+                        <div class="detalle-info-item">
+                            <div class="detalle-label">Razón social</div>
+                            <div class="detalle-value">@Model.RazonSocialProveedor</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PRODUCTOS -->
+        <div class="detalle-card detalle-productos-card">
+
+            <div class="detalle-card-header">
+                <img src="~/img/ProductoDetalle.png" class="detalle-card-icon" />
+                <h3 class="detalle-card-title">Productos de la compra</h3>
+            </div>
+
+            <div class="detalle-table-container">
+                <table class="detalle-table">
+
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio de Compra</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.Detalles)
+                        {
+                            <tr>
+                                <td>@(item.oProducto != null ? item.oProducto.Nombre : "N/A")</td>
+                                <td>@item.PrecioCompra.ToString("C0")</td>
+                                <td>
+                                    <span class="detalle-cantidad-pill">
+                                        @item.Cantidad
+                                    </span>
+                                </td>
+                                <td>@item.MontoTotal.ToString("C0")</td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- TOTALES + PDF -->
+            <div class="detalle-bottom-row">
+
+                <div class="detalle-totales">
+
+                    <div class="detalle-total-card">
+                        <div class="detalle-total-label">Monto total</div>
+                        <div class="detalle-total-value">@Model.MontoTotal.ToString("C0")</div>
+                    </div>
+
+                    <div class="detalle-total-card">
+                        <div class="detalle-total-label">Monto pagado</div>
+                        <div class="detalle-total-value">@Model.MontoPago.ToString("C0")</div>
+                    </div>
+
+                    <div class="detalle-total-card">
+                        <div class="detalle-total-label">Monto de cambio</div>
+                        <div class="detalle-total-value">@Model.MontoCambio.ToString("C0")</div>
+                    </div>
+
+                </div>
+
+                <div class="detalle-pdf-container">
+                    <a asp-controller="DetalleDeCompra"
+                           asp-action="DescargarPdf"
+                           asp-route-idCompra="@Model.IdCompra"
+                           class="btn-descargar-pdf">
+                        Descargar PDF
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="detalle-empty-state">
+            Ingresa un número de compra para visualizar el detalle.
+        </div>
+    }
+
+</div>
+
+<script>
+    function showAlert(mensaje, tipo = "danger") {
+        const container = document.getElementById("alertContainer");
+
+        if (!container) {
+            return;
+        }
+
+        const alert = document.createElement("div");
+        let alertClass = "alert-danger-custom";
+
+        if (tipo === "success") {
+            alertClass = "alert-success-custom";
+        } else if (tipo === "warning") {
+            alertClass = "alert-warning-custom";
+        }
+
+        alert.className = `alert-custom ${alertClass}`;
+
+        alert.innerHTML = `
+            <span class="alert-message">${mensaje}</span>
+            <button type="button" class="alert-close" onclick="closeAlert(this)">×</button>
+        `;
+
+        container.appendChild(alert);
+
+        setTimeout(() => {
+            if (alert) {
+                alert.style.animation = "fadeOut 0.4s ease forwards";
+
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 700);
+            }
+        }, 3000);
+    }
+
+    function closeAlert(element) {
+        const alert = element.parentElement;
+
+        if (!alert) {
+            return;
+        }
+
+        alert.style.animation = "fadeOut 0.4s ease forwards";
+
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.remove();
+            }
+        }, 700);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputBusqueda = document.getElementById("txtBuscarCompra");
+        const formBusqueda = document.getElementById("formBusquedaCompra");
+        const btnPDF = document.querySelector(".btn-descargar-pdf");
+
+        if (inputBusqueda && formBusqueda) {
+            inputBusqueda.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    if (!validarBusquedaCompra()) {
+                        return;
+                    }
+
+                    mostrarLoading("Consultando compra...");
+                    formBusqueda.submit();
+                }
+            });
+
+            inputBusqueda.focus();
+        }
+
+        if (formBusqueda) {
+            formBusqueda.addEventListener("submit", function (e) {
+                if (!validarBusquedaCompra()) {
+                    e.preventDefault();
+                    return;
+                }
+
+                mostrarLoading("Consultando compra...");
+            });
+        }
+
+        if (btnPDF) {
+            btnPDF.addEventListener("click", function () {
+                btnPDF.style.pointerEvents = "none";
+                btnPDF.style.opacity = "0.7";
+                btnPDF.innerText = "Generando...";
+
+                mostrarLoading("Generando comprobante PDF...");
+
+                setTimeout(() => {
+                    btnPDF.style.pointerEvents = "auto";
+                    btnPDF.style.opacity = "1";
+                    btnPDF.innerText = "Descargar PDF";
+                    ocultarLoading();
+                }, 2500);
+            });
+        }
+
+        function validarBusquedaCompra() {
+            if (!inputBusqueda) {
+                return false;
+            }
+
+            const valor = inputBusqueda.value.trim();
+
+            if (valor === "") {
+                showAlert("Debe ingresar un número de compra válido.", "warning");
+                inputBusqueda.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        function mostrarLoading(mensaje) {
+            ocultarLoading();
+
+            const overlay = document.createElement("div");
+            overlay.id = "detalle-loading-overlay";
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.background = "rgba(255,255,255,0.65)";
+            overlay.style.display = "flex";
+            overlay.style.flexDirection = "column";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = "9998";
+
+            const spinner = document.createElement("div");
+            spinner.style.width = "42px";
+            spinner.style.height = "42px";
+            spinner.style.border = "4px solid #d6d6d6";
+            spinner.style.borderTop = "4px solid #4d47c3";
+            spinner.style.borderRadius = "50%";
+            spinner.style.animation = "spinDetalleCompra 1s linear infinite";
+
+            const texto = document.createElement("div");
+            texto.innerText = mensaje || "Cargando...";
+            texto.style.marginTop = "12px";
+            texto.style.fontSize = "13px";
+            texto.style.fontWeight = "600";
+            texto.style.color = "#111111";
+
+            overlay.appendChild(spinner);
+            overlay.appendChild(texto);
+            document.body.appendChild(overlay);
+
+            agregarAnimacionSpinner();
+        }
+
+        function ocultarLoading() {
+            const overlay = document.getElementById("detalle-loading-overlay");
+
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        function agregarAnimacionSpinner() {
+            if (document.getElementById("detalle-spinner-style")) {
+                return;
+            }
+
+            const style = document.createElement("style");
+            style.id = "detalle-spinner-style";
+            style.innerHTML = `
+                @@keyframes spinDetalleCompra {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+            `;
+
+            document.head.appendChild(style);
+        }
+    });
+</script>

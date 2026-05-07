@@ -10,6 +10,8 @@ namespace CapaDatos
 {
     public class UsuarioDatos
     {
+        // Método encargado de listar todos los usuarios registrados en la base de datos.
+        // Realiza una consulta con INNER JOIN para obtener también la información del rol.
         public List<Usuario> Listar()
         {
             List<Usuario> lista = new List<Usuario>();
@@ -44,6 +46,8 @@ namespace CapaDatos
             return lista;
         }
 
+        // Busca un usuario específico por su número de documento.
+        // Retorna un objeto Usuario si lo encuentra, de lo contrario retorna null.
         public Usuario ObtenerPorDocumento(string documento)
         {
             Usuario objUsuario = null;
@@ -81,6 +85,8 @@ namespace CapaDatos
             return objUsuario;
         }
 
+        // Valida las credenciales del usuario usando documento y clave.
+        // Es utilizado normalmente en procesos de inicio de sesión.
         public Usuario ObtenerPorCredenciales(string documento, string clave)
         {
             Usuario objUsuario = null;
@@ -119,6 +125,8 @@ namespace CapaDatos
             return objUsuario;
         }
 
+        // Actualiza la clave de un usuario específico.
+        // Recibe el IdUsuario y la nueva clave, normalmente ya en formato hash.
         public bool ActualizarClave(int idUsuario, string claveHash)
         {
             bool respuesta = false;
@@ -145,6 +153,8 @@ namespace CapaDatos
             return respuesta;
         }
 
+        // Registra un nuevo usuario mediante el procedimiento almacenado SP_REGISTRARUSUARIO.
+        // Retorna el Id del usuario generado y un mensaje de respuesta desde la base de datos.
         public int Registrar(Usuario obj, out string Mensaje)
         {
             int idusuariogenerado = 0;
@@ -182,6 +192,8 @@ namespace CapaDatos
             return idusuariogenerado;
         }
 
+        // Edita la información de un usuario existente mediante el procedimiento almacenado SP_EDITARUSUARIO.
+        // Retorna true si la actualización fue exitosa.
         public bool Editar(Usuario obj, out string Mensaje)
         {
             bool respuesta = false;
@@ -252,6 +264,9 @@ namespace CapaDatos
             return respuesta;
         }
 
+
+        // Método privado reutilizable para convertir un registro SqlDataReader en un objeto Usuario.
+        // Evita repetir el mismo mapeo en los métodos Listar, ObtenerPorDocumento y ObtenerPorCredenciales.
         private Usuario MapearUsuario(SqlDataReader dr)
         {
             return new Usuario()

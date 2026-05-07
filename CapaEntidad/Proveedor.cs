@@ -13,8 +13,10 @@ namespace CapaEntidad
         public string RazonSocial { get; set; }
         public string Correo { get; set; }
         public string Telefono { get; set; }
+        public string Direccion { get; set; }
         public bool Estado { get; set; }
         public string FechaRegistro { get; set; }
+        public bool TieneComprasAsociadas { get; set; }
 
     }
 }

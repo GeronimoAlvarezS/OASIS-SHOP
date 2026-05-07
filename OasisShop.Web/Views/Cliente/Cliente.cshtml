@@ -4,6 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Clientes";
     var totalClientes = Model != null ? Model.Count() : 0;
+    string busquedaActual = ViewBag.Busqueda != null ? ViewBag.Busqueda.ToString() : string.Empty;
 }
 
 <style>
@@ -390,6 +391,48 @@
         margin: 0;
     }
 
+    .pagination-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+    }
+
+    .pagination-custom {
+        list-style: none;
+        display: flex;
+        gap: 6px;
+        padding: 0;
+        margin: 0;
+        align-items: center;
+    }
+
+        .pagination-custom li a,
+        .pagination-custom li span {
+            display: block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: #E5E7EB;
+            color: #111827;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .pagination-custom li.active a {
+            background: #1E1B4B;
+            color: #FFFFFF;
+        }
+
+        .pagination-custom li a:hover {
+            background: #3F3CBB;
+            color: #FFFFFF;
+        }
+
+        .pagination-custom li.disabled span {
+            opacity: 0.6;
+            cursor: default;
+        }
+
     @@keyframes slideIn {
         from {
             opacity: 0;
@@ -443,7 +486,6 @@
         <table class="table-custom">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Documento</th>
                     <th>Nombre Completo</th>
                     <th>Correo</th>
@@ -460,7 +502,6 @@
                     foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.IdCliente</td>
                             <td>@item.Documento</td>
                             <td>@item.NombreCompleto</td>
                             <td>@item.Correo</td>
@@ -497,6 +538,39 @@
         <div id="mensajeSinResultados" class="empty-message">
             No se encontraron clientes que coincidan con la búsqueda.
         </div>
+    </div>
+
+    <div class="pagination-container">
+        <ul class="pagination-custom">
+            @if (ViewBag.PaginaActual > 1)
+            {
+                <li>
+                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual - 1, busqueda = busquedaActual })">Anterior</a>
+                </li>
+            }
+            else
+            {
+                <li class="disabled"><span>Anterior</span></li>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+            {
+                <li class="@(i == ViewBag.PaginaActual ? "active" : "")">
+                    <a href="@Url.Action("Index", new { pagina = i, busqueda = busquedaActual })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+            {
+                <li>
+                    <a href="@Url.Action("Index", new { pagina = ViewBag.PaginaActual + 1, busqueda = busquedaActual })">Siguiente</a>
+                </li>
+            }
+            else
+            {
+                <li class="disabled"><span>Siguiente</span></li>
+            }
+        </ul>
     </div>
 </div>
 
