@@ -6,9 +6,7 @@ namespace CapaNegocio
 {
     public class ProveedorServicio
     {
-
         private ProveedorDatos objcd_Proveedor = new ProveedorDatos();
-
 
         public List<Proveedor> Listar()
         {
@@ -19,19 +17,29 @@ namespace CapaNegocio
         {
             Mensaje = string.Empty;
 
-            if (obj.Documento == "")
+            if (string.IsNullOrWhiteSpace(obj.Documento))
             {
                 Mensaje += "Es necesario el documento del Proveedor\n";
             }
 
-            if (obj.RazonSocial == "")
+            if (string.IsNullOrWhiteSpace(obj.RazonSocial))
             {
                 Mensaje += "Es necesario la razon social del Proveedor\n";
             }
 
-            if (obj.Correo == "")
+            if (string.IsNullOrWhiteSpace(obj.Correo))
             {
-                Mensaje += "Es necesario la correo del Proveedor\n";
+                Mensaje += "Es necesario el correo del Proveedor\n";
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Telefono))
+            {
+                Mensaje += "Es necesario el telefono del Proveedor\n";
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Direccion))
+            {
+                Mensaje += "Es necesaria la direccion del Proveedor\n";
             }
 
             if (Mensaje != string.Empty)
@@ -42,32 +50,41 @@ namespace CapaNegocio
             {
                 return objcd_Proveedor.Registrar(obj, out Mensaje);
             }
-
-
         }
-
 
         public bool Editar(Proveedor obj, out string Mensaje)
         {
-
             Mensaje = string.Empty;
 
-            if (obj.Documento == "")
+            if (obj.IdProveedor == 0)
+            {
+                Mensaje += "Es necesario seleccionar un Proveedor valido\n";
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Documento))
             {
                 Mensaje += "Es necesario el documento del Proveedor\n";
             }
 
-            if (obj.RazonSocial == "")
+            if (string.IsNullOrWhiteSpace(obj.RazonSocial))
             {
                 Mensaje += "Es necesario la razon social del Proveedor\n";
             }
 
-            if (obj.Correo == "")
+            if (string.IsNullOrWhiteSpace(obj.Correo))
             {
-                Mensaje += "Es necesario la correo del Proveedor\n";
+                Mensaje += "Es necesario el correo del Proveedor\n";
             }
 
+            if (string.IsNullOrWhiteSpace(obj.Telefono))
+            {
+                Mensaje += "Es necesario el telefono del Proveedor\n";
+            }
 
+            if (string.IsNullOrWhiteSpace(obj.Direccion))
+            {
+                Mensaje += "Es necesaria la direccion del Proveedor\n";
+            }
 
             if (Mensaje != string.Empty)
             {
@@ -77,16 +94,11 @@ namespace CapaNegocio
             {
                 return objcd_Proveedor.Editar(obj, out Mensaje);
             }
-
-
         }
-
 
         public bool Eliminar(Proveedor obj, out string Mensaje)
         {
             return objcd_Proveedor.Eliminar(obj, out Mensaje);
         }
-
-
     }
 }

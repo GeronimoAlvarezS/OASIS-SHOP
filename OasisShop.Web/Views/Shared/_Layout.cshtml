@@ -27,6 +27,21 @@
     {
         return permisos.Contains(permiso.Trim().ToLower());
     }
+
+    bool EsModuloActual(params string[] controladores)
+    {
+        return controladores.Any(c => controladorActual.Equals(c, StringComparison.OrdinalIgnoreCase));
+    }
+
+    string MostrarMenu(bool condicion)
+    {
+        return condicion ? "show" : string.Empty;
+    }
+
+    string MenuExpandido(bool condicion)
+    {
+        return condicion ? "true" : "false";
+    }
 }
 
 <!DOCTYPE html>
@@ -51,7 +66,6 @@
             html, body {
                 height: 100%;
                 margin: 0;
-                font-family: 'Fredoka', sans-serif;
                 background: #ECEDEF;
             }
 
@@ -87,6 +101,7 @@
                 overflow-y: auto;
                 overflow-x: hidden;
                 transition: all 0.25s ease;
+                scroll-behavior: auto;
             }
 
                 .sidebar::-webkit-scrollbar {
@@ -104,21 +119,6 @@
                 padding-left: 0;
                 padding-right: 0;
                 overflow: hidden;
-            }
-
-            .brand-title {
-                font-size: 28px;
-                font-weight: 800;
-                color: #FFFFFF;
-                margin-bottom: 8px;
-                white-space: nowrap;
-            }
-
-            .user-summary {
-                font-size: 14px;
-                color: #FFFFFF;
-                margin-bottom: 26px;
-                white-space: nowrap;
             }
 
             .menu-section-title {
@@ -152,6 +152,10 @@
                 transition: background-color .2s ease;
                 white-space: nowrap;
                 overflow: hidden;
+                width: 100%;
+                border: none;
+                background: transparent;
+                text-align: left;
             }
 
                 .nav-link-custom:hover {
@@ -189,7 +193,40 @@
                 font-size: 18px;
                 font-weight: 600;
                 line-height: 1;
+                transition: transform .2s ease;
             }
+
+            .nav-link-custom[aria-expanded="true"] .nav-arrow {
+                transform: rotate(90deg);
+            }
+
+            .submenu-custom {
+                padding-left: 34px;
+                margin-top: 6px;
+            }
+
+            .submenu-link-custom {
+                display: block;
+                color: #FFFFFF;
+                text-decoration: none;
+                padding: 8px 10px;
+                border-radius: 7px;
+                font-size: 16px;
+                font-weight: 500;
+                margin-bottom: 4px;
+                transition: background-color .2s ease;
+                white-space: nowrap;
+            }
+
+                .submenu-link-custom:hover {
+                    background: rgba(255,255,255,.08);
+                    color: #FFFFFF;
+                }
+
+                .submenu-link-custom.active {
+                    background: #2B286F;
+                    color: #FFFFFF;
+                }
 
             .main-container {
                 flex: 1;
@@ -242,20 +279,13 @@
                 padding: 0;
             }
 
-            .topbar-user-name {
-                color: #111111;
-                font-size: 16px;
-                font-weight: 600;
-                line-height: 1;
-            }
-
-            .topbar-user .arrow {
-                font-size: 22px;
-                font-weight: 400;
-                line-height: 1;
-                display: inline-block;
-                transition: transform 0.2s ease;
-            }
+                .topbar-user .arrow {
+                    font-size: 22px;
+                    font-weight: 400;
+                    line-height: 1;
+                    display: inline-block;
+                    transition: transform 0.2s ease;
+                }
 
             .topbar-user-wrapper.open .arrow {
                 transform: rotate(90deg);
@@ -361,11 +391,12 @@
             </ul>
 
             <div class="menu-section-title">Gestión</div>
+
             <ul class="nav-custom">
                 @if (TienePermiso("menuproductos"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom @ClaseActiva("Productos")" asp-controller="Producto" asp-action="Index">
+                        <a class="nav-link-custom @ClaseActiva("Producto")" asp-controller="Producto" asp-action="Index">
                             <span class="nav-icon">
                                 <img src="~/img/Productos.png" alt="Productos" class="nav-img-icon" />
                             </span>
@@ -376,34 +407,76 @@
 
                 @if (TienePermiso("menuventas"))
                 {
+                    var ventasActivo = EsModuloActual("Ventas", "Venta");
+
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom @ClaseActiva("Ventas")" asp-controller="Ventas" asp-action="Index">
+                        <button class="nav-link-custom @(ventasActivo ? "active" : string.Empty)"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#submenuVentas"
+                                aria-expanded="@MenuExpandido(ventasActivo)"
+                                aria-controls="submenuVentas">
                             <span class="nav-icon">
                                 <img src="~/img/Ventas.png" alt="Ventas" class="nav-img-icon" />
                             </span>
                             <span>Ventas</span>
                             <span class="nav-arrow">›</span>
-                        </a>
+                        </button>
+
+                        <div class="collapse submenu-custom @MostrarMenu(ventasActivo)" id="submenuVentas">
+                            <a class="submenu-link-custom @ClaseActiva("Venta", "Index")"
+                                   asp-controller="Venta"
+                                   asp-action="Index">
+                                Registrar Ventas
+                            </a>
+
+                            <a class="submenu-link-custom @ClaseActiva("Ventas", "Detalle")"
+                                   asp-controller="Ventas"
+                                   asp-action="Detalle">
+                                Detalle de Ventas
+                            </a>
+                        </div>
                     </li>
                 }
 
                 @if (TienePermiso("menucompras"))
                 {
+                    var comprasActivo = EsModuloActual("Compras", "Compra");
+
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom @ClaseActiva("Compras")" asp-controller="Compras" asp-action="Index">
+                        <button class="nav-link-custom @(comprasActivo ? "active" : string.Empty)"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#submenuCompras"
+                                aria-expanded="@MenuExpandido(comprasActivo)"
+                                aria-controls="submenuCompras">
                             <span class="nav-icon">
                                 <img src="~/img/Compras.png" alt="Compras" class="nav-img-icon" />
                             </span>
                             <span>Compras</span>
                             <span class="nav-arrow">›</span>
-                        </a>
+                        </button>
+
+                        <div class="collapse submenu-custom @MostrarMenu(comprasActivo)" id="submenuCompras">
+                            <a class="submenu-link-custom @ClaseActiva("Compras", "Index")"
+                                   asp-controller="Compra"
+                                   asp-action="Index">
+                                Registrar Compras
+                            </a>
+
+                            <a class="submenu-link-custom @ClaseActiva("Compras", "Detalle")"
+                                   asp-controller="DetalleDeCompra"
+                                   asp-action="Index">
+                                Detalle de Compras
+                            </a>
+                        </div>
                     </li>
                 }
 
                 @if (TienePermiso("menuclientes"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom @ClaseActiva("Clientes")" asp-controller="Cliente" asp-action="Index">
+                        <a class="nav-link-custom @ClaseActiva("Cliente")" asp-controller="Cliente" asp-action="Index">
                             <span class="nav-icon">
                                 <img src="~/img/Clientes.png" alt="Clientes" class="nav-img-icon" />
                             </span>
@@ -415,7 +488,7 @@
                 @if (TienePermiso("menuproveedores"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom @ClaseActiva("Proveedores")" asp-controller="Proveedores" asp-action="Index">
+                        <a class="nav-link-custom @ClaseActiva("Proveedor")" asp-controller="Proveedor" asp-action="Index">
                             <span class="nav-icon">
                                 <img src="~/img/Proveedores.png" alt="Proveedores" class="nav-img-icon" />
                             </span>
@@ -426,6 +499,7 @@
             </ul>
 
             <div class="menu-section-title">Reportes</div>
+
             <ul class="nav-custom">
                 @if (TienePermiso("menucompras"))
                 {
@@ -453,6 +527,7 @@
             </ul>
 
             <div class="menu-section-title">Configuración</div>
+
             <ul class="nav-custom">
                 @if (TienePermiso("menuusuarios"))
                 {
@@ -519,16 +594,55 @@
         </main>
     </div>
 
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const appContainer = document.getElementById('appContainer');
+                const sidebar = document.getElementById('sidebar');
                 const btnToggleSidebar = document.getElementById('btnToggleSidebar');
                 const userDropdownWrapper = document.getElementById('userDropdownWrapper');
                 const btnUserDropdown = document.getElementById('btnUserDropdown');
 
-                if (btnToggleSidebar) {
+                const sidebarScrollKey = 'oasisShopSidebarScroll';
+                const sidebarHiddenKey = 'oasisShopSidebarHidden';
+
+                if (sidebar) {
+                    const scrollGuardado = localStorage.getItem(sidebarScrollKey);
+
+                    if (scrollGuardado !== null) {
+                        setTimeout(function () {
+                            sidebar.scrollTop = parseInt(scrollGuardado, 10);
+                        }, 0);
+                    }
+
+                    sidebar.addEventListener('scroll', function () {
+                        localStorage.setItem(sidebarScrollKey, sidebar.scrollTop);
+                    });
+
+                    const menuLinks = sidebar.querySelectorAll('a.nav-link-custom, a.submenu-link-custom');
+
+                    menuLinks.forEach(function (link) {
+                        link.addEventListener('click', function () {
+                            localStorage.setItem(sidebarScrollKey, sidebar.scrollTop);
+                        });
+                    });
+                }
+
+                if (appContainer) {
+                    const sidebarOculto = localStorage.getItem(sidebarHiddenKey);
+
+                    if (sidebarOculto === 'true') {
+                        appContainer.classList.add('sidebar-hidden');
+                    }
+                }
+
+                if (btnToggleSidebar && appContainer) {
                     btnToggleSidebar.addEventListener('click', function () {
                         appContainer.classList.toggle('sidebar-hidden');
+
+                        const estaOculto = appContainer.classList.contains('sidebar-hidden');
+                        localStorage.setItem(sidebarHiddenKey, estaOculto ? 'true' : 'false');
                     });
                 }
 
@@ -547,7 +661,6 @@
             });
     </script>
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

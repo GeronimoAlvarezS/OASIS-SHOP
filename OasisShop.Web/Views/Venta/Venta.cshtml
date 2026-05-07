@@ -1,0 +1,1218 @@
+﻿@model OasisShop.Web.Models.ViewModels.VentaViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Registrar ventas";
+}
+
+<style>
+    .ventas-page {
+        padding: 18px 20px 28px;
+        background: #ECEEF3;
+        min-height: calc(100vh - 60px);
+    }
+
+    .page-header {
+        margin-bottom: 48px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0;
+        color: #111111;
+    }
+
+    .venta-main-layout {
+        max-width: 980px;
+    }
+
+    .add-product-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 95px;
+        gap: 56px;
+        align-items: end;
+        margin-bottom: 46px;
+    }
+
+    .field-title {
+        display: block;
+        color: #111111;
+        font-size: 15px;
+        font-weight: 550;
+        margin-bottom: 4px;
+        padding-left: 22px;
+    }
+
+    .search-product-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-product-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    .search-product-input {
+        width: 100%;
+        height: 38px;
+        border: 1px solid #8F8F8F;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 6px 12px 6px 42px;
+        font-size: 14px;
+        color: #333333;
+        font-weight: 550;
+        outline: none;
+    }
+
+        .search-product-input::placeholder {
+            color: #6F6F6F;
+            font-weight: 400;
+        }
+
+        .search-product-input:focus {
+            border-color: #4B43D1;
+            box-shadow: 0 0 0 2px rgba(75, 67, 209, 0.18);
+        }
+
+    .btn-add-product {
+        background: #241E65;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 6px;
+        height: 38px;
+        padding: 0 14px;
+        font-size: 14px;
+        font-weight: 400;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-width: 95px;
+    }
+
+        .btn-add-product:hover {
+            background: #1B174D;
+            color: #FFFFFF;
+        }
+
+    .btn-add-icon {
+        font-size: 30px;
+        line-height: 1;
+        font-weight: 900;
+        margin-top: -2px;
+    }
+
+    .table-card-venta {
+        background: transparent;
+        border-radius: 7px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    .table-venta {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        min-width: 700px;
+    }
+
+        .table-venta thead th {
+            background: #DCDDDF;
+            color: #676767;
+            font-weight: 700;
+            text-align: center;
+            padding: 13px 8px;
+            border-right: 1px solid #AEB1B8;
+        }
+
+            .table-venta thead th:last-child {
+                border-right: none;
+            }
+
+        .table-venta tbody td {
+            background: #F8F8F8;
+            color: #5A5A5A;
+            padding: 12px 8px;
+            border-top: 1px solid #D8D9DD;
+            border-right: 1px solid #BFC1C6;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 500;
+        }
+
+            .table-venta tbody td:last-child {
+                border-right: none;
+            }
+
+        .table-venta tbody tr:nth-child(even) td {
+            background: #DCDDDF;
+        }
+
+    .cantidad-display {
+        display: inline-block;
+        min-width: 36px;
+        height: 22px;
+        line-height: 22px;
+        text-align: center;
+        border: 1px solid #9CA3AF;
+        border-radius: 8px;
+        background: #FFFFFF;
+        font-size: 11px;
+        color: #333333;
+    }
+
+    .cantidad-input {
+        width: 58px;
+        height: 26px;
+        border: 1px solid #9CA3AF;
+        border-radius: 8px;
+        background: #FFFFFF;
+        text-align: center;
+        font-size: 12px;
+        color: #333333;
+        outline: none;
+    }
+
+    .btn-delete-product {
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .delete-icon {
+        width: 17px;
+        height: 17px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .empty-detail-row {
+        text-align: center;
+        color: #666666;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 22px 8px !important;
+        background: #F8F8F8 !important;
+    }
+
+    .summary-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 16px;
+    }
+
+    .summary-card {
+        width: 310px;
+        background: #FFFFFF;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+        overflow: hidden;
+        padding: 7px;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 6px;
+        color: #111111;
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    .summary-divider {
+        height: 1px;
+        background: #A8A8A8;
+        margin: 4px 6px;
+    }
+
+    .summary-value {
+        font-weight: 400;
+        color: #111111;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
+    .summary-number {
+        font-weight: 600;
+        color: #1E1B4B;
+        font-size: 14px;
+        white-space: nowrap;
+        user-select: text;
+    }
+
+    .summary-input,
+    .summary-select {
+        width: 120px;
+        height: 28px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        outline: none;
+        padding: 4px 8px;
+        text-align: right;
+        font-size: 14px;
+        background: #FFFFFF;
+        color: #111111;
+    }
+
+    .summary-select {
+        text-align: left;
+    }
+
+    .discount-box {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        padding: 2px 6px;
+        background: #F5F5F5;
+    }
+
+        .discount-box input {
+            width: 55px;
+            height: 25px;
+            border: none;
+            outline: none;
+            background: #FFFFFF;
+            text-align: center;
+            font-size: 14px;
+            color: #111111;
+        }
+
+    .btn-register-venta,
+    .btn-copy-venta,
+    .btn-clean-venta {
+        width: calc(100% - 12px);
+        margin: 0 7px 8px;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 3px;
+        height: 28px;
+        font-size: 13px;
+        font-weight: 450;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-register-venta {
+        background: #4B43D1;
+        display: flex;
+    }
+
+        .btn-register-venta:hover {
+            background: #3F3CBB;
+            color: #FFFFFF;
+        }
+
+    .btn-copy-venta {
+        background: #22C55E;
+        display: none;
+    }
+
+        .btn-copy-venta:hover {
+            background: #16A34A;
+            color: #FFFFFF;
+        }
+
+    .btn-clean-venta {
+        background: #F59E0B;
+        display: flex;
+    }
+
+        .btn-clean-venta:hover {
+            background: #D97706;
+            color: #FFFFFF;
+        }
+
+    .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .alert-custom {
+        min-width: 280px;
+        max-width: 340px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: #FFFFFF;
+        font-weight: 400;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0,0,0,0.18);
+        animation: slideIn 0.4s ease;
+    }
+
+    .alert-success-custom {
+        background-color: #22C55E;
+    }
+
+    .alert-danger-custom {
+        background-color: #C63637;
+    }
+
+    .alert-warning-custom {
+        background-color: #FFCE1B;
+        color: #111111;
+    }
+
+        .alert-warning-custom .alert-close {
+            color: #111111;
+        }
+
+    .alert-message {
+        flex: 1;
+        text-align: center;
+        line-height: 1.25;
+        padding-right: 8px;
+    }
+
+    .alert-close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        color: inherit;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+
+    .modal-venta-custom .modal-dialog {
+        max-width: 430px;
+    }
+
+    .modal-venta-custom .modal-content {
+        border: none;
+        border-radius: 18px;
+        overflow: visible;
+        background: #ECEEF3;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal-header-venta {
+        background: #1E1B4B;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 22px;
+        position: relative;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .modal-title-venta {
+        color: #FFFFFF;
+        font-size: 18px;
+        font-weight: 750;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .btn-close-venta {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #FFFFFF;
+        font-size: 30px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .modal-body-venta {
+        padding: 22px 22px 16px 22px;
+        min-height: 560px;
+        overflow: visible;
+    }
+
+    .modal-group {
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+        .modal-group:first-of-type {
+            margin-top: 8px;
+        }
+
+    .modal-label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #111111;
+    }
+
+    .modal-input {
+        width: 100%;
+        height: 31px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 4px 10px;
+        font-size: 14px;
+        color: #333333;
+        outline: none;
+        box-shadow: none;
+    }
+
+        .modal-input[readonly] {
+            background: #FFFFFF;
+            cursor: default;
+        }
+
+        .modal-input:focus {
+            border-color: #6366F1;
+            box-shadow: 0 0 0 0.14rem rgba(99, 102, 241, 0.18);
+        }
+
+    .custom-select-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .custom-select-box {
+        width: 100%;
+        height: 31px;
+        border: 1px solid #8E8E8E;
+        border-radius: 6px;
+        background: #FFFFFF;
+        padding: 4px 10px;
+        font-size: 14px;
+        color: #333333;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+    }
+
+    .custom-select-text {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .custom-arrow {
+        font-size: 13px;
+        color: #666666;
+        margin-left: 8px;
+    }
+
+    .custom-options {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 35px;
+        width: 100%;
+        max-height: 210px;
+        overflow-y: auto;
+        background: #FFFFFF;
+        border: 1px solid #00A6C8;
+        z-index: 99999;
+        padding: 4px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+    }
+
+        .custom-options.show {
+            display: block;
+        }
+
+    .custom-search-label {
+        display: block;
+        font-size: 12px;
+        color: #333333;
+        margin: 2px 0 4px;
+        text-align: left;
+        font-weight: 400;
+    }
+
+    .custom-search {
+        width: 100%;
+        height: 28px;
+        border: 1px solid #8E8E8E;
+        margin-bottom: 4px;
+        padding: 3px 6px;
+        outline: none;
+        font-size: 14px;
+        background: #FFFFFF;
+    }
+
+        .custom-search:focus {
+            border-color: #00A6C8;
+        }
+
+    .custom-option {
+        padding: 7px 8px;
+        text-align: center;
+        font-size: 14px;
+        cursor: pointer;
+        color: #111111;
+        background: #FFFFFF;
+        line-height: 1.25;
+    }
+
+        .custom-option:hover,
+        .custom-option.active {
+            background: #00A6C8;
+            color: #FFFFFF;
+        }
+
+    .modal-footer-venta {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 4px;
+    }
+
+    .btn-save-venta-modal {
+        border: none;
+        border-radius: 6px;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 7px 20px;
+        min-width: 76px;
+        background: #22C55E;
+    }
+
+        .btn-save-venta-modal:hover {
+            background: #16A34A;
+        }
+
+    @@media (max-width: 992px) {
+        .venta-main-layout {
+            max-width: 100%;
+        }
+
+        .add-product-header {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn-add-product {
+            width: 100%;
+        }
+
+        .summary-wrapper {
+            justify-content: flex-end;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .ventas-page {
+            padding: 14px 12px 22px;
+        }
+
+        .page-header {
+            margin-bottom: 26px;
+        }
+
+        .page-title {
+            font-size: 21px;
+        }
+
+        .summary-card {
+            width: 100%;
+        }
+
+        .summary-wrapper {
+            justify-content: stretch;
+        }
+
+        .modal-body-venta {
+            min-height: auto;
+        }
+    }
+</style>
+<div id="alertContainer" class="alert-container"></div>
+
+<div class="ventas-page">
+    <div class="page-header">
+        <h1 class="page-title">Registrar ventas</h1>
+    </div>
+
+    <div class="venta-main-layout">
+
+        <!-- HEADER -->
+        <div class="add-product-header">
+            <div>
+                <label class="field-title">Agregar venta</label>
+
+                <div class="search-product-container">
+                    <img src="~/img/buscar.png" class="search-product-icon" />
+                    <input type="text"
+                           id="txtBuscarProducto"
+                           class="search-product-input"
+                           placeholder="Buscar producto (Código o nombre)" />
+                </div>
+            </div>
+
+            <button type="button"
+                    class="btn-add-product"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalAgregarProductoVenta"
+                    onclick="prepararModalAgregarProducto()">
+                <span class="btn-add-icon">+</span>
+                <span>Agregar</span>
+            </button>
+        </div>
+
+        <!-- TABLA DETALLE VENTA -->
+        <div class="table-card-venta">
+            <div class="table-responsive">
+                <table class="table-venta">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Código</th>
+                            <th>Precio venta</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaDetalleVenta">
+                        <tr>
+                            <td colspan="6" class="empty-detail-row">
+                                No se han agregado productos a la venta.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RESUMEN DE VENTA -->
+        <div class="summary-wrapper">
+            <div class="summary-card">
+
+                <div class="summary-line">
+                    <span>N° venta:</span>
+                    <span id="txtNumeroVenta" class="summary-number">Pendiente</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Subtotal:</span>
+                    <span id="txtSubtotal" class="summary-value">$0</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Descuento:</span>
+                    <div class="discount-box">
+                        <input type="number"
+                               id="txtDescuento"
+                               min="0"
+                               max="100"
+                               value="0"
+                               oninput="actualizarTotales()" />
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="summary-line">
+                    <span>Tipo factura:</span>
+                    <select id="cboTipoFactura" class="summary-select">
+                        <option value="0" data-nombre="">Seleccione</option>
+
+                        @foreach (var tf in Model.TiposFactura)
+                        {
+                            <option value="@tf.IdTipoFactura" data-nombre="@tf.Nombre">
+                                @tf.Nombre
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-line">
+                    <span>Total a pagar:</span>
+                    <span id="txtTotalPagar" class="summary-value">$0</span>
+                </div>
+
+                <div class="summary-line">
+                    <span>Monto pagado:</span>
+                    <input type="number"
+                           id="txtMontoPagado"
+                           class="summary-input"
+                           value="0"
+                           min="0"
+                           oninput="actualizarCambio()" />
+                </div>
+
+                <div class="summary-line">
+                    <span>Monto cambio:</span>
+                    <span id="txtMontoCambio" class="summary-value">$0</span>
+                </div>
+
+                <button type="button"
+                        class="btn-register-venta"
+                        onclick="registrarVenta()">
+                    Registrar venta
+                </button>
+
+                <button type="button"
+                        id="btnCopiarNumeroVenta"
+                        class="btn-copy-venta"
+                        onclick="copiarNumeroVenta()">
+                    Copiar número de venta
+                </button>
+
+                <button type="button"
+                        class="btn-clean-venta"
+                        onclick="limpiarVenta()">
+                    Limpiar venta
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL REGISTRAR VENTA -->
+<div class="modal fade modal-venta-custom" id="modalAgregarProductoVenta" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header-venta">
+                <h5 class="modal-title-venta">REGISTRO DE VENTA</h5>
+                <button type="button"
+                        class="btn-close-venta"
+                        data-bs-dismiss="modal">
+                    ×
+                </button>
+            </div>
+
+            <div class="modal-body modal-body-venta">
+
+                <!-- CLIENTE -->
+                <div class="modal-group">
+                    <label class="modal-label">Número de documento del cliente</label>
+                    <input id="ModalDocumentoCliente"
+                           class="modal-input"
+                           type="text"
+                           placeholder="Ingrese documento del cliente"
+                           oninput="buscarClientePorDocumento()" />
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Nombre completo del cliente</label>
+                    <input id="ModalNombreCliente"
+                           class="modal-input"
+                           type="text"
+                           readonly />
+                </div>
+
+                <!-- PRODUCTO -->
+                <div class="modal-group">
+                    <label class="modal-label">Nombre del producto</label>
+
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select-box" onclick="toggleDropdown('productoOptions')">
+                            <span id="productoTexto" class="custom-select-text">SELECCIONE</span>
+                            <span class="custom-arrow">▼</span>
+                        </div>
+
+                        <div id="productoOptions" class="custom-options">
+                            <label class="custom-search-label">Buscar producto</label>
+
+                            <input type="text"
+                                   class="custom-search"
+                                   onkeyup="filtrarOpciones(this,'productoItem')" />
+
+                            @foreach (var p in Model.Productos)
+                            {
+                                <div class="custom-option productoItem"
+                                     onclick="seleccionarProductoCustom('@p.IdProducto','@p.Nombre','@p.Codigo','@p.PrecioVenta','@p.Stock')">
+                                    @p.Nombre
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Código del producto</label>
+                    <input id="ModalCodigoProducto"
+                           class="modal-input"
+                           type="text"
+                           readonly />
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Precio de venta</label>
+                    <input id="ModalPrecioVenta"
+                           class="modal-input"
+                           type="number"
+                           readonly />
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Stock disponible</label>
+                    <input id="ModalStockDisponible"
+                           class="modal-input"
+                           type="number"
+                           readonly />
+                </div>
+
+                <div class="modal-group">
+                    <label class="modal-label">Cantidad</label>
+                    <input id="ModalCantidad"
+                           class="modal-input"
+                           type="number"
+                           value="1"
+                           min="1" />
+                </div>
+
+                <div class="modal-footer-venta">
+                    <button type="button"
+                            class="btn-save-venta-modal"
+                            onclick="agregarProductoDetalle()">
+                        Crear
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =========================
+    // VARIABLES GLOBALES
+    // =========================
+    let detalleVenta = [];
+
+    let documentoClienteVenta = "";
+    let nombreClienteVenta = "";
+
+    let idProductoSeleccionado = 0;
+    let codigoProductoSeleccionado = "";
+    let nombreProductoSeleccionado = "";
+    let precioVentaSeleccionado = 0;
+    let stockDisponibleSeleccionado = 0;
+
+    let numeroVentaRegistrada = "";
+
+    const numeroDocumentoVenta = "@Model.NumeroDocumento";
+
+    // Lista de clientes cargada desde backend
+    const clientes = [
+        @foreach (var c in Model.Clientes)
+        {
+            <text>{
+                documento: "@c.Documento",
+                nombre: "@c.NombreCompleto"
+            },</text>
+        }
+    ];
+
+    // =========================
+    // INICIO
+    // =========================
+    document.addEventListener("DOMContentLoaded", function () {
+        actualizarTotales();
+    });
+
+    // =========================
+    // CLIENTE
+    // =========================
+    function buscarClientePorDocumento() {
+        const documento = document.getElementById("ModalDocumentoCliente").value.trim();
+
+        documentoClienteVenta = documento;
+        nombreClienteVenta = "";
+
+        const cliente = clientes.find(x => x.documento === documento);
+
+        if (cliente) {
+            nombreClienteVenta = cliente.nombre;
+            document.getElementById("ModalNombreCliente").value = cliente.nombre;
+        } else {
+            document.getElementById("ModalNombreCliente").value = "";
+        }
+    }
+
+    // =========================
+    // DROPDOWN PRODUCTOS
+    // =========================
+    function toggleDropdown(idDropdown) {
+        const dropdown = document.getElementById(idDropdown);
+
+        document.querySelectorAll(".custom-options").forEach(x => {
+            if (x.id !== idDropdown) x.classList.remove("show");
+        });
+
+        dropdown.classList.toggle("show");
+    }
+
+    function filtrarOpciones(input, claseItem) {
+        const filtro = input.value.toLowerCase();
+        const opciones = document.querySelectorAll("." + claseItem);
+
+        opciones.forEach(op => {
+            const texto = op.innerText.toLowerCase();
+            op.style.display = texto.includes(filtro) ? "block" : "none";
+        });
+    }
+
+    function seleccionarProductoCustom(id, nombre, codigo, precio, stock) {
+        idProductoSeleccionado = parseInt(id);
+        nombreProductoSeleccionado = nombre;
+        codigoProductoSeleccionado = codigo;
+        precioVentaSeleccionado = parseFloat(precio);
+        stockDisponibleSeleccionado = parseInt(stock);
+
+        document.getElementById("productoTexto").innerText = nombre;
+        document.getElementById("ModalCodigoProducto").value = codigo;
+        document.getElementById("ModalPrecioVenta").value = precio;
+        document.getElementById("ModalStockDisponible").value = stock;
+
+        let inputCantidad = document.getElementById("ModalCantidad");
+        inputCantidad.value = 1;
+        inputCantidad.max = stock;
+
+        document.getElementById("productoOptions").classList.remove("show");
+    }
+
+    // =========================
+    // AGREGAR PRODUCTO
+    // =========================
+    function agregarProductoDetalle() {
+        const cantidad = parseInt(document.getElementById("ModalCantidad").value);
+
+        if (!idProductoSeleccionado) {
+            showAlert("Debe seleccionar un producto.", "warning");
+            return;
+        }
+
+        if (cantidad > stockDisponibleSeleccionado) {
+            showAlert("Stock insuficiente.", "warning");
+            return;
+        }
+
+        if (detalleVenta.some(x => x.idProducto === idProductoSeleccionado)) {
+            showAlert("Producto duplicado. Modifique cantidad.", "warning");
+            return;
+        }
+
+        detalleVenta.push({
+            idProducto: idProductoSeleccionado,
+            codigoProducto: codigoProductoSeleccionado,
+            nombreProducto: nombreProductoSeleccionado,
+            precioVenta: precioVentaSeleccionado,
+            cantidad: cantidad,
+            stock: stockDisponibleSeleccionado,
+            subTotal: cantidad * precioVentaSeleccionado
+        });
+
+        renderizarTabla();
+        actualizarTotales();
+
+        bootstrap.Modal.getInstance(document.getElementById("modalAgregarProductoVenta")).hide();
+    }
+
+    // =========================
+    // TABLA
+    // =========================
+    function renderizarTabla() {
+        const tabla = document.getElementById("tablaDetalleVenta");
+        tabla.innerHTML = "";
+
+        if (detalleVenta.length === 0) {
+            tabla.innerHTML = `<tr><td colspan="6">Sin productos</td></tr>`;
+            return;
+        }
+
+        detalleVenta.forEach(item => {
+            tabla.innerHTML += `
+                <tr>
+                    <td>${item.nombreProducto}</td>
+                    <td>${item.codigoProducto}</td>
+                    <td>${formatoMoneda(item.precioVenta)}</td>
+                    <td>
+                        <input type="number" value="${item.cantidad}" min="1" max="${item.stock}"
+                        onchange="modificarCantidad(${item.idProducto}, this.value)" />
+                    </td>
+                    <td>${formatoMoneda(item.subTotal)}</td>
+                    <td>
+                        <button onclick="eliminarProducto(${item.idProducto})">X</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    function modificarCantidad(id, cantidad) {
+        let item = detalleVenta.find(x => x.idProducto === id);
+
+        if (!item) return;
+
+        cantidad = parseInt(cantidad);
+
+        if (cantidad > item.stock) {
+            showAlert("Stock insuficiente", "warning");
+            return;
+        }
+
+        item.cantidad = cantidad;
+        item.subTotal = cantidad * item.precioVenta;
+
+        actualizarTotales();
+        renderizarTabla();
+    }
+
+    function eliminarProducto(id) {
+        detalleVenta = detalleVenta.filter(x => x.idProducto !== id);
+        renderizarTabla();
+        actualizarTotales();
+    }
+
+    // =========================
+    // CALCULOS
+    // =========================
+    function obtenerSubtotal() {
+        return detalleVenta.reduce((acc, x) => acc + x.subTotal, 0);
+    }
+
+    function obtenerDescuento() {
+        return parseInt(document.getElementById("txtDescuento").value) || 0;
+    }
+
+    function obtenerTotal() {
+        let subtotal = obtenerSubtotal();
+        let descuento = obtenerDescuento();
+
+        return subtotal - (subtotal * (descuento / 100));
+    }
+
+    function actualizarTotales() {
+        document.getElementById("txtSubtotal").innerText = formatoMoneda(obtenerSubtotal());
+        document.getElementById("txtTotalPagar").innerText = formatoMoneda(obtenerTotal());
+
+        actualizarCambio();
+    }
+
+    function actualizarCambio() {
+        let total = obtenerTotal();
+        let pago = parseFloat(document.getElementById("txtMontoPagado").value || 0);
+
+        let cambio = pago - total;
+        if (cambio < 0) cambio = 0;
+
+        document.getElementById("txtMontoCambio").innerText = formatoMoneda(cambio);
+    }
+
+    // =========================
+    // REGISTRAR VENTA
+    // =========================
+    function registrarVenta() {
+        buscarClientePorDocumento();
+
+        if (detalleVenta.length === 0) {
+            showAlert("Debe agregar productos.", "warning");
+            return;
+        }
+
+        let tipoFactura = document.getElementById("cboTipoFactura");
+        let nombreTipo = tipoFactura.options[tipoFactura.selectedIndex].text;
+
+        if (nombreTipo === "Electrónica" && (!documentoClienteVenta || !nombreClienteVenta)) {
+            showAlert("Cliente obligatorio para factura electrónica.", "warning");
+            return;
+        }
+
+        let total = obtenerTotal();
+        let pago = parseFloat(document.getElementById("txtMontoPagado").value || 0);
+
+        if (pago < total) {
+            showAlert("Pago insuficiente.", "warning");
+            return;
+        }
+
+        let venta = {
+            idTipoFactura: parseInt(tipoFactura.value),
+            numeroDocumento: numeroDocumentoVenta,
+            documentoCliente: documentoClienteVenta,
+            nombreCliente: nombreClienteVenta,
+            montoTotal: total,
+            montoPago: pago,
+            montoCambio: pago - total,
+            detalleVenta: detalleVenta
+        };
+
+        fetch("/Venta/Registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(venta)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.resultado) {
+                showAlert("Venta registrada correctamente", "success");
+            } else {
+                showAlert(data.mensaje, "danger");
+            }
+        });
+    }
+
+    // =========================
+    // UTILIDADES
+    // =========================
+    function formatoMoneda(valor) {
+        return new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: "COP"
+        }).format(valor || 0);
+    }
+
+    function showAlert(msg, tipo) {
+        alert(msg); 
+    }
+
+</script>
