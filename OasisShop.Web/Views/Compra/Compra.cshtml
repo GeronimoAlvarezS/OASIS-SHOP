@@ -704,7 +704,7 @@
 
 <div class="compras-page">
     <div class="page-header">
-        <h1 class="page-title">Registrar compras</h1>
+        <h1 class="page-title">Registrar Inventario</h1>
     </div>
 
     <div class="compra-main-layout">
@@ -712,7 +712,7 @@
         <!-- HEADER -->
         <div class="add-product-header">
             <div>
-                <label class="field-title">Agregar compra</label>
+                <label class="field-title">Agregar productos</label>
 
                 <div class="search-product-container">
                     <img src="~/img/buscar.png" class="search-product-icon" />
@@ -749,7 +749,7 @@
                     <tbody id="tablaDetalleCompra">
                         <tr>
                             <td colspan="5" class="empty-detail-row">
-                                No se han agregado productos a la compra.
+                                No se han agregado productos a la compra del inventario.
                             </td>
                         </tr>
                     </tbody>
@@ -762,7 +762,7 @@
             <div class="summary-card">
 
                 <div class="summary-line">
-                    <span>N° compra:</span>
+                    <span>N° compra de inventario:</span>
                     <span id="txtNumeroCompra" class="summary-number">Pendiente</span>
                 </div>
 
@@ -809,21 +809,21 @@
                 <!-- BOTONES -->
                 <button class="btn-register-compra"
                         onclick="registrarCompra()">
-                    Registrar compra
+                    Registrar compra de inventario
                 </button>
 
                 <button type="button"
                         id="btnCopiarNumeroCompra"
                         class="btn-copy-compra"
                         onclick="copiarNumeroCompra()">
-                    Copiar número de compra
+                    Copiar número de compra de inventario
                 </button>
 
                 <!-- 🔥 BOTÓN LIMPIAR (NUEVO) -->
                 <button type="button"
                         class="btn-clean-compra"
                         onclick="limpiarCompra()">
-                    Limpiar compra
+                    Limpiar
                 </button>
 
             </div>
@@ -1119,7 +1119,7 @@
                 tabla.innerHTML = `
                     <tr>
                         <td colspan="5" class="empty-detail-row">
-                            No se han agregado productos a la compra.
+                            No se han agregado productos a la compra de inventario.
                         </td>
                     </tr>`;
                 return;
@@ -1360,7 +1360,7 @@
             renderizarTabla();
             actualizarTotales();
 
-            showAlert("Compra limpiada correctamente.", "success");
+            showAlert("Campos limpiados correctamente.", "success");
         }
 
         function formatoMoneda(valor) {

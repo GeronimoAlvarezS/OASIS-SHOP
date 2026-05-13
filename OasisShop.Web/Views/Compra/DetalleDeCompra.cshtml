@@ -434,7 +434,7 @@
 
 <div class="detalle-compra-page">
 
-    <h2 class="detalle-compra-title">Detalle de compras</h2>
+    <h2 class="detalle-compra-title">Detalle de inventario</h2>
 
     <!-- CONTENEDOR DE ALERTAS -->
     <div id="alertContainer" class="alert-container"></div>
@@ -482,7 +482,7 @@
                    id="txtBuscarCompra"
                    class="detalle-search-input"
                    value="@(ViewBag.NumeroCompraBuscado ?? "")"
-                   placeholder="Buscar compra (Número de compra)"
+                   placeholder="Buscar inventario (Número de compra)"
                    autocomplete="off" />
         </form>
     </div>
@@ -496,7 +496,7 @@
             <div class="detalle-card">
                 <div class="detalle-card-header">
                     <img src="~/img/InformacionDetalle.png" class="detalle-card-icon" />
-                    <h3 class="detalle-card-title">Información de la compra</h3>
+                    <h3 class="detalle-card-title">Información de la compra del inventario</h3>
                 </div>
 
                 <div class="detalle-card-body">
@@ -547,7 +547,7 @@
 
             <div class="detalle-card-header">
                 <img src="~/img/ProductoDetalle.png" class="detalle-card-icon" />
-                <h3 class="detalle-card-title">Productos de la compra</h3>
+                <h3 class="detalle-card-title">Productos de la compra del inventario</h3>
             </div>
 
             <div class="detalle-table-container">
@@ -619,7 +619,7 @@
     else
     {
         <div class="detalle-empty-state">
-            Ingresa un número de compra para visualizar el detalle.
+            Ingresa un número de compra de inventario para visualizar el detalle.
         </div>
     }
 
@@ -738,7 +738,7 @@
             const valor = inputBusqueda.value.trim();
 
             if (valor === "") {
-                showAlert("Debe ingresar un número de compra válido.", "warning");
+                showAlert("Debe ingresar un número de compra de inventario válido.", "warning");
                 inputBusqueda.focus();
                 return false;
             }

@@ -612,7 +612,7 @@
 
                                 <button type="button"
                                         class="btn-action btn-detail"
-                                        onclick="verDetalle('@item.Documento','@item.NombreCompleto','@item.Correo','@item.Clave','@item.oRol?.Descripcion','@(item.Estado ? "Activo" : "Inactivo")')">
+                                        onclick="verDetalle('@item.Documento','@item.NombreCompleto','@item.Correo','@item.oRol?.Descripcion','@(item.Estado ? "Activo" : "Inactivo")')">
                                     <img src="~/img/Detalles.png" alt="Detalles" class="icon-btn" />
                                     <span>Detalles</span>
                                 </button>
@@ -837,7 +837,7 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width:430px;">
         <div class="modal-content">
             <div class="modal-header-detalle">
-                <h5 class="modal-title-custom">DETALLES</h5>
+                <h5 class="modal-title-custom">DETALLES DE USUARIO</h5>
                 <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">×</button>
             </div>
 
@@ -856,11 +856,6 @@
                     <div class="details-item">
                         <span class="details-label">Correo</span>
                         <span class="details-value" id="detalleCorreo"></span>
-                    </div>
-
-                    <div class="details-item">
-                        <span class="details-label">Contraseña</span>
-                        <span class="details-value" id="detalleClave"></span>
                     </div>
 
                     <div class="details-item">
@@ -1027,11 +1022,10 @@
             modal.show();
         }
 
-        function verDetalle(documento, nombre, correo, clave, rol, estado) {
+              function verDetalle(documento, nombre, correo, rol, estado) {
             document.getElementById('detalleDocumento').innerText = documento;
             document.getElementById('detalleNombre').innerText = nombre;
             document.getElementById('detalleCorreo').innerText = correo;
-            document.getElementById('detalleClave').innerText = clave;
             document.getElementById('detalleRol').innerText = rol;
             document.getElementById('detalleEstado').innerText = estado;
 
