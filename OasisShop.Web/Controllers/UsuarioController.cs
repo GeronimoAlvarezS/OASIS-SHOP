@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CapaEntidad;
 using CapaNegocio;
-using System;
-using System.Linq;
 
 namespace OasisShop.Web.Controllers
 {
@@ -15,8 +13,9 @@ namespace OasisShop.Web.Controllers
         // Incluye funcionalidades de búsqueda y paginación.
 
         [HttpGet]
-        public IActionResult Index(int pagina = 1, string busqueda = "")
+        public IActionResult Index()
         {
+<<<<<<< HEAD
             // Cantidad de registros que se mostrarán por página.
 
             int registrosPorPagina = 5;
@@ -64,6 +63,10 @@ namespace OasisShop.Web.Controllers
             // Retorna la vista Usuario.cshtml junto con la lista paginada.
 
             return View("~/Views/Usuario/Usuario.cshtml", usuariosPaginados);
+=======
+            var lista = _usuarioServicio.Listar();
+            return View("~/Views/Usuario/Usuario.cshtml", lista);
+>>>>>>> parent of 234fe1e (feature/LogicaDeGestionDeUsuario)
         }
 
         // Método POST encargado de registrar o editar usuarios.
