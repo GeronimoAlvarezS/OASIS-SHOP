@@ -24,7 +24,6 @@ namespace CapaNegocio
                 return false;
             }
 
-            // 🔹 Validaciones básicas
             if (string.IsNullOrWhiteSpace(obj.Nombre))
             {
                 Mensaje += "Es necesario el nombre del negocio\n";
@@ -42,6 +41,15 @@ namespace CapaNegocio
             if (string.IsNullOrWhiteSpace(obj.Direccion))
             {
                 Mensaje += "Es necesario la dirección\n";
+            }
+
+            if (string.IsNullOrWhiteSpace(obj.Correo))
+            {
+                Mensaje += "Es necesario el correo electrónico\n";
+            }
+            else if (!Regex.IsMatch(obj.Correo.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                Mensaje += "El formato del correo electrónico no es válido\n";
             }
 
             if (obj.IdDepartamento <= 0)
@@ -62,6 +70,7 @@ namespace CapaNegocio
             obj.Nombre = obj.Nombre.Trim();
             obj.RUC = obj.RUC.Trim().ToUpper();
             obj.Direccion = obj.Direccion.Trim();
+            obj.Correo = obj.Correo.Trim().ToLower();
 
             if (obj.oDepartamento == null)
             {

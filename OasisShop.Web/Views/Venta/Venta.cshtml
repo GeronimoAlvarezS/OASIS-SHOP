@@ -158,6 +158,12 @@
             background: #DCDDDF;
         }
 
+    .td-cantidad {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .cantidad-display {
         display: inline-block;
         min-width: 36px;
@@ -169,18 +175,6 @@
         background: #FFFFFF;
         font-size: 11px;
         color: #333333;
-    }
-
-    .cantidad-input {
-        width: 58px;
-        height: 26px;
-        border: 1px solid #9CA3AF;
-        border-radius: 8px;
-        background: #FFFFFF;
-        text-align: center;
-        font-size: 12px;
-        color: #333333;
-        outline: none;
     }
 
     .btn-delete-product {
@@ -668,6 +662,23 @@
             min-height: auto;
         }
     }
+
+    .btn-delete-product {
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .delete-icon {
+        width: 17px;
+        height: 17px;
+        object-fit: contain;
+        display: block;
+    }
 </style>
 <div id="alertContainer" class="alert-container"></div>
 
@@ -869,7 +880,7 @@
                             @foreach (var p in Model.Productos)
                             {
                                 <div class="custom-option productoItem"
-                                     onclick="seleccionarProductoCustom('@p.IdProducto','@p.Nombre','@p.Codigo','@p.PrecioVenta','@p.Stock')">
+                                     onclick="seleccionarProductoCustom('@p.IdProducto','@p.Nombre','@p.Codigo','@p.PrecioVenta.ToString(System.Globalization.CultureInfo.InvariantCulture)','@p.Stock')">
                                     @p.Nombre
                                 </div>
                             }
@@ -889,7 +900,7 @@
                     <label class="modal-label">Precio de venta</label>
                     <input id="ModalPrecioVenta"
                            class="modal-input"
-                           type="number"
+                           type="text"
                            readonly />
                 </div>
 
@@ -903,11 +914,7 @@
 
                 <div class="modal-group">
                     <label class="modal-label">Cantidad</label>
-                    <input id="ModalCantidad"
-                           class="modal-input"
-                           type="number"
-                           value="1"
-                           min="1" />
+                    <input id="ModalCantidad" class="modal-input" type="number" value="0" />
                 </div>
 
                 <div class="modal-footer-venta">
@@ -946,273 +953,448 @@
     const clientes = [
         @foreach (var c in Model.Clientes)
         {
-            <text>{
-                documento: "@c.Documento",
-                nombre: "@c.NombreCompleto"
-            },</text>
-        }
-    ];
+                    <text>{
+                                documento: "@c.Documento",
+                                nombre: "@c.NombreCompleto"
+                            },</text>
+                }
+            ];
 
-    // =========================
-    // INICIO
-    // =========================
-    document.addEventListener("DOMContentLoaded", function () {
-        actualizarTotales();
-    });
+            // =========================
+            // INICIO
+            // =========================
+            document.addEventListener("DOMContentLoaded", function () {
+                actualizarTotales();
+            });
 
-    // =========================
-    // CLIENTE
-    // =========================
-    function buscarClientePorDocumento() {
-        const documento = document.getElementById("ModalDocumentoCliente").value.trim();
+            // =========================
+            // CLIENTE
+            // =========================
+            function buscarClientePorDocumento() {
+                const documento = document.getElementById("ModalDocumentoCliente").value.trim();
 
-        documentoClienteVenta = documento;
-        nombreClienteVenta = "";
+                documentoClienteVenta = documento;
+                nombreClienteVenta = "";
 
-        const cliente = clientes.find(x => x.documento === documento);
+                const cliente = clientes.find(x => x.documento === documento);
 
-        if (cliente) {
-            nombreClienteVenta = cliente.nombre;
-            document.getElementById("ModalNombreCliente").value = cliente.nombre;
-        } else {
-            document.getElementById("ModalNombreCliente").value = "";
-        }
-    }
-
-    // =========================
-    // DROPDOWN PRODUCTOS
-    // =========================
-    function toggleDropdown(idDropdown) {
-        const dropdown = document.getElementById(idDropdown);
-
-        document.querySelectorAll(".custom-options").forEach(x => {
-            if (x.id !== idDropdown) x.classList.remove("show");
-        });
-
-        dropdown.classList.toggle("show");
-    }
-
-    function filtrarOpciones(input, claseItem) {
-        const filtro = input.value.toLowerCase();
-        const opciones = document.querySelectorAll("." + claseItem);
-
-        opciones.forEach(op => {
-            const texto = op.innerText.toLowerCase();
-            op.style.display = texto.includes(filtro) ? "block" : "none";
-        });
-    }
-
-    function seleccionarProductoCustom(id, nombre, codigo, precio, stock) {
-        idProductoSeleccionado = parseInt(id);
-        nombreProductoSeleccionado = nombre;
-        codigoProductoSeleccionado = codigo;
-        precioVentaSeleccionado = parseFloat(precio);
-        stockDisponibleSeleccionado = parseInt(stock);
-
-        document.getElementById("productoTexto").innerText = nombre;
-        document.getElementById("ModalCodigoProducto").value = codigo;
-        document.getElementById("ModalPrecioVenta").value = precio;
-        document.getElementById("ModalStockDisponible").value = stock;
-
-        let inputCantidad = document.getElementById("ModalCantidad");
-        inputCantidad.value = 1;
-        inputCantidad.max = stock;
-
-        document.getElementById("productoOptions").classList.remove("show");
-    }
-
-    // =========================
-    // AGREGAR PRODUCTO
-    // =========================
-    function agregarProductoDetalle() {
-        const cantidad = parseInt(document.getElementById("ModalCantidad").value);
-
-        if (!idProductoSeleccionado) {
-            showAlert("Debe seleccionar un producto.", "warning");
-            return;
-        }
-
-        if (cantidad > stockDisponibleSeleccionado) {
-            showAlert("Stock insuficiente.", "warning");
-            return;
-        }
-
-        if (detalleVenta.some(x => x.idProducto === idProductoSeleccionado)) {
-            showAlert("Producto duplicado. Modifique cantidad.", "warning");
-            return;
-        }
-
-        detalleVenta.push({
-            idProducto: idProductoSeleccionado,
-            codigoProducto: codigoProductoSeleccionado,
-            nombreProducto: nombreProductoSeleccionado,
-            precioVenta: precioVentaSeleccionado,
-            cantidad: cantidad,
-            stock: stockDisponibleSeleccionado,
-            subTotal: cantidad * precioVentaSeleccionado
-        });
-
-        renderizarTabla();
-        actualizarTotales();
-
-        bootstrap.Modal.getInstance(document.getElementById("modalAgregarProductoVenta")).hide();
-    }
-
-    // =========================
-    // TABLA
-    // =========================
-    function renderizarTabla() {
-        const tabla = document.getElementById("tablaDetalleVenta");
-        tabla.innerHTML = "";
-
-        if (detalleVenta.length === 0) {
-            tabla.innerHTML = `<tr><td colspan="6">Sin productos</td></tr>`;
-            return;
-        }
-
-        detalleVenta.forEach(item => {
-            tabla.innerHTML += `
-                <tr>
-                    <td>${item.nombreProducto}</td>
-                    <td>${item.codigoProducto}</td>
-                    <td>${formatoMoneda(item.precioVenta)}</td>
-                    <td>
-                        <input type="number" value="${item.cantidad}" min="1" max="${item.stock}"
-                        onchange="modificarCantidad(${item.idProducto}, this.value)" />
-                    </td>
-                    <td>${formatoMoneda(item.subTotal)}</td>
-                    <td>
-                        <button onclick="eliminarProducto(${item.idProducto})">X</button>
-                    </td>
-                </tr>`;
-        });
-    }
-
-    function modificarCantidad(id, cantidad) {
-        let item = detalleVenta.find(x => x.idProducto === id);
-
-        if (!item) return;
-
-        cantidad = parseInt(cantidad);
-
-        if (cantidad > item.stock) {
-            showAlert("Stock insuficiente", "warning");
-            return;
-        }
-
-        item.cantidad = cantidad;
-        item.subTotal = cantidad * item.precioVenta;
-
-        actualizarTotales();
-        renderizarTabla();
-    }
-
-    function eliminarProducto(id) {
-        detalleVenta = detalleVenta.filter(x => x.idProducto !== id);
-        renderizarTabla();
-        actualizarTotales();
-    }
-
-    // =========================
-    // CALCULOS
-    // =========================
-    function obtenerSubtotal() {
-        return detalleVenta.reduce((acc, x) => acc + x.subTotal, 0);
-    }
-
-    function obtenerDescuento() {
-        return parseInt(document.getElementById("txtDescuento").value) || 0;
-    }
-
-    function obtenerTotal() {
-        let subtotal = obtenerSubtotal();
-        let descuento = obtenerDescuento();
-
-        return subtotal - (subtotal * (descuento / 100));
-    }
-
-    function actualizarTotales() {
-        document.getElementById("txtSubtotal").innerText = formatoMoneda(obtenerSubtotal());
-        document.getElementById("txtTotalPagar").innerText = formatoMoneda(obtenerTotal());
-
-        actualizarCambio();
-    }
-
-    function actualizarCambio() {
-        let total = obtenerTotal();
-        let pago = parseFloat(document.getElementById("txtMontoPagado").value || 0);
-
-        let cambio = pago - total;
-        if (cambio < 0) cambio = 0;
-
-        document.getElementById("txtMontoCambio").innerText = formatoMoneda(cambio);
-    }
-
-    // =========================
-    // REGISTRAR VENTA
-    // =========================
-    function registrarVenta() {
-        buscarClientePorDocumento();
-
-        if (detalleVenta.length === 0) {
-            showAlert("Debe agregar productos.", "warning");
-            return;
-        }
-
-        let tipoFactura = document.getElementById("cboTipoFactura");
-        let nombreTipo = tipoFactura.options[tipoFactura.selectedIndex].text;
-
-        if (nombreTipo === "Electrónica" && (!documentoClienteVenta || !nombreClienteVenta)) {
-            showAlert("Cliente obligatorio para factura electrónica.", "warning");
-            return;
-        }
-
-        let total = obtenerTotal();
-        let pago = parseFloat(document.getElementById("txtMontoPagado").value || 0);
-
-        if (pago < total) {
-            showAlert("Pago insuficiente.", "warning");
-            return;
-        }
-
-        let venta = {
-            idTipoFactura: parseInt(tipoFactura.value),
-            numeroDocumento: numeroDocumentoVenta,
-            documentoCliente: documentoClienteVenta,
-            nombreCliente: nombreClienteVenta,
-            montoTotal: total,
-            montoPago: pago,
-            montoCambio: pago - total,
-            detalleVenta: detalleVenta
-        };
-
-        fetch("/Venta/Registrar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(venta)
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.resultado) {
-                showAlert("Venta registrada correctamente", "success");
-            } else {
-                showAlert(data.mensaje, "danger");
+                if (cliente) {
+                    nombreClienteVenta = cliente.nombre;
+                    document.getElementById("ModalNombreCliente").value = cliente.nombre;
+                } else {
+                    document.getElementById("ModalNombreCliente").value = "";
+                }
             }
-        });
-    }
 
-    // =========================
-    // UTILIDADES
-    // =========================
-    function formatoMoneda(valor) {
-        return new Intl.NumberFormat("es-CO", {
-            style: "currency",
-            currency: "COP"
-        }).format(valor || 0);
-    }
+            // =========================
+            // DROPDOWN PRODUCTOS
+            // =========================
+            function toggleDropdown(idDropdown) {
+                const dropdown = document.getElementById(idDropdown);
 
-    function showAlert(msg, tipo) {
-        alert(msg); 
-    }
+                document.querySelectorAll(".custom-options").forEach(x => {
+                    if (x.id !== idDropdown) x.classList.remove("show");
+                });
 
-</script>
+                dropdown.classList.toggle("show");
+            }
+
+            function filtrarOpciones(input, claseItem) {
+                const filtro = input.value.toLowerCase();
+                const opciones = document.querySelectorAll("." + claseItem);
+
+                opciones.forEach(op => {
+                    const texto = op.innerText.toLowerCase();
+                    op.style.display = texto.includes(filtro) ? "block" : "none";
+                });
+            }
+
+            function seleccionarProductoCustom(id, nombre, codigo, precio, stock) {
+
+                idProductoSeleccionado = parseInt(id);
+                nombreProductoSeleccionado = nombre;
+                codigoProductoSeleccionado = codigo;
+
+                precioVentaSeleccionado = parseFloat(
+                    precio.toString().replace(",", ".")
+                );
+
+                stockDisponibleSeleccionado = parseInt(stock);
+
+                document.getElementById("productoTexto").innerText = nombre;
+                document.getElementById("ModalCodigoProducto").value = codigo;
+
+                document.getElementById("ModalPrecioVenta").value =
+                    precioVentaSeleccionado.toLocaleString("es-CO");
+
+                document.getElementById("ModalStockDisponible").value = stock;
+
+                let inputCantidad = document.getElementById("ModalCantidad");
+
+                inputCantidad.value = 1;
+                inputCantidad.max = stock;
+
+                document.getElementById("productoOptions")
+                    .classList.remove("show");
+            }
+
+            // =========================
+            // AGREGAR PRODUCTO
+            // =========================
+            function agregarProductoDetalle() {
+                const cantidad = parseInt(document.getElementById("ModalCantidad").value);
+
+                if (!idProductoSeleccionado) {
+                    showAlert("Debe seleccionar un producto.", "warning");
+                    return;
+                }
+
+                if (cantidad > stockDisponibleSeleccionado) {
+                    showAlert("Stock insuficiente.", "warning");
+                    return;
+                }
+
+                if (detalleVenta.some(x => x.idProducto === idProductoSeleccionado)) {
+                    showAlert("Producto duplicado. Modifique cantidad.", "warning");
+                    return;
+                }
+
+                detalleVenta.push({
+                    idProducto: idProductoSeleccionado,
+                    codigoProducto: codigoProductoSeleccionado,
+                    nombreProducto: nombreProductoSeleccionado,
+                    precioVenta: precioVentaSeleccionado,
+                    cantidad: cantidad,
+                    stock: stockDisponibleSeleccionado,
+                    subTotal: cantidad * precioVentaSeleccionado
+                });
+
+                renderizarTabla();
+                actualizarTotales();
+
+                bootstrap.Modal.getInstance(document.getElementById("modalAgregarProductoVenta")).hide();
+            }
+
+            // =========================
+            // TABLA
+            // =========================
+      function renderizarTabla() {
+            const tabla = document.getElementById("tablaDetalleVenta");
+            tabla.innerHTML = "";
+
+            if (detalleVenta.length === 0) {
+                tabla.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-detail-row">
+                            No se han agregado productos a la venta.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            detalleVenta.forEach(item => {
+                tabla.innerHTML += `
+                    <tr>
+                        <td>${item.nombreProducto}</td>
+                        <td>${item.codigoProducto}</td>
+                        <td>${formatoMoneda(item.precioVenta)}</td>
+
+                        <td class="td-cantidad">
+                            <span class="cantidad-display">${item.cantidad}</span>
+                        </td>
+
+                        <td>${formatoMoneda(item.subTotal)}</td>
+
+                        <td>
+                            <button class="btn-delete-product"
+                                    onclick="eliminarProducto(${item.idProducto})">
+                                <img src="/img/Eliminar.png"
+                                     class="delete-icon"
+                                     alt="Eliminar" />
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+      }
+
+            function modificarCantidad(id, cantidad) {
+                let item = detalleVenta.find(x => x.idProducto === id);
+
+                if (!item) return;
+
+                cantidad = parseInt(cantidad);
+
+                if (cantidad > item.stock) {
+                    showAlert("Stock insuficiente", "warning");
+                    return;
+                }
+
+                item.cantidad = cantidad;
+                item.subTotal = cantidad * item.precioVenta;
+
+                actualizarTotales();
+                renderizarTabla();
+            }
+
+            function eliminarProducto(id) {
+                detalleVenta = detalleVenta.filter(x => x.idProducto !== id);
+                renderizarTabla();
+                actualizarTotales();
+            }
+
+            // =========================
+            // CALCULOS
+            // =========================
+            function obtenerSubtotal() {
+                return detalleVenta.reduce((acc, x) => acc + x.subTotal, 0);
+            }
+
+            function obtenerDescuento() {
+                return parseInt(document.getElementById("txtDescuento").value) || 0;
+            }
+
+            function obtenerTotal() {
+                let subtotal = obtenerSubtotal();
+                let descuento = obtenerDescuento();
+
+                return subtotal - (subtotal * (descuento / 100));
+            }
+
+            function actualizarTotales() {
+                document.getElementById("txtSubtotal").innerText = formatoMoneda(obtenerSubtotal());
+                document.getElementById("txtTotalPagar").innerText = formatoMoneda(obtenerTotal());
+
+                actualizarCambio();
+            }
+
+            function actualizarCambio() {
+                let total = obtenerTotal();
+                let pago = parseFloat(document.getElementById("txtMontoPagado").value || 0);
+
+                let cambio = pago - total;
+                if (cambio < 0) cambio = 0;
+
+                document.getElementById("txtMontoCambio").innerText = formatoMoneda(cambio);
+            }
+
+            // =========================
+            // REGISTRAR VENTA
+            // =========================
+            function registrarVenta() {
+                buscarClientePorDocumento();
+
+                if (detalleVenta.length === 0) {
+                    showAlert("Debe agregar productos.", "warning");
+                    return;
+                }
+
+                let tipoFactura = document.getElementById("cboTipoFactura");
+                let nombreTipo = tipoFactura.options[tipoFactura.selectedIndex].text;
+
+                if (nombreTipo === "Electrónica" && (!documentoClienteVenta || !nombreClienteVenta)) {
+                    showAlert("Debe ingresar un cliente para la factura electrónica.", "danger");
+                    return;
+                }
+
+                let total = obtenerTotal();
+                let pago = parseFloat(document.getElementById("txtMontoPagado").value || 0);
+
+                if (pago < total) {
+                    showAlert("Pago insuficiente.", "warning");
+                    return;
+                }
+
+                let venta = {
+                    idTipoFactura: parseInt(tipoFactura.value),
+                    numeroDocumento: numeroDocumentoVenta,
+                    documentoCliente: documentoClienteVenta,
+                    nombreCliente: nombreClienteVenta,
+                    montoTotal: total,
+                    montoPago: pago,
+                    montoCambio: pago - total,
+                    detalleVenta: detalleVenta
+                };
+
+                fetch("/Venta/Registrar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(venta)
+                })
+                .then(r => r.json())
+                .then(data => {
+                            if (data.resultado) {
+                    const numeroVenta = data.numeroDocumento || extraerNumeroVenta(data.mensaje);
+
+                    numeroVentaRegistrada = numeroVenta || "";
+
+                    showAlert(data.mensaje || "Venta registrada correctamente.", "success");
+
+                    if (numeroVentaRegistrada) {
+                        document.getElementById("txtNumeroVenta").innerText = numeroVentaRegistrada;
+                        document.getElementById("btnCopiarNumeroVenta").style.display = "flex";
+                    }
+                } else {
+                    showAlert(data.mensaje || "No se pudo registrar la venta.", "danger");
+                }
+                });
+            }
+
+            // =========================
+            // UTILIDADES
+            // =========================
+            function formatoMoneda(valor) {
+                return new Intl.NumberFormat("es-CO", {
+                    style: "currency",
+                    currency: "COP"
+                }).format(valor || 0);
+            }
+
+                    function extraerNumeroVenta(mensaje) {
+                if (!mensaje) {
+                    return "";
+                }
+
+                const coincidencia = mensaje.match(/VENT-\d+/);
+                return coincidencia ? coincidencia[0] : "";
+            }
+
+            function showAlert(msg, tipo) {
+                alert(msg);
+            }
+
+                    function limpiarVenta() {
+                    detalleVenta = [];
+
+                    documentoClienteVenta = "";
+                    nombreClienteVenta = "";
+
+                    idProductoSeleccionado = 0;
+                    codigoProductoSeleccionado = "";
+                    nombreProductoSeleccionado = "";
+                    precioVentaSeleccionado = 0;
+                    stockDisponibleSeleccionado = 0;
+
+                    numeroVentaRegistrada = "";
+
+                    document.getElementById("txtNumeroVenta").innerText = "Pendiente";
+                    document.getElementById("btnCopiarNumeroVenta").style.display = "none";
+
+                    document.getElementById("txtBuscarProducto").value = "";
+                    document.getElementById("productoTexto").innerText = "SELECCIONE";
+
+                    document.getElementById("ModalDocumentoCliente").value = "";
+                    document.getElementById("ModalNombreCliente").value = "";
+                    document.getElementById("ModalCodigoProducto").value = "";
+                    document.getElementById("ModalPrecioVenta").value = "";
+                    document.getElementById("ModalStockDisponible").value = "";
+                    document.getElementById("ModalCantidad").value = "1";
+
+                    document.getElementById("txtDescuento").value = 0;
+                    document.getElementById("cboTipoFactura").value = 0;
+                    document.getElementById("txtMontoPagado").value = 0;
+                    document.getElementById("txtMontoCambio").innerText = formatoMoneda(0);
+
+                    renderizarTabla();
+                    actualizarTotales();
+
+                    showAlert("Venta limpiada correctamente.", "success");
+                }
+
+                function copiarNumeroVenta() {
+                    const numeroVenta = document.getElementById("txtNumeroVenta").innerText;
+
+                    if (!numeroVenta || numeroVenta === "Pendiente") {
+                        showAlert("No hay número de venta para copiar.", "warning");
+                        return;
+                    }
+
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(numeroVenta)
+                            .then(function () {
+                                showAlert("Número de venta copiado al portapapeles.", "success");
+                            })
+                            .catch(function () {
+                                copiarNumeroVentaFallback(numeroVenta);
+                            });
+                    } else {
+                        copiarNumeroVentaFallback(numeroVenta);
+                    }
+                }
+
+                function copiarNumeroVentaFallback(numeroVenta) {
+                    const inputTemporal = document.createElement("input");
+                    inputTemporal.value = numeroVenta;
+
+                    document.body.appendChild(inputTemporal);
+                    inputTemporal.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(inputTemporal);
+
+                    showAlert("Número de venta copiado al portapapeles.", "success");
+                }
+
+                function showAlert(mensaje, tipo = "danger") {
+                    const container = document.getElementById("alertContainer");
+
+                    if (!container) {
+                        alert(mensaje);
+                        return;
+                    }
+
+                    const alert = document.createElement("div");
+
+                    let alertClass = "alert-danger-custom";
+
+                    if (tipo === "success") {
+                        alertClass = "alert-success-custom";
+                    } else if (tipo === "warning") {
+                        alertClass = "alert-warning-custom";
+                    }
+
+                    alert.className = `alert-custom ${alertClass}`;
+
+                    alert.innerHTML = `
+                        <span class="alert-message">${mensaje}</span>
+                        <button type="button" class="alert-close" onclick="closeAlert(this)">×</button>
+                    `;
+
+                    container.appendChild(alert);
+
+                            let duracion = 3000;
+
+        // ALERTAS MÁS IMPORTANTES CON MAYOR DURACIÓN
+        if (
+            mensaje.toLowerCase().includes("factura electrónica") ||
+            mensaje.toLowerCase().includes("cliente")
+        ) {
+            duracion = 4500;
+        }
+
+        setTimeout(function () {
+
+            alert.style.animation = "fadeOut 0.4s ease forwards";
+
+            setTimeout(function () {
+
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+
+            }, 700);
+
+        }, duracion);
+                }
+
+                function closeAlert(element) {
+                    const alert = element.parentElement;
+
+                    alert.style.animation = "fadeOut 0.4s ease forwards";
+
+                    setTimeout(function () {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 700);
+                }
+
+    </script>

@@ -12,6 +12,8 @@ namespace OasisShop.Web.Models.ViewModels
 
         public string Direccion { get; set; } = string.Empty;
 
+        public string Correo { get; set; } = string.Empty;
+
         public int IdDepartamento { get; set; }
 
         public int IdCiudad { get; set; }

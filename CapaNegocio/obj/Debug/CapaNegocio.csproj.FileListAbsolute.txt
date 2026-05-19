@@ -80,3 +80,5 @@ C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calida
 C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\CapaDatos.dll.config
 C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\CapaEntidad.dll.config
 C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\QuestPDF.xml
+C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\Newtonsoft.Json.dll
+C:\Users\geron\OneDrive\Imágenes\Escritorio\OCTAVO SEMESTRE ING SOFTWARE\Calidad de Software y Auditoria en Sistemas\OASIS-SHOP\CapaNegocio\bin\Debug\Newtonsoft.Json.xml

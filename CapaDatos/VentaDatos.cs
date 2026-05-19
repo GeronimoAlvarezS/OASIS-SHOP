@@ -10,7 +10,6 @@ namespace CapaDatos
 {
     public class VentaDatos
     {
-
         public int ObtenerCorrelativo()
         {
             int idcorrelativo = 0;
@@ -33,6 +32,7 @@ namespace CapaDatos
                     idcorrelativo = 0;
                 }
             }
+
             return idcorrelativo;
         }
 
@@ -45,7 +45,7 @@ namespace CapaDatos
                 try
                 {
                     StringBuilder query = new StringBuilder();
-                    query.AppendLine("update producto set stock = stock - @cantidad where idproducto = @idproducto");
+                    query.AppendLine("update PRODUCTO set Stock = Stock - @cantidad where IdProducto = @idproducto");
 
                     SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@cantidad", cantidad);
@@ -60,6 +60,7 @@ namespace CapaDatos
                     respuesta = false;
                 }
             }
+
             return respuesta;
         }
 
@@ -72,7 +73,7 @@ namespace CapaDatos
                 try
                 {
                     StringBuilder query = new StringBuilder();
-                    query.AppendLine("update producto set stock = stock + @cantidad where idproducto = @idproducto");
+                    query.AppendLine("update PRODUCTO set Stock = Stock + @cantidad where IdProducto = @idproducto");
 
                     SqlCommand cmd = new SqlCommand(query.ToString(), oconexion);
                     cmd.Parameters.AddWithValue("@cantidad", cantidad);
@@ -87,10 +88,10 @@ namespace CapaDatos
                     respuesta = false;
                 }
             }
+
             return respuesta;
         }
 
-        // 🔥 REGISTRAR VENTA (ACTUALIZADO)
         public bool Registrar(Venta obj, DataTable DetalleVenta, out string Mensaje)
         {
             bool Respuesta = false;
@@ -102,26 +103,32 @@ namespace CapaDatos
                 {
                     SqlCommand cmd = new SqlCommand("usp_RegistrarVenta", oconexion);
 
-                    cmd.Parameters.AddWithValue("IdUsuario", obj.oUsuario.IdUsuario);
-                    cmd.Parameters.AddWithValue("IdTipoFactura", obj.IdTipoFactura);
-                    cmd.Parameters.AddWithValue("NumeroDocumento", obj.NumeroDocumento);
-                    cmd.Parameters.AddWithValue("DocumentoCliente", obj.DocumentoCliente);
-                    cmd.Parameters.AddWithValue("NombreCliente", obj.NombreCliente);
-                    cmd.Parameters.AddWithValue("MontoPago", obj.MontoPago);
-                    cmd.Parameters.AddWithValue("MontoCambio", obj.MontoCambio);
-                    cmd.Parameters.AddWithValue("MontoTotal", obj.MontoTotal);
-                    cmd.Parameters.AddWithValue("DetalleVenta", DetalleVenta);
+                    cmd.Parameters.AddWithValue("@IdUsuario", obj.oUsuario.IdUsuario);
+                    cmd.Parameters.AddWithValue("@IdTipoFactura", obj.IdTipoFactura);
+                    cmd.Parameters.AddWithValue("@NumeroDocumento", obj.NumeroDocumento ?? string.Empty);
+                    cmd.Parameters.AddWithValue("@DocumentoCliente", obj.DocumentoCliente ?? string.Empty);
+                    cmd.Parameters.AddWithValue("@NombreCliente", obj.NombreCliente ?? string.Empty);
+                    cmd.Parameters.AddWithValue("@MontoPago", obj.MontoPago);
+                    cmd.Parameters.AddWithValue("@MontoCambio", obj.MontoCambio);
+                    cmd.Parameters.AddWithValue("@MontoTotal", obj.MontoTotal);
+                    cmd.Parameters.AddWithValue("@DetalleVenta", DetalleVenta);
 
-                    cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("@Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("@Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("@NumeroDocumentoGenerado", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
 
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     oconexion.Open();
                     cmd.ExecuteNonQuery();
 
-                    Respuesta = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
-                    Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
+                    Respuesta = Convert.ToBoolean(cmd.Parameters["@Resultado"].Value);
+                    Mensaje = cmd.Parameters["@Mensaje"].Value.ToString();
+
+                    if (cmd.Parameters["@NumeroDocumentoGenerado"].Value != DBNull.Value)
+                    {
+                        obj.NumeroDocumento = cmd.Parameters["@NumeroDocumentoGenerado"].Value.ToString();
+                    }
                 }
             }
             catch (Exception ex)
@@ -144,12 +151,18 @@ namespace CapaDatos
                     oconexion.Open();
 
                     StringBuilder query = new StringBuilder();
-                    query.AppendLine("select v.IdVenta,u.NombreCompleto,");
-                    query.AppendLine("v.DocumentoCliente,v.NombreCliente,");
-                    query.AppendLine("tf.IdTipoFactura,tf.Nombre as TipoFactura,");
+                    query.AppendLine("select v.IdVenta,");
+                    query.AppendLine("u.NombreCompleto,");
+                    query.AppendLine("u.Documento as DocumentoUsuario,");
+                    query.AppendLine("v.DocumentoCliente,");
+                    query.AppendLine("v.NombreCliente,");
+                    query.AppendLine("tf.IdTipoFactura,");
+                    query.AppendLine("tf.Nombre as TipoFactura,");
                     query.AppendLine("v.NumeroDocumento,");
-                    query.AppendLine("v.MontoPago,v.MontoCambio,v.MontoTotal,");
-                    query.AppendLine("convert(char(10),v.FechaRegistro,103)[FechaRegistro]");
+                    query.AppendLine("v.MontoPago,");
+                    query.AppendLine("v.MontoCambio,");
+                    query.AppendLine("v.MontoTotal,");
+                    query.AppendLine("convert(char(10), v.FechaRegistro, 103) as FechaRegistro");
                     query.AppendLine("from VENTA v");
                     query.AppendLine("inner join USUARIO u on u.IdUsuario = v.IdUsuario");
                     query.AppendLine("inner join TIPO_FACTURA tf on tf.IdTipoFactura = v.IdTipoFactura");
@@ -166,15 +179,24 @@ namespace CapaDatos
                             obj = new Venta()
                             {
                                 IdVenta = Convert.ToInt32(dr["IdVenta"]),
-                                oUsuario = new Usuario() { NombreCompleto = dr["NombreCompleto"].ToString() },
+
+                                oUsuario = new Usuario()
+                                {
+                                    NombreCompleto = dr["NombreCompleto"].ToString(),
+                                    Documento = dr["DocumentoUsuario"].ToString()
+                                },
+
                                 DocumentoCliente = dr["DocumentoCliente"].ToString(),
                                 NombreCliente = dr["NombreCliente"].ToString(),
                                 NumeroDocumento = dr["NumeroDocumento"].ToString(),
+
                                 MontoPago = Convert.ToDecimal(dr["MontoPago"]),
                                 MontoCambio = Convert.ToDecimal(dr["MontoCambio"]),
                                 MontoTotal = Convert.ToDecimal(dr["MontoTotal"]),
                                 FechaRegistro = dr["FechaRegistro"].ToString(),
+
                                 IdTipoFactura = Convert.ToInt32(dr["IdTipoFactura"]),
+
                                 oTipoFactura = new TipoFactura()
                                 {
                                     IdTipoFactura = Convert.ToInt32(dr["IdTipoFactura"]),
@@ -189,6 +211,7 @@ namespace CapaDatos
                     obj = new Venta();
                 }
             }
+
             return obj;
         }
 
@@ -203,7 +226,13 @@ namespace CapaDatos
                     oconexion.Open();
 
                     StringBuilder query = new StringBuilder();
-                    query.AppendLine("select p.Nombre,dv.PrecioVenta,dv.Cantidad,dv.SubTotal from DETALLE_VENTA dv");
+                    query.AppendLine("select p.IdProducto,");
+                    query.AppendLine("p.Codigo,");
+                    query.AppendLine("p.Nombre,");
+                    query.AppendLine("dv.PrecioVenta,");
+                    query.AppendLine("dv.Cantidad,");
+                    query.AppendLine("dv.SubTotal");
+                    query.AppendLine("from DETALLE_VENTA dv");
                     query.AppendLine("inner join PRODUCTO p on p.IdProducto = dv.IdProducto");
                     query.AppendLine("where dv.IdVenta = @idventa");
 
@@ -217,10 +246,16 @@ namespace CapaDatos
                         {
                             oLista.Add(new Detalle_Venta()
                             {
-                                oProducto = new Producto() { Nombre = dr["Nombre"].ToString() },
+                                oProducto = new Producto()
+                                {
+                                    IdProducto = Convert.ToInt32(dr["IdProducto"]),
+                                    Codigo = dr["Codigo"].ToString(),
+                                    Nombre = dr["Nombre"].ToString()
+                                },
+
                                 PrecioVenta = Convert.ToDecimal(dr["PrecioVenta"]),
                                 Cantidad = Convert.ToInt32(dr["Cantidad"]),
-                                SubTotal = Convert.ToDecimal(dr["SubTotal"]),
+                                SubTotal = Convert.ToDecimal(dr["SubTotal"])
                             });
                         }
                     }
@@ -230,6 +265,7 @@ namespace CapaDatos
                     oLista = new List<Detalle_Venta>();
                 }
             }
+
             return oLista;
         }
 

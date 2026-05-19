@@ -40,6 +40,7 @@ namespace OasisShop.Web.Controllers
                 Nombre = negocio.Nombre,
                 RUC = negocio.RUC,
                 Direccion = negocio.Direccion,
+                Correo = negocio.Correo,
                 IdDepartamento = negocio.IdDepartamento,
                 IdCiudad = negocio.IdCiudad,
                 NombreDepartamento = negocio.oDepartamento != null ? negocio.oDepartamento.Nombre : string.Empty,
@@ -116,6 +117,7 @@ namespace OasisShop.Web.Controllers
                 Nombre = model.Nombre,
                 RUC = model.RUC,
                 Direccion = model.Direccion,
+                Correo = model.Correo,
                 IdDepartamento = model.IdDepartamento,
                 IdCiudad = model.IdCiudad
             };

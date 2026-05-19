@@ -4,9 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CapaDatos
 {
@@ -20,7 +17,6 @@ namespace CapaDatos
             {
                 try
                 {
-                    StringBuilder query = new StringBuilder();
                     SqlCommand cmd = new SqlCommand("sp_ReporteCompras", oconexion);
                     cmd.Parameters.AddWithValue("fechainicio", fechainicio);
                     cmd.Parameters.AddWithValue("fechafin", fechafin);
@@ -33,36 +29,30 @@ namespace CapaDatos
                     {
                         while (dr.Read())
                         {
-
                             lista.Add(new ReporteCompra()
                             {
                                 FechaRegistro = dr["FechaRegistro"].ToString(),
-                                TipoDocumento = dr["TipoDocumento"].ToString(),
-                                NumeroDocumento = dr["NumeroDocumento"].ToString(),
-                                MontoTotal = dr["MontoTotal"].ToString(),
+                                NumeroCompra = dr["NumeroCompra"].ToString(),
                                 UsuarioRegistro = dr["UsuarioRegistro"].ToString(),
                                 DocumentoProveedor = dr["DocumentoProveedor"].ToString(),
                                 RazonSocial = dr["RazonSocial"].ToString(),
                                 CodigoProducto = dr["CodigoProducto"].ToString(),
                                 NombreProducto = dr["NombreProducto"].ToString(),
+                                Cantidad = dr["Cantidad"].ToString(),
                                 Categoria = dr["Categoria"].ToString(),
                                 PrecioCompra = dr["PrecioCompra"].ToString(),
-                                PrecioVenta = dr["PrecioVenta"].ToString(),
-                                Cantidad = dr["Cantidad"].ToString(),
-                                SubTotal = dr["SubTotal"].ToString(),
+                                PrecioVenta = dr["PrecioVenta"].ToString()
                             });
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-
                     lista = new List<ReporteCompra>();
                 }
             }
 
             return lista;
-
         }
 
         public List<ReporteVenta> Venta(string fechainicio, string fechafin)
@@ -73,10 +63,9 @@ namespace CapaDatos
             {
                 try
                 {
-                    StringBuilder query = new StringBuilder();
                     SqlCommand cmd = new SqlCommand("sp_ReporteVentas", oconexion);
-                    cmd.Parameters.AddWithValue("fechainicio", fechainicio);
-                    cmd.Parameters.AddWithValue("fechafin", fechafin);
+                    cmd.Parameters.Add("@fechainicio", SqlDbType.Date).Value = Convert.ToDateTime(fechainicio);
+                    cmd.Parameters.Add("@fechafin", SqlDbType.Date).Value = Convert.ToDateTime(fechafin);
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     oconexion.Open();
@@ -88,7 +77,7 @@ namespace CapaDatos
                             lista.Add(new ReporteVenta()
                             {
                                 FechaRegistro = dr["FechaRegistro"].ToString(),
-                                TipoDocumento = dr["TipoDocumento"].ToString(),
+                                Nombre = dr["Nombre"].ToString(),
                                 NumeroDocumento = dr["NumeroDocumento"].ToString(),
                                 MontoTotal = dr["MontoTotal"].ToString(),
                                 UsuarioRegistro = dr["UsuarioRegistro"].ToString(),
@@ -104,17 +93,13 @@ namespace CapaDatos
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     lista = new List<ReporteVenta>();
                 }
             }
 
             return lista;
-
         }
-
-
-
     }
 }
