@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CapaEntidad;
 using CapaNegocio;
-using System;
-using System.Linq;
 
 namespace OasisShop.Web.Controllers
 {
@@ -15,18 +13,15 @@ namespace OasisShop.Web.Controllers
         // Incluye funcionalidades de búsqueda y paginación.
 
         [HttpGet]
-        public IActionResult Index(int pagina = 1, string busqueda = "")
+        public IActionResult Index(string busqueda = "", int pagina = 1)
         {
             // Cantidad de registros que se mostrarán por página.
-
             int registrosPorPagina = 5;
 
             // Obtiene la lista completa de usuarios desde la capa de negocio.
-
             var lista = _usuarioServicio.Listar();
 
             // Verifica si el usuario ingresó un texto de búsqueda.
-
             if (!string.IsNullOrWhiteSpace(busqueda))
             {
                 string filtro = busqueda.Trim().ToLower();
@@ -36,7 +31,8 @@ namespace OasisShop.Web.Controllers
                         (u.Documento ?? string.Empty).ToLower().Contains(filtro) ||
                         (u.NombreCompleto ?? string.Empty).ToLower().Contains(filtro) ||
                         (u.Correo ?? string.Empty).ToLower().Contains(filtro) ||
-                        (u.oRol != null && (u.oRol.Descripcion ?? string.Empty).ToLower().Contains(filtro)) ||
+                        (u.oRol != null &&
+                         (u.oRol.Descripcion ?? string.Empty).ToLower().Contains(filtro)) ||
                         (u.Estado ? "activo" : "inactivo").Contains(filtro) ||
                         u.IdUsuario.ToString().Contains(filtro)
                     )
@@ -44,17 +40,18 @@ namespace OasisShop.Web.Controllers
             }
 
             // Obtiene el total de registros después del filtro.
-
             int totalRegistros = lista.Count();
+
+            // Calcula el total de páginas.
             int totalPaginas = (int)Math.Ceiling((double)totalRegistros / registrosPorPagina);
 
+            // Aplica la paginación.
             var usuariosPaginados = lista
                 .Skip((pagina - 1) * registrosPorPagina)
                 .Take(registrosPorPagina)
                 .ToList();
 
             // Variables enviadas a la vista mediante ViewBag.
-
             ViewBag.PaginaActual = pagina;
             ViewBag.TotalPaginas = totalPaginas == 0 ? 1 : totalPaginas;
             ViewBag.RegistrosPorPagina = registrosPorPagina;
@@ -62,7 +59,6 @@ namespace OasisShop.Web.Controllers
             ViewBag.Busqueda = busqueda;
 
             // Retorna la vista Usuario.cshtml junto con la lista paginada.
-
             return View("~/Views/Usuario/Usuario.cshtml", usuariosPaginados);
         }
 
@@ -71,12 +67,18 @@ namespace OasisShop.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Guardar(int IdUsuario, string Documento, string NombreCompleto, string Correo, string Clave, int IdRol, bool Estado)
+        public IActionResult Guardar(
+            int IdUsuario,
+            string Documento,
+            string NombreCompleto,
+            string Correo,
+            string Clave,
+            int IdRol,
+            bool Estado)
         {
             string mensaje = string.Empty;
 
             // Construcción del objeto Usuario con los datos recibidos del formulario.
-
             Usuario objUsuario = new Usuario()
             {
                 IdUsuario = IdUsuario,
@@ -92,11 +94,9 @@ namespace OasisShop.Web.Controllers
             };
 
             // Si el IdUsuario es 0 significa que es un nuevo registro.
-
             if (IdUsuario == 0)
             {
                 // Llama al servicio para registrar el usuario.
-
                 int idGenerado = _usuarioServicio.Registrar(objUsuario, out mensaje);
 
                 if (idGenerado == 0)
@@ -111,6 +111,7 @@ namespace OasisShop.Web.Controllers
             }
             else
             {
+                // Llama al servicio para editar el usuario.
                 bool respuesta = _usuarioServicio.Editar(objUsuario, out mensaje);
 
                 if (!respuesta)
@@ -125,7 +126,6 @@ namespace OasisShop.Web.Controllers
             }
 
             // Redirecciona nuevamente al método Index después de guardar.
-
             return RedirectToAction("Index");
         }
     }

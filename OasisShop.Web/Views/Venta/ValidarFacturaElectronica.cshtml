@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Validación factura electrónica";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Validación factura electrónica</title>
+
+    <style>
+            body {
+                margin: 0;
+                min-height: 100vh;
+                background: #f5f6fa;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .validacion-card {
+                width: 90%;
+                max-width: 420px;
+                background: #ffffff;
+                border-radius: 18px;
+                padding: 32px 24px;
+                text-align: center;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            }
+
+            .validacion-logo {
+                width: 190px;
+                max-width: 100%;
+                margin-bottom: 28px;
+            }
+
+            .validacion-check {
+                width: 82px;
+                height: 82px;
+                border-radius: 50%;
+                background: #22C55E;
+                color: #ffffff;
+                font-size: 52px;
+                font-weight: 700;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0 auto 22px auto;
+            }
+
+            .validacion-title {
+                color: #15803D;
+                font-size: 22px;
+                font-weight: 700;
+                margin-bottom: 14px;
+                text-transform: uppercase;
+            }
+
+            .validacion-cufe {
+                font-size: 12px;
+                color: #4B5563;
+                word-break: break-word;
+                margin-top: 18px;
+            }
+    </style>
+</head>
+<body>
+
+    <img src="@Url.Content("~/img/Dian.png")"
+         class="validacion-logo"
+         alt="DIAN" />
+
+        <div class="validacion-check">
+            ✓
+        </div>
+
+        <div class="validacion-title">
+            SU FACTURA ELECTRÓNICA ES VÁLIDA
+        </div>
+
+        @if (ViewBag.CUFE != null)
+        {
+            <div class="validacion-cufe">
+                <strong>CUFE:</strong><br />
+                @ViewBag.CUFE
+            </div>
+        }
+
+    </div>
+
+</body>
+</html>

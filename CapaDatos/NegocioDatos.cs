@@ -20,8 +20,8 @@ namespace CapaDatos
                 BEGIN
                     SET IDENTITY_INSERT NEGOCIO ON;
 
-                    INSERT INTO NEGOCIO (IdNegocio, Nombre, RUC, Direccion, IdDepartamento, IdCiudad)
-                    VALUES (1, '', '', '', NULL, NULL);
+                    INSERT INTO NEGOCIO (IdNegocio, Nombre, RUC, Direccion, Correo, IdDepartamento, IdCiudad)
+                    VALUES (1, '', '', '', '', NULL, NULL);
 
                     SET IDENTITY_INSERT NEGOCIO OFF;
                 END";
@@ -50,6 +50,7 @@ namespace CapaDatos
                         n.Nombre, 
                         n.RUC, 
                         n.Direccion,
+                        n.Correo,
                         n.IdDepartamento,
                         n.IdCiudad,
                         d.Nombre AS NombreDepartamento,
@@ -75,6 +76,7 @@ namespace CapaDatos
                                 Nombre = dr["Nombre"] == DBNull.Value ? string.Empty : dr["Nombre"].ToString(),
                                 RUC = dr["RUC"] == DBNull.Value ? string.Empty : dr["RUC"].ToString(),
                                 Direccion = dr["Direccion"] == DBNull.Value ? string.Empty : dr["Direccion"].ToString(),
+                                Correo = dr["Correo"] == DBNull.Value ? string.Empty : dr["Correo"].ToString(),
 
                                 IdDepartamento = dr["IdDepartamento"] == DBNull.Value ? 0 : Convert.ToInt32(dr["IdDepartamento"]),
                                 IdCiudad = dr["IdCiudad"] == DBNull.Value ? 0 : Convert.ToInt32(dr["IdCiudad"]),
@@ -126,6 +128,7 @@ namespace CapaDatos
                     query.AppendLine("Nombre = @nombre,");
                     query.AppendLine("RUC = @ruc,");
                     query.AppendLine("Direccion = @direccion,");
+                    query.AppendLine("Correo = @correo,");
                     query.AppendLine("IdDepartamento = @idDepartamento,");
                     query.AppendLine("IdCiudad = @idCiudad");
                     query.AppendLine("WHERE IdNegocio = 1;");
@@ -134,6 +137,7 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("@nombre", objeto.Nombre ?? string.Empty);
                     cmd.Parameters.AddWithValue("@ruc", objeto.RUC ?? string.Empty);
                     cmd.Parameters.AddWithValue("@direccion", objeto.Direccion ?? string.Empty);
+                    cmd.Parameters.AddWithValue("@correo", objeto.Correo ?? string.Empty);
 
                     if (objeto.IdDepartamento > 0)
                     {

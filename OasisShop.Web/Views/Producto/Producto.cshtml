@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<CapaEntidad.Producto>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -605,6 +607,28 @@
             opacity: 0.6;
             cursor: default;
         }
+
+    .alerta-informacion {
+        width: 94%;
+        margin: 10px 12px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+
+    .input-error {
+        border-color: #DC2626 !important;
+        box-shadow: 0 0 0 0.12rem rgba(220, 38, 38, 0.18) !important;
+    }
+
+    .error-campo {
+        display: none;
+        color: #DC2626;
+        font-size: 12px;
+        font-weight: 400;
+        margin-top: 4px;
+    }
 </style>
 
 <div id="alertContainer" class="alert-container"></div>
@@ -781,7 +805,7 @@
                 <button class="btn-close-custom" data-bs-dismiss="modal">×</button>
             </div>
 
-            <form method="post" asp-action="Guardar">
+            <form method="post" asp-action="Guardar" onsubmit="return validarCrearProducto(event)" novalidate>
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body modal-body-producto">
@@ -792,28 +816,55 @@
 
                     <div class="modal-group">
                         <label class="modal-label">Código</label>
-                        <input class="modal-input" name="Codigo" required />
+
+                        <input class="modal-input"
+                               id="CrearCodigo"
+                               name="Codigo" />
+
+                        <span class="error-campo" id="errorCodigo">
+                            El código es obligatorio.
+                        </span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Nombre</label>
-                        <input class="modal-input" name="Nombre" required />
+
+                        <input class="modal-input"
+                               id="CrearNombre"
+                               name="Nombre" />
+
+                        <span class="error-campo" id="errorNombre">
+                            El nombre es obligatorio.
+                        </span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Descripción</label>
-                        <textarea class="modal-textarea" name="Descripcion"></textarea>
+
+                        <textarea class="modal-textarea"
+                                  id="CrearDescripcion"
+                                  name="Descripcion"></textarea>
+
+                        <span class="error-campo" id="errorDescripcion">
+                            La descripción es obligatoria.
+                        </span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Categoría</label>
-                        <select class="modal-select" name="IdCategoria" required>
+
+                        <select class="modal-select"
+                                id="CrearCategoria"
+                                name="IdCategoria">
                             <option value="">Seleccione</option>
                             @foreach (var c in categorias)
                             {
                                 <option value="@c.IdCategoria">@c.Nombre</option>
                             }
                         </select>
+                        <span class="error-campo" id="errorCategoria">
+                            La categoría es obligatoria.
+                        </span>
                     </div>
 
                     <div class="modal-group">
@@ -822,6 +873,19 @@
                             <option value="true">Activo</option>
                             <option value="false">Inactivo</option>
                         </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="alert alert-info d-flex align-items-center alerta-informacion" role="alert">
+
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                            <small>
+                                Para registrar el precio de venta, el precio de compra y el stock,
+                                deberá realizarlo por el módulo de Inventario en registrar inventario.
+                            </small>
+
+                        </div>
                     </div>
 
                     <div class="modal-footer-custom">
@@ -857,27 +921,69 @@
 
                     <div class="modal-group">
                         <label class="modal-label">Código</label>
-                        <input id="EditarCodigo" class="modal-input" name="Codigo" required />
+
+                        <input class="modal-input"
+                               id="EditarCodigo"
+                               name="Codigo" />
+
+                        <span class="error-campo" id="errorCodigo">
+                            El código es obligatorio.
+                        </span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Nombre</label>
-                        <input id="EditarNombre" class="modal-input" name="Nombre" required />
+
+                        <input class="modal-input"
+                               id="EditarNombre"
+                               name="Nombre" />
+
+                        <span class="error-campo" id="errorNombre">
+                            El nombre es obligatorio.
+                        </span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Descripción</label>
-                        <textarea id="EditarDescripcion" class="modal-textarea" name="Descripcion"></textarea>
+
+                        <textarea class="modal-textarea"
+                                  id="EditarDescripcion"
+                                  name="Descripcion"></textarea>
+
+                        <span class="error-campo" id="errorDescripcion">
+                            La descripción es obligatoria.
+                        </span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Categoría</label>
-                        <select id="EditarIdCategoria" class="modal-select" name="IdCategoria"></select>
+
+                        <select id="EditarIdCategoria"
+                                class="modal-select"
+                                name="IdCategoria">
+                        </select>
+
+                        <span class="error-campo" id="errorEditarCategoria">
+                            La categoría es obligatoria.
+                        </span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label">Estado</label>
                         <select id="EditarEstado" class="modal-select" name="Estado"></select>
+                    </div>
+
+                    <div class="row">
+                        <div class="alert alert-info d-flex align-items-center alerta-informacion" role="alert">
+
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                            <small>
+                                Para editar el precio de venta, el precio de compra y el stock,
+                                deberá realizarlo por el módulo de Inventario.
+                            </small>
+
+                        </div>
                     </div>
 
                     <div class="modal-footer-custom">
@@ -953,26 +1059,13 @@
     </div>
 </div>
 
-@if (TempData["MensajeOk"] != null)
-{
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            showAlert("@TempData["MensajeOk"]", "success");
-        });
-    </script>
-}
-
-@if (TempData["MensajeError"] != null)
-{
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            showAlert("@TempData["MensajeError"]", "danger");
-        });
-    </script>
-}
-
 @section Scripts {
     <script>
+
+        // =========================
+        // CATEGORÍAS
+        // =========================
+
         const categorias = [
             @if (categorias != null)
             {
@@ -988,15 +1081,22 @@
             }
         ];
 
+        // =========================
+        // ALERTAS
+        // =========================
+
         function showAlert(mensaje, tipo = "danger") {
+
             const container = document.getElementById("alertContainer");
 
             const alert = document.createElement("div");
+
             let alertClass = "alert-danger-custom";
 
             if (tipo === "success") {
                 alertClass = "alert-success-custom";
-            } else if (tipo === "warning") {
+            }
+            else if (tipo === "warning") {
                 alertClass = "alert-warning-custom";
             }
 
@@ -1004,47 +1104,304 @@
 
             alert.innerHTML = `
                 <span class="alert-message">${mensaje}</span>
-                <button type="button" class="alert-close" onclick="closeAlert(this)">×</button>
+
+                <button type="button"
+                        class="alert-close"
+                        onclick="closeAlert(this)">
+                    ×
+                </button>
             `;
 
             container.appendChild(alert);
 
             setTimeout(() => {
+
                 if (alert) {
-                    alert.style.animation = "fadeOut 0.4s ease forwards";
+
+                    alert.style.animation =
+                        "fadeOut 0.4s ease forwards";
+
                     setTimeout(() => {
+
                         if (alert.parentNode) {
                             alert.remove();
                         }
+
                     }, 700);
                 }
+
             }, 3000);
         }
 
         function closeAlert(element) {
+
             const alert = element.parentElement;
-            alert.style.animation = "fadeOut 0.4s ease forwards";
+
+            alert.style.animation =
+                "fadeOut 0.4s ease forwards";
 
             setTimeout(() => {
+
                 if (alert.parentNode) {
                     alert.remove();
                 }
+
             }, 700);
         }
 
-        function cargarCategoriasEditar(idCategoriaSeleccionada) {
-            const selectCategoria = document.getElementById("EditarIdCategoria");
+        // =========================
+        // VALIDACIONES
+        // =========================
+
+        function validarCampoProducto(idCampo, idError, mensaje) {
+
+            const campo = document.getElementById(idCampo);
+            const error = document.getElementById(idError);
+
+            if (!campo || !error) return true;
+
+            const valor = campo.value.trim();
+
+            if (valor === "") {
+
+                campo.classList.add("input-error");
+
+                error.innerText = mensaje;
+
+                error.style.display = "block";
+
+                return false;
+            }
+
+            campo.classList.remove("input-error");
+
+            error.innerText = "";
+
+            error.style.display = "none";
+
+            return true;
+        }
+
+        // =========================
+        // VALIDAR CREAR PRODUCTO
+        // =========================
+
+        function validarCrearProducto(event) {
+
+            if (event) {
+                event.preventDefault();
+            }
+
+            let formularioValido = true;
+
+            const campos = [
+
+                {
+                    campo: "CrearCodigo",
+                    error: "errorCodigo",
+                    mensaje: "El código es obligatorio."
+                },
+
+                {
+                    campo: "CrearNombre",
+                    error: "errorNombre",
+                    mensaje: "El nombre es obligatorio."
+                },
+
+                {
+                    campo: "CrearDescripcion",
+                    error: "errorDescripcion",
+                    mensaje: "La descripción es obligatoria."
+                },
+
+                {
+                    campo: "CrearCategoria",
+                    error: "errorCategoria",
+                    mensaje: "La categoría es obligatoria."
+                }
+            ];
+
+            campos.forEach(function (item) {
+
+                const valido = validarCampoProducto(
+                    item.campo,
+                    item.error,
+                    item.mensaje
+                );
+
+                if (!valido) {
+                    formularioValido = false;
+                }
+            });
+
+            if (formularioValido) {
+                event.target.submit();
+            }
+
+            return false;
+        }
+
+        // =========================
+        // VALIDAR EDITAR PRODUCTO
+        // =========================
+
+        function validarEditarProducto(event) {
+
+            if (event) {
+                event.preventDefault();
+            }
+
+            let formularioValido = true;
+
+            const campos = [
+
+                {
+                    campo: "EditarCodigo",
+                    error: "errorEditarCodigo",
+                    mensaje: "El código es obligatorio."
+                },
+
+                {
+                    campo: "EditarNombre",
+                    error: "errorEditarNombre",
+                    mensaje: "El nombre es obligatorio."
+                },
+
+                {
+                    campo: "EditarDescripcion",
+                    error: "errorEditarDescripcion",
+                    mensaje: "La descripción es obligatoria."
+                },
+
+                {
+                    campo: "EditarIdCategoria",
+                    error: "errorEditarCategoria",
+                    mensaje: "La categoría es obligatoria."
+                }
+            ];
+
+            campos.forEach(function (item) {
+
+                const valido = validarCampoProducto(
+                    item.campo,
+                    item.error,
+                    item.mensaje
+                );
+
+                if (!valido) {
+                    formularioValido = false;
+                }
+            });
+
+            if (formularioValido) {
+                event.target.submit();
+            }
+
+            return false;
+        }
+
+        // =========================
+        // LIMPIAR ERRORES
+        // =========================
+
+        function limpiarErrorCampo(idCampo, idError) {
+
+            const campo = document.getElementById(idCampo);
+            const error = document.getElementById(idError);
+
+            if (campo) {
+                campo.classList.remove("input-error");
+            }
+
+            if (error) {
+
+                error.innerText = "";
+
+                error.style.display = "none";
+            }
+        }
+
+        // =========================
+        // LIMPIAR FORMULARIO CREAR
+        // =========================
+
+        function limpiarFormularioCrearProducto() {
+
+            const codigo =
+                document.getElementById("CrearCodigo");
+
+            const nombre =
+                document.getElementById("CrearNombre");
+
+            const descripcion =
+                document.getElementById("CrearDescripcion");
+
+            const categoria =
+                document.getElementById("CrearCategoria");
+
+            const estado =
+                document.querySelector(
+                    '#modalCrearProducto [name="Estado"]'
+                );
+
+            if (codigo) codigo.value = "";
+            if (nombre) nombre.value = "";
+            if (descripcion) descripcion.value = "";
+            if (categoria) categoria.value = "";
+            if (estado) estado.value = "true";
+
+            limpiarErrorCampo(
+                "CrearCodigo",
+                "errorCodigo"
+            );
+
+            limpiarErrorCampo(
+                "CrearNombre",
+                "errorNombre"
+            );
+
+            limpiarErrorCampo(
+                "CrearDescripcion",
+                "errorDescripcion"
+            );
+
+            limpiarErrorCampo(
+                "CrearCategoria",
+                "errorCategoria"
+            );
+        }
+
+        // =========================
+        // CARGAR CATEGORÍAS EDITAR
+        // =========================
+
+        function cargarCategoriasEditar(
+            idCategoriaSeleccionada
+        ) {
+
+            const selectCategoria =
+                document.getElementById(
+                    "EditarIdCategoria"
+                );
 
             if (!selectCategoria) return;
 
-            selectCategoria.innerHTML = `<option value="">SELECCIONE</option>`;
+            selectCategoria.innerHTML =
+                `<option value="">SELECCIONE</option>`;
 
             categorias.forEach(categoria => {
-                const option = document.createElement("option");
+
+                const option =
+                    document.createElement("option");
+
                 option.value = categoria.id;
+
                 option.textContent = categoria.nombre;
 
-                if (categoria.id === idCategoriaSeleccionada) {
+                if (
+                    categoria.id ===
+                    idCategoriaSeleccionada
+                ) {
                     option.selected = true;
                 }
 
@@ -1052,8 +1409,18 @@
             });
         }
 
-        function cargarEstadosEditar(estadoSeleccionado) {
-            const selectEstado = document.getElementById("EditarEstado");
+        // =========================
+        // CARGAR ESTADOS
+        // =========================
+
+        function cargarEstadosEditar(
+            estadoSeleccionado
+        ) {
+
+            const selectEstado =
+                document.getElementById(
+                    "EditarEstado"
+                );
 
             if (!selectEstado) return;
 
@@ -1066,153 +1433,452 @@
             selectEstado.value = estadoSeleccionado;
         }
 
-        function limpiarFormularioCrearProducto() {
-            const codigo = document.querySelector('#modalCrearProducto [name="Codigo"]');
-            const nombre = document.querySelector('#modalCrearProducto [name="Nombre"]');
-            const descripcion = document.querySelector('#modalCrearProducto [name="Descripcion"]');
-            const categoria = document.querySelector('#modalCrearProducto [name="IdCategoria"]');
-            const estado = document.querySelector('#modalCrearProducto [name="Estado"]');
+        // =========================
+        // EDITAR PRODUCTO
+        // =========================
 
-            if (codigo) codigo.value = "";
-            if (nombre) nombre.value = "";
-            if (descripcion) descripcion.value = "";
-            if (categoria) categoria.value = "";
-            if (estado) estado.value = "true";
-        }
+        function editarProducto(
+            id,
+            codigo,
+            nombre,
+            descripcion,
+            idCategoria,
+            estado
+        ) {
 
-        function editarProducto(id, codigo, nombre, descripcion, idCategoria, estado) {
-            document.getElementById("EditarIdProducto").value = id;
-            document.getElementById("EditarCodigo").value = codigo;
-            document.getElementById("EditarNombre").value = nombre;
-            document.getElementById("EditarDescripcion").value = descripcion;
+            document.getElementById(
+                "EditarIdProducto"
+            ).value = id;
+
+            document.getElementById(
+                "EditarCodigo"
+            ).value = codigo;
+
+            document.getElementById(
+                "EditarNombre"
+            ).value = nombre;
+
+            document.getElementById(
+                "EditarDescripcion"
+            ).value = descripcion;
 
             cargarCategoriasEditar(idCategoria);
+
             cargarEstadosEditar(estado);
 
-            new bootstrap.Modal(document.getElementById("modalEditarProducto")).show();
-        }
+            limpiarErrorCampo(
+                "EditarCodigo",
+                "errorEditarCodigo"
+            );
 
-        function verDetalleProducto(codigo, nombre, descripcion, categoria, stock, precioCompra, precioVenta, estado) {
-            document.getElementById("detalleCodigo").innerText = codigo || "---";
-            document.getElementById("detalleNombre").innerText = nombre || "---";
-            document.getElementById("detalleDescripcion").innerText = descripcion || "---";
-            document.getElementById("detalleCategoria").innerText = categoria || "Sin categoría";
-            document.getElementById("detalleStock").innerText = stock || "0";
-            document.getElementById("detallePrecioCompra").innerText = precioCompra || "$ 0";
-            document.getElementById("detallePrecioVenta").innerText = precioVenta || "$ 0";
-            document.getElementById("detalleEstado").innerText = estado || "---";
+            limpiarErrorCampo(
+                "EditarNombre",
+                "errorEditarNombre"
+            );
 
-            new bootstrap.Modal(document.getElementById("modalDetalleProducto")).show();
+            limpiarErrorCampo(
+                "EditarDescripcion",
+                "errorEditarDescripcion"
+            );
+
+            limpiarErrorCampo(
+                "EditarIdCategoria",
+                "errorEditarCategoria"
+            );
+
+            new bootstrap.Modal(
+                document.getElementById(
+                    "modalEditarProducto"
+                )
+            ).show();
         }
 
         // =========================
-        // 🔥 LOADING (IGUAL A DETALLE COMPRA)
+        // VER DETALLE
         // =========================
+
+        function verDetalleProducto(
+            codigo,
+            nombre,
+            descripcion,
+            categoria,
+            stock,
+            precioCompra,
+            precioVenta,
+            estado
+        ) {
+
+            document.getElementById(
+                "detalleCodigo"
+            ).innerText = codigo || "---";
+
+            document.getElementById(
+                "detalleNombre"
+            ).innerText = nombre || "---";
+
+            document.getElementById(
+                "detalleDescripcion"
+            ).innerText = descripcion || "---";
+
+            document.getElementById(
+                "detalleCategoria"
+            ).innerText = categoria || "---";
+
+            document.getElementById(
+                "detalleStock"
+            ).innerText = stock || "0";
+
+            document.getElementById(
+                "detallePrecioCompra"
+            ).innerText = precioCompra || "$0";
+
+            document.getElementById(
+                "detallePrecioVenta"
+            ).innerText = precioVenta || "$0";
+
+            document.getElementById(
+                "detalleEstado"
+            ).innerText = estado || "---";
+
+            new bootstrap.Modal(
+                document.getElementById(
+                    "modalDetalleProducto"
+                )
+            ).show();
+        }
+
+        // =========================
+        // LOADING
+        // =========================
+
         function mostrarLoading(mensaje) {
+
             ocultarLoading();
 
-            const overlay = document.createElement("div");
-            overlay.id = "detalle-loading-overlay";
+            const overlay =
+                document.createElement("div");
+
+            overlay.id =
+                "detalle-loading-overlay";
+
             overlay.style.position = "fixed";
             overlay.style.top = "0";
             overlay.style.left = "0";
             overlay.style.width = "100%";
             overlay.style.height = "100%";
-            overlay.style.background = "rgba(255,255,255,0.65)";
+            overlay.style.background =
+                "rgba(255,255,255,0.65)";
+
             overlay.style.display = "flex";
             overlay.style.flexDirection = "column";
             overlay.style.justifyContent = "center";
             overlay.style.alignItems = "center";
             overlay.style.zIndex = "9998";
 
-            const spinner = document.createElement("div");
+            const spinner =
+                document.createElement("div");
+
             spinner.style.width = "42px";
             spinner.style.height = "42px";
-            spinner.style.border = "4px solid #d6d6d6";
-            spinner.style.borderTop = "4px solid #4d47c3";
-            spinner.style.borderRadius = "50%";
-            spinner.style.animation = "spinDetalleCompra 1s linear infinite";
+            spinner.style.border =
+                "4px solid #d6d6d6";
 
-            const texto = document.createElement("div");
-            texto.innerText = mensaje || "Cargando...";
+            spinner.style.borderTop =
+                "4px solid #4d47c3";
+
+            spinner.style.borderRadius = "50%";
+
+            spinner.style.animation =
+                "spinDetalleCompra 1s linear infinite";
+
+            const texto =
+                document.createElement("div");
+
+            texto.innerText =
+                mensaje || "Cargando...";
+
             texto.style.marginTop = "12px";
+
             texto.style.fontSize = "13px";
+
             texto.style.fontWeight = "600";
+
             texto.style.color = "#111111";
 
             overlay.appendChild(spinner);
+
             overlay.appendChild(texto);
+
             document.body.appendChild(overlay);
 
             agregarAnimacionSpinner();
         }
 
         function ocultarLoading() {
-            const overlay = document.getElementById("detalle-loading-overlay");
-            if (overlay) overlay.remove();
+
+            const overlay =
+                document.getElementById(
+                    "detalle-loading-overlay"
+                );
+
+            if (overlay) {
+                overlay.remove();
+            }
         }
 
         function agregarAnimacionSpinner() {
-            if (document.getElementById("detalle-spinner-style")) return;
 
-            const style = document.createElement("style");
-            style.id = "detalle-spinner-style";
+            if (
+                document.getElementById(
+                    "detalle-spinner-style"
+                )
+            ) return;
+
+            const style =
+                document.createElement("style");
+
+            style.id =
+                "detalle-spinner-style";
+
             style.innerHTML = `
                 @@keyframes spinDetalleCompra {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
+
+                    0% {
+                        transform: rotate(0deg);
+                    }
+
+                    100% {
+                        transform: rotate(360deg);
+                    }
                 }
             `;
+
             document.head.appendChild(style);
         }
 
-                document.addEventListener("DOMContentLoaded", function () {
+        // =========================
+        // DOM READY
+        // =========================
 
-            const btnExcel = document.getElementById("btnExportarExcel");
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
 
-            if (btnExcel) {
-                btnExcel.addEventListener("click", async function () {
+                // VALIDACIÓN EN TIEMPO REAL
 
-                    btnExcel.style.pointerEvents = "none";
-                    btnExcel.style.opacity = "0.7";
-                    btnExcel.innerText = "Generando...";
+                const camposValidar = [
 
-                    mostrarLoading("Generar reporte de Excel...");
+                    {
+                        campo: "CrearCodigo",
+                        error: "errorCodigo",
+                        mensaje: "El código es obligatorio."
+                    },
 
-                    try {
-                        const response = await fetch('@Url.Action("ExportarExcel", "Producto", new { busqueda = busquedaActual })');
+                    {
+                        campo: "CrearNombre",
+                        error: "errorNombre",
+                        mensaje: "El nombre es obligatorio."
+                    },
 
-                        if (!response.ok) {
-                            throw new Error("Error al generar el Excel");
-                        }
+                    {
+                        campo: "CrearDescripcion",
+                        error: "errorDescripcion",
+                        mensaje: "La descripción es obligatoria."
+                    },
 
-                        const blob = await response.blob();
+                    {
+                        campo: "CrearCategoria",
+                        error: "errorCategoria",
+                        mensaje: "La categoría es obligatoria."
+                    }
+                ];
 
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement("a");
-                        a.href = url;
+                camposValidar.forEach(item => {
 
-                        // nombre del archivo
-                        a.download = "Productos.xlsx";
+                    const campo =
+                        document.getElementById(
+                            item.campo
+                        );
 
-                        document.body.appendChild(a);
-                        a.click();
+                    if (campo) {
 
-                        a.remove();
-                        window.URL.revokeObjectURL(url);
+                        campo.addEventListener(
+                            "input",
+                            function () {
 
-                    } catch (error) {
-                        showAlert("Error al generar el Excel", "danger");
-                    } finally {
-                        ocultarLoading();
+                                validarCampoProducto(
+                                    item.campo,
+                                    item.error,
+                                    item.mensaje
+                                );
+                            }
+                        );
 
-                        btnExcel.style.pointerEvents = "auto";
-                        btnExcel.style.opacity = "1";
-                        btnExcel.innerText = "Exportar Excel";
+                        campo.addEventListener(
+                            "change",
+                            function () {
+
+                                validarCampoProducto(
+                                    item.campo,
+                                    item.error,
+                                    item.mensaje
+                                );
+                            }
+                        );
                     }
                 });
-            }
 
-        });
+                // =========================
+                // BÚSQUEDA AUTOMÁTICA
+                // =========================
+
+                const txtBuscar =
+                    document.getElementById(
+                        "txtBuscar"
+                    );
+
+                const formBusquedaProductos =
+                    document.getElementById(
+                        "formBusquedaProductos"
+                    );
+
+                if (
+                    txtBuscar &&
+                    formBusquedaProductos
+                ) {
+
+                    let temporizadorBusqueda;
+
+                    let ultimoValor =
+                        txtBuscar.value;
+
+                    txtBuscar.addEventListener(
+                        "input",
+                        function () {
+
+                            clearTimeout(
+                                temporizadorBusqueda
+                            );
+
+                            const valorActual =
+                                this.value;
+
+                            temporizadorBusqueda =
+                                setTimeout(
+                                    function () {
+
+                                        if (
+                                            valorActual !==
+                                            ultimoValor
+                                        ) {
+
+                                            ultimoValor =
+                                                valorActual;
+
+                                            formBusquedaProductos.submit();
+                                        }
+
+                                    },
+                                    500
+                                );
+                        }
+                    );
+                }
+
+                // =========================
+                // EXPORTAR EXCEL
+                // =========================
+
+                const btnExcel =
+                    document.getElementById(
+                        "btnExportarExcel"
+                    );
+
+                if (btnExcel) {
+
+                    btnExcel.addEventListener(
+                        "click",
+                        async function () {
+
+                            btnExcel.style.pointerEvents =
+                                "none";
+
+                            btnExcel.style.opacity =
+                                "0.7";
+
+                            btnExcel.innerText =
+                                "Generando...";
+
+                            mostrarLoading(
+                                "Generar reporte de Excel..."
+                            );
+
+                            try {
+
+                                const response =
+                                    await fetch(
+                                        '@Url.Action("ExportarExcel", "Producto", new { busqueda = busquedaActual })'
+                                    );
+
+                                if (!response.ok) {
+                                    throw new Error(
+                                        "Error al generar el Excel"
+                                    );
+                                }
+
+                                const blob =
+                                    await response.blob();
+
+                                const url =
+                                    window.URL.createObjectURL(
+                                        blob
+                                    );
+
+                                const a =
+                                    document.createElement(
+                                        "a"
+                                    );
+
+                                a.href = url;
+
+                                a.download =
+                                    "Productos.xlsx";
+
+                                document.body.appendChild(a);
+
+                                a.click();
+
+                                a.remove();
+
+                                window.URL.revokeObjectURL(
+                                    url
+                                );
+                            }
+                            catch (error) {
+
+                                showAlert(
+                                    "Error al generar el Excel",
+                                    "danger"
+                                );
+                            }
+                            finally {
+
+                                ocultarLoading();
+
+                                btnExcel.style.pointerEvents =
+                                    "auto";
+
+                                btnExcel.style.opacity =
+                                    "1";
+
+                                btnExcel.innerText =
+                                    "Exportar Excel";
+                            }
+                        }
+                    );
+                }
+            }
+        );
+
     </script>
 }

@@ -46,7 +46,7 @@ namespace OasisShop.Web.Controllers
 
         #endregion
 
-        #region DESCARGAR PDF QUESTPDF
+        #region DESCARGAR PDF
 
         [HttpGet]
         public IActionResult DescargarPdf(int idCompra)
@@ -81,7 +81,7 @@ namespace OasisShop.Web.Controllers
 
         #endregion
 
-        #region PDF QUESTPDF
+        #region PDF FACTURA COMPRA
 
         private byte[] GenerarFacturaCompraPdf(DetalleDeCompraViewModel model, Negocio negocio)
         {
@@ -95,395 +95,222 @@ namespace OasisShop.Web.Controllers
             string direccionNegocio = negocio?.Direccion ?? string.Empty;
             string ciudadNegocio = negocio?.oCiudad?.Nombre ?? string.Empty;
             string departamentoNegocio = negocio?.oDepartamento?.Nombre ?? string.Empty;
+            string correoNegocio = negocio?.Correo ?? "No registrado";
 
             return Document.Create(document =>
             {
                 document.Page(page =>
                 {
-                    page.Size(PageSizes.A4);
+                    page.Size(PageSizes.A4.Landscape());
                     page.Margin(20);
-                    page.PageColor("#F4F6FB");
-                    page.DefaultTextStyle(x => x.FontFamily("Arial").FontSize(12));
+                    page.DefaultTextStyle(x => x.FontFamily("Arial").FontSize(9));
+                    page.PageColor(Colors.White);
 
-                    page.Content().Background(Colors.White).Column(col =>
+                    page.Content().Column(col =>
                     {
-                        col.Item().Element(c => HeaderFactura(
-                            c,
-                            model,
-                            logo,
-                            nombreNegocio,
-                            rucNegocio,
-                            direccionNegocio,
-                            ciudadNegocio,
-                            departamentoNegocio
-                        ));
-
-                        col.Item().Padding(25).Column(contenido =>
+                        col.Item().Row(row =>
                         {
-                            contenido.Item().Element(c => TituloSeccion(c, "Información general"));
-
-                            contenido.Item().Row(row =>
+                            row.ConstantItem(170).Height(75).Element(c =>
                             {
-                                row.RelativeItem().Element(c =>
-                                {
-                                    TarjetaInfo(c, new List<(string, string)>
-                                    {
-                                        ("Número de compra", model.NumeroDocumento),
-                                        ("Tipo de factura", model.TipoDocumento),
-                                        ("Fecha", model.FechaRegistro)
-                                    }, 90);
-                                });
-
-                                row.RelativeItem().PaddingLeft(12).Element(c =>
-                                {
-                                    TarjetaInfo(c, new List<(string, string)>
-                                    {
-                                        ("Usuario comprador", model.NombreUsuario),
-                                        ("Documento", model.DocumentoUsuario)
-                                    }, 90);
-                                });
+                                if (logo.Length > 0)
+                                    c.Image(logo).FitArea();
+                                else
+                                    c.Text(nombreNegocio).Bold().FontSize(18);
                             });
 
-                            contenido.Item().PaddingTop(22).Element(c => TituloSeccion(c, "Información del proveedor"));
-
-                            contenido.Item().Row(row =>
+                            row.RelativeItem().AlignCenter().Column(info =>
                             {
-                                row.RelativeItem().Element(c =>
-                                {
-                                    TarjetaInfo(c, new List<(string, string)>
-                                    {
-                                        ("Documento / NIT", model.DocumentoProveedor)
-                                    }, 60);
-                                });
-
-                                row.RelativeItem().PaddingLeft(12).Element(c =>
-                                {
-                                    TarjetaInfo(c, new List<(string, string)>
-                                    {
-                                        ("Nombre / Razón social", model.RazonSocialProveedor)
-                                    }, 60);
-                                });
+                                info.Item().AlignCenter().Text(nombreNegocio.ToUpper()).Bold().FontSize(16);
+                                info.Item().AlignCenter().Text($"NIT: {rucNegocio}").FontSize(9);
+                                info.Item().AlignCenter().Text($"{ciudadNegocio} - {departamentoNegocio}").FontSize(9);
+                                info.Item().AlignCenter().Text(direccionNegocio).FontSize(9);
+                                info.Item().AlignCenter().Text(correoNegocio).FontSize(9);
                             });
 
-                            contenido.Item().PaddingTop(22).Element(c => TituloSeccion(c, "Productos comprados"));
-
-                            contenido.Item().Element(c => TablaProductos(c, model));
-
-                            contenido.Item().PaddingTop(28).Row(row =>
-                            {
-                                row.RelativeItem();
-
-                                row.RelativeItem().Element(c =>
-                                {
-                                    TotalesCompacto(c, model);
-                                });
-                            });
-                        });
-
-                        col.Item()
-                        .AlignCenter()
-                        .Element(container =>
-                        {
-                            container
+                            row.ConstantItem(200)
                                 .Border(1)
-                                .BorderColor("#E5E7EB")
-                                .Background("#F3F4F6")
-                                .CornerRadius(10)
-                                .Padding(12)
-                                .MaxWidth(400)
-                                .AlignCenter()
-                                .Text("Este documento fue generado automáticamente y sirve como respaldo formal de la transacción registrada en el sistema.")
-                                .FontSize(11)
-                                .FontColor("#4B5563")
-                                .AlignCenter();
+                                .BorderColor("#D1D5DB")
+                                .Padding(10)
+                                .Column(box =>
+                                {
+                                    box.Item().AlignCenter().Text("FACTURA DE COMPRA DE INVENTARIO").Bold().FontSize(13);
+                                    box.Item().PaddingTop(8).AlignCenter().Text(model.NumeroDocumento).Bold().FontSize(12);
+
+                                    box.Item().PaddingTop(10).Text("Fecha de Compra").Bold().FontSize(8);
+                                    box.Item().Text(model.FechaRegistro).FontSize(8);
+                                });
                         });
+
+                        col.Item().PaddingTop(16).Row(row =>
+                        {
+                            row.RelativeItem().Table(table =>
+                            {
+                                table.ColumnsDefinition(columns =>
+                                {
+                                    columns.ConstantColumn(120);
+                                    columns.RelativeColumn();
+                                    columns.ConstantColumn(120);
+                                    columns.RelativeColumn();
+                                });
+
+                                InfoTableRowCompra(table, "Proveedor", model.RazonSocialProveedor, "Documento / NIT", model.DocumentoProveedor);
+                                InfoTableRowCompra(table, "Dirección", direccionNegocio, "Comprador", model.NombreUsuario);
+                                InfoTableRowCompra(table, "Ciudad", $"{ciudadNegocio} - {departamentoNegocio}", "Correo", correoNegocio);
+                                InfoTableRowCompra(table, "Número de Compra", model.NumeroDocumento, "Tipo Documento", model.TipoDocumento);
+                            });
+                        });
+
+                        col.Item().PaddingTop(24).Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(100);
+                                columns.RelativeColumn();
+                                columns.ConstantColumn(80);
+                                columns.ConstantColumn(110);
+                                columns.ConstantColumn(110);
+                            });
+
+                            CompraHeaderCell(table.Cell(), "Código");
+                            CompraHeaderCell(table.Cell(), "Nombre del producto");
+                            CompraHeaderCell(table.Cell(), "Cantidad");
+                            CompraHeaderCell(table.Cell(), "Valor Unitario");
+                            CompraHeaderCell(table.Cell(), "Valor Total");
+
+                            foreach (var item in model.Detalles)
+                            {
+                                CompraBodyCell(table.Cell(), item.oProducto != null ? item.oProducto.Codigo : "N/A");
+                                CompraBodyCell(table.Cell(), item.oProducto != null ? item.oProducto.Nombre : "N/A");
+                                CompraBodyCell(table.Cell(), item.Cantidad.ToString());
+                                CompraBodyCell(table.Cell(), item.PrecioCompra.ToString("C0"));
+                                CompraBodyCell(table.Cell(), item.MontoTotal.ToString("C0"));
+                            }
+                        });
+
+                        col.Item().PaddingTop(24).Row(row =>
+                        {
+                            row.RelativeItem().Column(left =>
+                            {
+                                left.Item().Text("CONDICIÓN DE PAGO").Bold().FontSize(9);
+                                left.Item().PaddingTop(5).Text("Crédito / Contado").FontSize(8);
+
+                                left.Item().PaddingTop(14).Text("OBSERVACIONES").Bold().FontSize(9);
+                                left.Item().Text("Factura de compra generada desde el sistema Oasis Shop.").FontSize(8);
+                            });
+
+                            row.ConstantItem(280).Table(table =>
+                            {
+                                table.ColumnsDefinition(columns =>
+                                {
+                                    columns.RelativeColumn();
+                                    columns.RelativeColumn();
+                                });
+
+                                TotalRowCompra(table, "Total Bruto", model.MontoTotal.ToString("C0"), false);
+                                TotalRowCompra(table, "IVA", "$0", false);
+                                TotalRowCompra(table, "Monto Pagado", model.MontoPago.ToString("C0"), false);
+                                TotalRowCompra(table, "Monto Cambio", model.MontoCambio.ToString("C0"), false);
+                                TotalRowCompra(table, "Total Compra", model.MontoTotal.ToString("C0"), true);
+                            });
+                        });
+
+                        col.Item().PaddingTop(22).AlignCenter()
+                            .Text("Documento generado automáticamente por el sistema Oasis Shop.")
+                            .FontSize(8)
+                            .FontColor("#4B5563");
+
+                        col.Item().PaddingTop(4).AlignCenter()
+                            .Text($"{nombreNegocio} - NIT: {rucNegocio}")
+                            .Bold()
+                            .FontSize(8);
                     });
                 });
             }).GeneratePdf();
         }
 
-        // ===========================
-        // NUEVOS MÉTODOS (TOTALES COMPACTOS)
-        // ===========================
+        #endregion
 
-        private void TotalesCompacto(IContainer container, DetalleDeCompraViewModel model)
+        #region MÉTODOS AUXILIARES PDF
+
+        private void InfoTableRowCompra(TableDescriptor table, string label1, string value1, string label2, string value2)
+        {
+            InfoLabelCellCompra(table.Cell(), label1);
+            InfoValueCellCompra(table.Cell(), value1);
+            InfoLabelCellCompra(table.Cell(), label2);
+            InfoValueCellCompra(table.Cell(), value2);
+        }
+
+        private void InfoLabelCellCompra(IContainer container, string texto)
+        {
+            container
+                .Background("#E5E7EB")
+                .Border(1)
+                .BorderColor("#D1D5DB")
+                .Padding(5)
+                .Text(texto)
+                .Bold()
+                .FontSize(8);
+        }
+
+        private void InfoValueCellCompra(IContainer container, string texto)
         {
             container
                 .Border(1)
-                .BorderColor("#E5E7EB")
-                .CornerRadius(12)
-                .Column(col =>
-                {
-                    col.Item().Row(row =>
-                    {
-                        row.RelativeItem().Element(c =>
-                            CajaTotalSimple(c, "Monto pagado", model.MontoPago.ToString("C0"))
-                        );
-
-                        row.RelativeItem().Element(c =>
-                            CajaTotalSimple(c, "Monto cambio", model.MontoCambio.ToString("C0"))
-                        );
-                    });
-
-                    col.Item().Element(c =>
-                        CajaTotalFinal(c, "TOTAL COMPRA", model.MontoTotal.ToString("C0"))
-                    );
-                });
+                .BorderColor("#D1D5DB")
+                .Padding(5)
+                .Text(texto ?? string.Empty)
+                .FontSize(8);
         }
 
-        private void CajaTotalSimple(IContainer container, string etiqueta, string valor)
+        private void CompraHeaderCell(IContainer container, string texto)
         {
             container
-                .BorderRight(1)
-                .BorderColor("#E5E7EB")
-                .Padding(10)
-                .Column(col =>
-                {
-                    col.Item().Text(etiqueta)
-                        .FontSize(11)
-                        .FontColor("#6B7280");
-
-                    col.Item().PaddingTop(2).Text(valor)
-                        .FontSize(13)
-                        .Bold()
-                        .FontColor("#111827");
-                });
-        }
-
-        private void CajaTotalFinal(IContainer container, string etiqueta, string valor)
-        {
-            container
-                .Background("#4B43D1")
-                .Padding(12)
-                .Row(row =>
-                {
-                    row.RelativeItem().Text(etiqueta)
-                        .FontSize(13)
-                        .Bold()
-                        .FontColor(Colors.White);
-
-                    row.RelativeItem().AlignRight().Text(valor)
-                        .FontSize(13)
-                        .Bold()
-                        .FontColor(Colors.White);
-                });
-        }
-
-        // ===========================
-        // MÉTODOS ORIGINALES
-        // ===========================
-
-        private void HeaderFactura(
-            IContainer container,
-            DetalleDeCompraViewModel model,
-            byte[] logo,
-            string nombreNegocio,
-            string rucNegocio,
-            string direccionNegocio,
-            string ciudadNegocio,
-            string departamentoNegocio)
-        {
-            container
-                .Background("#241E65")
-                .CornerRadius(18)
-                .Padding(28)
-                .Row(row =>
-                {
-                    row.ConstantItem(90)
-                       .Height(90)
-                       .Background(Colors.White)
-                       .CornerRadius(12)
-                       .Padding(8)
-                       .AlignMiddle()
-                       .AlignCenter()
-                       .Element(c =>
-                       {
-                           if (logo.Length > 0)
-                           {
-                               c.Image(logo).FitArea();
-                           }
-                           else
-                           {
-                               c.Text("LOGO")
-                                .FontSize(11)
-                                .Bold()
-                                .FontColor("#4B43D1");
-                           }
-                       });
-
-                    row.RelativeItem()
-                       .PaddingLeft(18)
-                       .AlignMiddle()
-                       .Column(info =>
-                       {
-                           info.Item().Text(nombreNegocio)
-                               .FontSize(28)
-                               .Bold()
-                               .FontColor(Colors.White);
-
-                           if (!string.IsNullOrWhiteSpace(rucNegocio))
-                           {
-                               info.Item().PaddingTop(6).Text($"RUT: {rucNegocio}")
-                                   .FontSize(13)
-                                   .FontColor("#F3F4F6");
-                           }
-
-                           if (!string.IsNullOrWhiteSpace(direccionNegocio))
-                           {
-                               info.Item().Text($"Dirección: {direccionNegocio}")
-                                   .FontSize(13)
-                                   .FontColor("#F3F4F6");
-                           }
-
-                           if (!string.IsNullOrWhiteSpace(ciudadNegocio) || !string.IsNullOrWhiteSpace(departamentoNegocio))
-                           {
-                               info.Item().Text($"Ubicación: {ciudadNegocio} - {departamentoNegocio}")
-                                   .FontSize(13)
-                                   .FontColor("#F3F4F6");
-                           }
-                       });
-
-                    row.ConstantItem(190)
-                       .AlignRight()
-                       .Column(col =>
-                       {
-                           col.Item()
-                              .AlignRight()
-                              .Text("FACTURA\nDE COMPRA")
-                              .FontSize(28)
-                              .Bold()
-                              .FontColor(Colors.White)
-                              .LineHeight(1.05f);
-
-                           col.Item()
-                              .PaddingTop(12)
-                              .AlignRight()
-                              .Width(135)
-                              .Background(Colors.White)
-                              .CornerRadius(6)
-                              .PaddingVertical(8)
-                              .AlignCenter()
-                              .Text(model.NumeroDocumento)
-                              .FontSize(12)
-                              .Bold()
-                              .FontColor("#241E65");
-                       });
-                });
-        }
-
-        private void TituloSeccion(IContainer container, string titulo)
-        {
-            container
-                .PaddingBottom(10)
-                .Row(row =>
-                {
-                    row.ConstantItem(5)
-                       .Height(22)
-                       .Background("#4B43D1");
-
-                    row.RelativeItem()
-                       .PaddingLeft(8)
-                       .AlignMiddle()
-                       .Text(titulo)
-                       .FontSize(18)
-                       .Bold()
-                       .FontColor("#241E65");
-                });
-        }
-
-        private void TarjetaInfo(IContainer container, List<(string Etiqueta, string Valor)> datos, float altoMinimo)
-        {
-            container
-                .Background("#F9FAFB")
+                .Background("#E5E7EB")
                 .Border(1)
-                .BorderColor("#E5E7EB")
-                .CornerRadius(12)
-                .Padding(14)
-                .MinHeight(altoMinimo)
-                .Column(col =>
-                {
-                    foreach (var item in datos)
-                    {
-                        col.Item().PaddingVertical(4).Row(row =>
-                        {
-                            row.RelativeItem()
-                               .Text(item.Etiqueta)
-                               .FontSize(12)
-                               .FontColor("#6B7280");
-
-                            row.RelativeItem()
-                               .AlignRight()
-                               .Text(item.Valor ?? string.Empty)
-                               .FontSize(12)
-                               .Bold()
-                               .FontColor("#111827");
-                        });
-                    }
-                });
-        }
-
-        private void TablaProductos(IContainer container, DetalleDeCompraViewModel model)
-        {
-            container.Table(table =>
-            {
-                table.ColumnsDefinition(columns =>
-                {
-                    columns.ConstantColumn(50);
-                    columns.RelativeColumn();
-                    columns.ConstantColumn(120);
-                    columns.ConstantColumn(90);
-                    columns.ConstantColumn(120);
-                });
-
-                table.Header(header =>
-                {
-                    HeaderCelda(header.Cell(), "Item");
-                    HeaderCelda(header.Cell(), "Producto");
-                    HeaderCelda(header.Cell(), "Precio compra");
-                    HeaderCelda(header.Cell(), "Cantidad");
-                    HeaderCelda(header.Cell(), "Subtotal");
-                });
-
-                int contador = 1;
-
-                foreach (var item in model.Detalles)
-                {
-                    BodyCelda(table.Cell(), contador.ToString());
-                    BodyCelda(table.Cell(), item.oProducto != null ? item.oProducto.Nombre : "Producto no disponible");
-                    BodyCelda(table.Cell(), item.PrecioCompra.ToString("C0"));
-                    BodyCelda(table.Cell(), item.Cantidad.ToString());
-                    BodyCelda(table.Cell(), item.MontoTotal.ToString("C0"));
-
-                    contador++;
-                }
-            });
-        }
-
-        private void HeaderCelda(IContainer container, string texto)
-        {
-            container
-                .Background("#241E65")
-                .PaddingVertical(12)
-                .PaddingHorizontal(8)
+                .BorderColor("#D1D5DB")
+                .Padding(6)
                 .AlignCenter()
                 .Text(texto)
-                .FontSize(12)
                 .Bold()
-                .FontColor(Colors.White);
+                .FontSize(8);
         }
 
-        private void BodyCelda(IContainer container, string texto)
+        private void CompraBodyCell(IContainer container, string texto)
         {
             container
-                .BorderBottom(1)
-                .BorderColor("#E5E7EB")
-                .PaddingVertical(12)
-                .PaddingHorizontal(8)
+                .Border(1)
+                .BorderColor("#D1D5DB")
+                .Padding(6)
                 .AlignCenter()
                 .Text(texto ?? string.Empty)
-                .FontSize(12)
-                .FontColor("#111827");
+                .FontSize(8);
         }
+
+        private void TotalRowCompra(TableDescriptor table, string label, string value, bool destacado)
+        {
+            table.Cell()
+                .Background(destacado ? "#E5E7EB" : Colors.White)
+                .Border(1)
+                .BorderColor("#D1D5DB")
+                .Padding(6)
+                .Text(label)
+                .Bold()
+                .FontSize(destacado ? 10 : 8);
+
+            table.Cell()
+                .Background(destacado ? "#E5E7EB" : Colors.White)
+                .Border(1)
+                .BorderColor("#D1D5DB")
+                .Padding(6)
+                .AlignRight()
+                .Text(value)
+                .Bold()
+                .FontSize(destacado ? 10 : 8);
+        }
+
+        #endregion
+
+        #region MAPEO Y NORMALIZACIÓN
 
         private DetalleDeCompraViewModel MapearCompraAViewModel(Compra compra)
         {

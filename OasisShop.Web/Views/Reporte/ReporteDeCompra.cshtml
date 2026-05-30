@@ -1,0 +1,1000 @@
+﻿@model OasisShop.Web.Models.ViewModels.ReporteDeComprasViewModel
+
+@{
+    ViewData["Title"] = "Reporte de compras de inventario";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<style>
+    html,
+    body {
+        background: #F5F5F5 !important;
+    }
+
+    .reporte-page {
+        width: 100%;
+        min-height: 100vh;
+        padding: 28px 34px;
+        background: #F5F5F5;
+        box-sizing: border-box;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 14px 0;
+        color: #111111;
+    }
+
+    .search-row {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .search-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .search-container {
+        position: relative;
+        width: 440px;
+        max-width: 100%;
+    }
+
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        width: 15px;
+        height: 15px;
+        opacity: 0.65;
+        pointer-events: none;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 36px;
+        border: 1px solid #8F8F8F;
+        border-radius: 7px;
+        padding: 4px 10px 4px 34px;
+        font-size: 13px;
+        font-weight: 600;
+        background: #F5F5F5;
+        color: #444444;
+        box-sizing: border-box;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4B43D1;
+            box-shadow: 0 0 0 2px rgba(75, 67, 209, 0.2);
+        }
+
+    .filters-row {
+        display: flex;
+        align-items: end;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .filter-label {
+        font-size: 14px;
+        font-weight: 800;
+        color: #111111;
+    }
+
+    .date-input {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .flatpickr-calendar {
+        border: 1px solid #E5E7EB !important;
+        border-radius: 14px !important;
+        box-shadow: 0 14px 35px rgba(17, 24, 39, 0.14) !important;
+        font-family: inherit !important;
+        overflow: hidden;
+    }
+
+    .flatpickr-months {
+        background: #FFFFFF !important;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .flatpickr-month {
+        height: 46px !important;
+    }
+
+    .flatpickr-current-month {
+        padding-top: 11px !important;
+        font-size: 14px !important;
+        font-weight: 450 !important;
+        color: #111827 !important;
+    }
+
+        .flatpickr-current-month input.cur-year {
+            font-weight: 450 !important;
+            color: #111827 !important;
+        }
+
+    .flatpickr-monthDropdown-months {
+        font-weight: 450 !important;
+        color: #111827 !important;
+    }
+
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        top: 6px !important;
+        color: #374151 !important;
+        fill: #374151 !important;
+    }
+
+        .flatpickr-prev-month:hover svg,
+        .flatpickr-next-month:hover svg {
+            fill: #4B43D1 !important;
+        }
+
+    .flatpickr-weekdays {
+        background: #FFFFFF !important;
+        border-bottom: 1px solid #F3F4F6;
+    }
+
+    span.flatpickr-weekday {
+        color: #6B7280 !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    .flatpickr-days {
+        background: #FFFFFF !important;
+    }
+
+    .flatpickr-day {
+        border-radius: 8px !important;
+        color: #374151 !important;
+        font-weight: 450 !important;
+    }
+
+        .flatpickr-day:hover {
+            background: #F3F4F6 !important;
+            border-color: #F3F4F6 !important;
+            color: #111827 !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: #4B43D1 !important;
+            color: #4B43D1 !important;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange {
+            background: #241E65 !important;
+            border-color: #241E65 !important;
+            color: #FFFFFF !important;
+        }
+
+        .flatpickr-day.prevMonthDay,
+        .flatpickr-day.nextMonthDay {
+            color: #CBD5E1 !important;
+        }
+
+        .flatpickr-day.disabled,
+        .flatpickr-day.disabled:hover {
+            color: #D1D5DB !important;
+            background: transparent !important;
+        }
+
+    .flatpickr-calendar.arrowTop:before,
+    .flatpickr-calendar.arrowTop:after {
+        display: none !important;
+    }
+
+    .date-input:focus {
+        outline: none;
+        border-color: #4B43D1;
+        box-shadow: 0 0 0 2px rgba(75, 67, 209, 0.2);
+    }
+
+    .export-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 16px;
+    }
+
+    .btn-export-excel {
+        background: #F5F5F5;
+        color: #666666;
+        border: 1px solid #9CA3AF;
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        min-width: 118px;
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 2px 3px rgba(0,0,0,0.25);
+    }
+
+        .btn-export-excel:hover {
+            background: #E5E7EB;
+            color: #1F2937;
+        }
+
+    .table-card {
+        background: #F5F5F5;
+        border-radius: 8px;
+        overflow-x: auto;
+        box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        min-width: 1300px;
+    }
+
+        .table-custom thead th {
+            background: #DCDDDF;
+            color: #676767;
+            font-weight: 700;
+            text-align: center;
+            padding: 12px 8px;
+            border: 1px solid #BFC1C6;
+        }
+
+        .table-custom tbody td {
+            background: #F5F5F5;
+            color: #5A5A5A;
+            padding: 10px 8px;
+            border: 1px solid #C9CBD1;
+            text-align: center;
+            vertical-align: middle;
+            font-weight: 500;
+        }
+
+        .table-custom tbody tr:nth-child(even) td {
+            background: #E5E7EB;
+        }
+
+    .sin-registros {
+        padding: 18px;
+        font-weight: 600;
+        color: #111111;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+    }
+
+    .pagination-custom {
+        list-style: none;
+        display: flex;
+        gap: 6px;
+        padding: 0;
+        margin: 0;
+        align-items: center;
+    }
+
+        .pagination-custom li a,
+        .pagination-custom li span {
+            display: block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: #E5E7EB;
+            color: #111827;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .pagination-custom li.active a {
+            background: #1E1B4B;
+            color: #FFFFFF;
+        }
+
+        .pagination-custom li a:hover {
+            background: #3F3CBB;
+            color: #FFFFFF;
+        }
+
+        .pagination-custom li.disabled span {
+            opacity: 0.6;
+        }
+
+    .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .alert-custom {
+        min-width: 280px;
+        max-width: 340px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: #FFFFFF;
+        background: #C63637;
+        font-weight: 400;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        animation: slideIn 0.4s ease;
+    }
+
+    .alert-message {
+        flex: 1;
+        text-align: center;
+    }
+
+    .alert-close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 700;
+        color: #FFFFFF;
+        background: transparent;
+        border: none;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+</style>
+
+<div id="alertContainer" class="alert-container"></div>
+
+<div class="reporte-page">
+
+    <h1 class="page-title">Reporte de compras de inventario</h1>
+
+    <div class="search-row">
+
+        <form method="get"
+              asp-controller="ReporteDeCompra"
+              asp-action="Index"
+              class="search-form"
+              id="formReporteCompras">
+
+            <div class="search-container">
+
+                <img src="~/img/buscar.png"
+                     class="search-icon" />
+
+                <input type="text"
+                       class="search-input"
+                       id="txtBuscarReporte"
+                       name="busqueda"
+                       value="@Model.Busqueda"
+                       placeholder="Buscar compra de inventario" />
+
+            </div>
+
+            <div class="filters-row">
+
+                <input type="text"
+                       class="date-input calendario-moderno"
+                       id="fechaInicio"
+                       name="fechaInicio"
+                       value="@Model.FechaInicio"
+                       placeholder="Desde"
+                       readonly />
+
+                <input type="text"
+                       class="date-input calendario-moderno"
+                       id="fechaFin"
+                       name="fechaFin"
+                       value="@Model.FechaFin"
+                       placeholder="Hasta"
+                       readonly />
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <div class="export-row">
+
+        <a class="btn-export-excel"
+               id="btnExportarExcel"
+               href="javascript:void(0);">
+
+            Exportar Excel
+
+        </a>
+
+    </div>
+
+    <div class="table-card">
+
+        <table class="table-custom">
+
+            <thead>
+
+                <tr>
+                    <th>Fecha de registro</th>
+
+                    <th>Número de compra de inventario</th>
+
+                    <th>Usuario de registro</th>
+
+                    <th>Documento proveedor</th>
+
+                    <th>Razón social</th>
+
+                    <th>Código producto</th>
+
+                    <th>Nombre producto</th>
+
+                    <th>Cantidad</th>
+
+                    <th>Categoría</th>
+
+                    <th>Precio compra</th>
+
+                    <th>Precio venta</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (Model.Compras != null && Model.Compras.Any())
+                {
+                    foreach (var item in Model.Compras)
+                    {
+                        <tr>
+
+                            <td>@item.FechaRegistro</td>
+
+                            <td>@item.NumeroCompra</td>
+
+                            <td>@item.UsuarioRegistro</td>
+
+                            <td>@item.DocumentoProveedor</td>
+
+                            <td>@item.RazonSocial</td>
+
+                            <td>@item.CodigoProducto</td>
+
+                            <td>@item.NombreProducto</td>
+
+                            <td>@item.Cantidad</td>
+
+                            <td>@item.Categoria</td>
+
+                            <td>
+                                @{
+                                    decimal precioCompra = 0;
+                                    decimal.TryParse(item.PrecioCompra, out precioCompra);
+                                }
+
+                                @precioCompra.ToString("C0", new System.Globalization.CultureInfo("es-CO"))
+                            </td>
+
+                            <td>
+                                @{
+                                    decimal precioVenta = 0;
+                                    decimal.TryParse(item.PrecioVenta, out precioVenta);
+                                }
+
+                                @precioVenta.ToString("C0", new System.Globalization.CultureInfo("es-CO"))
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="10"
+                            class="sin-registros">
+
+                            No se encontraron compras para el periodo seleccionado.
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    @if (Model.TotalPaginas > 1)
+    {
+        <div class="pagination-container">
+
+            <ul class="pagination-custom">
+
+                @if (Model.PaginaActual > 1)
+                {
+                    <li>
+
+                        <a asp-controller="ReporteDeCompra"
+                               asp-action="Index"
+                               asp-route-pagina="@(Model.PaginaActual - 1)"
+                               asp-route-fechaInicio="@Model.FechaInicio"
+                               asp-route-fechaFin="@Model.FechaFin"
+                               asp-route-busqueda="@Model.Busqueda">
+
+                            Anterior
+
+                        </a>
+
+                    </li>
+                }
+                else
+                {
+                    <li class="disabled">
+
+                        <span>
+                            Anterior
+                        </span>
+
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPaginas; i++)
+                {
+                    <li class="@(i == Model.PaginaActual ? "active" : "")">
+
+                        <a asp-controller="ReporteDeCompra"
+                               asp-action="Index"
+                               asp-route-pagina="@i"
+                               asp-route-fechaInicio="@Model.FechaInicio"
+                               asp-route-fechaFin="@Model.FechaFin"
+                               asp-route-busqueda="@Model.Busqueda">
+
+                            @i
+
+                        </a>
+
+                    </li>
+                }
+
+                @if (Model.PaginaActual < Model.TotalPaginas)
+                {
+                    <li>
+
+                        <a asp-controller="ReporteDeCompra"
+                               asp-action="Index"
+                               asp-route-pagina="@(Model.PaginaActual + 1)"
+                               asp-route-fechaInicio="@Model.FechaInicio"
+                               asp-route-fechaFin="@Model.FechaFin"
+                               asp-route-busqueda="@Model.Busqueda">
+
+                            Siguiente
+
+                        </a>
+
+                    </li>
+                }
+                else
+                {
+                    <li class="disabled">
+
+                        <span>
+                            Siguiente
+                        </span>
+
+                    </li>
+                }
+
+            </ul>
+
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
+    <script>
+
+        function showAlert(mensaje) {
+
+        const container = document.getElementById("alertContainer");
+
+        if (!container) {
+        return;
+        }
+
+        const alert = document.createElement("div");
+
+        alert.className = "alert-custom";
+
+        alert.innerHTML = `
+        <span class="alert-message">${mensaje}</span>
+        <button type="button"
+        class="alert-close"
+        onclick="closeAlert(this)">
+        ×
+        </button>
+        `;
+
+        container.appendChild(alert);
+
+        setTimeout(() => {
+
+        alert.style.animation = "fadeOut 0.4s ease forwards";
+
+        setTimeout(() => {
+
+        if (alert.parentNode) {
+        alert.remove();
+        }
+
+        }, 700);
+
+        }, 3000);
+        }
+
+        function closeAlert(element) {
+
+        const alert = element.parentElement;
+
+        alert.style.animation = "fadeOut 0.4s ease forwards";
+
+        setTimeout(() => {
+
+        if (alert.parentNode) {
+        alert.remove();
+        }
+
+        }, 700);
+        }
+
+        function mostrarLoading(mensaje) {
+
+        ocultarLoading();
+
+        const overlay = document.createElement("div");
+
+        overlay.id = "detalle-loading-overlay";
+
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.background = "rgba(255,255,255,0.65)";
+        overlay.style.display = "flex";
+        overlay.style.flexDirection = "column";
+        overlay.style.justifyContent = "center";
+        overlay.style.alignItems = "center";
+        overlay.style.zIndex = "9998";
+
+        const spinner = document.createElement("div");
+
+        spinner.style.width = "42px";
+        spinner.style.height = "42px";
+        spinner.style.border = "4px solid #d6d6d6";
+        spinner.style.borderTop = "4px solid #4d47c3";
+        spinner.style.borderRadius = "50%";
+        spinner.style.animation = "spinReporteCompra 1s linear infinite";
+
+        const texto = document.createElement("div");
+
+        texto.innerText = mensaje || "Cargando...";
+        texto.style.marginTop = "12px";
+        texto.style.fontSize = "13px";
+        texto.style.fontWeight = "600";
+        texto.style.color = "#111111";
+
+        overlay.appendChild(spinner);
+        overlay.appendChild(texto);
+
+        document.body.appendChild(overlay);
+
+        agregarAnimacionSpinner();
+        }
+
+        function ocultarLoading() {
+
+        const overlay = document.getElementById("detalle-loading-overlay");
+
+        if (overlay) {
+        overlay.remove();
+        }
+        }
+
+        function agregarAnimacionSpinner() {
+
+        if (document.getElementById("spinner-style-reporte")) {
+        return;
+        }
+
+        const style = document.createElement("style");
+
+        style.id = "spinner-style-reporte";
+
+        style.innerHTML = `
+        @@keyframes spinReporteCompra {
+
+        0% {
+        transform: rotate(0deg);
+        }
+
+        100% {
+        transform: rotate(360deg);
+        }
+        }
+        `;
+
+        document.head.appendChild(style);
+        }
+
+        function validarFechas() {
+
+        const fechaInicio = document.getElementById("fechaInicio");
+
+        const fechaFin = document.getElementById("fechaFin");
+
+        if (!fechaInicio || !fechaFin) {
+        return true;
+        }
+
+        if (!fechaInicio.value || !fechaFin.value) {
+        return true;
+        }
+
+        const inicio = new Date(fechaInicio.value);
+
+        const fin = new Date(fechaFin.value);
+
+        if (inicio > fin) {
+
+        showAlert("La fecha inicial no puede ser mayor a la fecha final.");
+
+        return false;
+        }
+
+        return true;
+        }
+
+        function enviarFormularioReporte() {
+
+        const formReporteCompras =
+        document.getElementById("formReporteCompras");
+
+        if (!formReporteCompras) {
+        return;
+        }
+
+        if (!validarFechas()) {
+        return;
+        }
+
+        mostrarLoading("Consultando reporte de compras de inventario...");
+
+        formReporteCompras.submit();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+        flatpickr("#fechaInicio", {
+
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        locale: "es",
+        allowInput: false,
+        disableMobile: true
+        });
+
+        flatpickr("#fechaFin", {
+
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        locale: "es",
+        allowInput: false,
+        disableMobile: true
+        });
+
+        const formReporteCompras =
+        document.getElementById("formReporteCompras");
+
+        const txtBuscarReporte =
+        document.getElementById("txtBuscarReporte");
+
+        const fechaInicio =
+        document.getElementById("fechaInicio");
+
+        const fechaFin =
+        document.getElementById("fechaFin");
+
+        const btnExcel =
+        document.getElementById("btnExportarExcel");
+
+        if (
+        txtBuscarReporte &&
+        formReporteCompras
+        ) {
+
+        let temporizadorBusqueda;
+
+        let ultimoValor =
+        txtBuscarReporte.value;
+
+        txtBuscarReporte.addEventListener(
+        "input",
+        function () {
+
+        clearTimeout(
+        temporizadorBusqueda
+        );
+
+        const valorActual =
+        this.value;
+
+        temporizadorBusqueda =
+        setTimeout(
+        function () {
+
+        if (
+        valorActual !==
+        ultimoValor
+        ) {
+
+        ultimoValor =
+        valorActual;
+
+        enviarFormularioReporte();
+        }
+
+        },
+        500
+        );
+        }
+        );
+        }
+
+        if (fechaInicio) {
+
+        fechaInicio.addEventListener("change", function () {
+
+        enviarFormularioReporte();
+        });
+        }
+
+        if (fechaFin) {
+
+        fechaFin.addEventListener("change", function () {
+
+        enviarFormularioReporte();
+        });
+        }
+
+        if (btnExcel) {
+
+        btnExcel.addEventListener("click", async function () {
+
+        if (!validarFechas()) {
+        return;
+        }
+
+        btnExcel.style.pointerEvents = "none";
+
+        btnExcel.style.opacity = "0.7";
+
+        btnExcel.innerText = "Generando...";
+
+        mostrarLoading("Generando reporte Excel...");
+
+        try {
+
+        const busqueda =
+        txtBuscarReporte
+        ? txtBuscarReporte.value
+        : "";
+
+        const inicio =
+        fechaInicio
+        ? fechaInicio.value
+        : "";
+
+        const fin =
+        fechaFin
+        ? fechaFin.value
+        : "";
+
+        const url =
+        '@Url.Action("ExportarExcel", "ReporteDeCompra")' +
+        '?fechaInicio=' + encodeURIComponent(inicio) +
+        '&fechaFin=' + encodeURIComponent(fin) +
+        '&busqueda=' + encodeURIComponent(busqueda);
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+
+        throw new Error("Error al generar Excel");
+        }
+
+        const blob = await response.blob();
+
+        const downloadUrl =
+        window.URL.createObjectURL(blob);
+
+        const a =
+        document.createElement("a");
+
+        a.href = downloadUrl;
+
+        a.download = "ReporteCompras.xlsx";
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+        window.URL.revokeObjectURL(downloadUrl);
+        }
+        catch (error) {
+
+        showAlert("Error al generar el archivo Excel.");
+        }
+        finally {
+
+        ocultarLoading();
+
+        btnExcel.style.pointerEvents = "auto";
+
+        btnExcel.style.opacity = "1";
+
+        btnExcel.innerText = "Exportar Excel";
+        }
+        });
+        }
+        });
+
+    </script>
+}

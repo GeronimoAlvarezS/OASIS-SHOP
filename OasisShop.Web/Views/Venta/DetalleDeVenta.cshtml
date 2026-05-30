@@ -1,19 +1,19 @@
-﻿@model OasisShop.Web.Models.ViewModels.DetalleDeCompraViewModel
+﻿@model OasisShop.Web.Models.ViewModels.DetalleDeVentaViewModel
 
 @{
-    ViewData["Title"] = "Detalle de compras";
+    ViewData["Title"] = "Detalle de ventas";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <style>
-    .detalle-compra-page {
+    .detalle-venta-page {
         padding: 22px 28px 28px 28px;
         background-color: #f5f6fa;
         min-height: calc(100vh - 70px);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .detalle-compra-title {
+    .detalle-venta-title {
         font-size: 24px;
         font-weight: 600;
         color: #111111;
@@ -53,6 +53,7 @@
         font-weight: 400;
         color: #111111;
         outline: none;
+        box-sizing: border-box;
     }
 
         .detalle-search-input:focus {
@@ -190,10 +191,14 @@
 
     .detalle-info-row {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 0;
         min-height: 52px;
         align-items: center;
+    }
+
+    .detalle-info-row-cliente {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .detalle-info-item {
@@ -290,7 +295,7 @@
         justify-content: space-between;
         gap: 18px;
         margin-top: 8px;
-        padding: 0 42px 0 52px;
+        padding: 0 42px 0 0;
     }
 
     .detalle-totales {
@@ -329,7 +334,7 @@
         justify-content: flex-end;
         align-items: center;
         min-height: 64px;
-        padding-right: 28px;
+        padding-right: 0;
     }
 
     .btn-descargar-pdf {
@@ -347,7 +352,6 @@
         transition: background .2s ease, transform .1s ease;
         cursor: pointer;
         min-width: 132px;
-        margin-right: 18px;
     }
 
         .btn-descargar-pdf:hover {
@@ -386,12 +390,23 @@
     }
 
     @@media (max-width: 768px) {
-        .detalle-compra-page {
+        .detalle-venta-page {
             padding: 18px;
         }
 
         .detalle-search-form {
             max-width: 100%;
+        }
+
+        .detalle-info-row {
+            grid-template-columns: 1fr;
+        }
+
+        .detalle-info-item + .detalle-info-item {
+            border-left: none;
+            border-top: 1px solid #ececec;
+            padding-top: 12px;
+            margin-top: 8px;
         }
 
         .detalle-totales {
@@ -405,7 +420,6 @@
 
         .btn-descargar-pdf {
             width: 100%;
-            margin-right: 0;
         }
 
         .detalle-pdf-container {
@@ -420,7 +434,7 @@
             display: none !important;
         }
 
-        .detalle-compra-page {
+        .detalle-venta-page {
             background: #ffffff;
             padding: 0;
         }
@@ -432,14 +446,14 @@
     }
 </style>
 
-<div class="detalle-compra-page">
+<div class="detalle-venta-page">
 
-    <h2 class="detalle-compra-title">Detalle de inventario</h2>
+    <h2 class="detalle-venta-title">Detalle de ventas</h2>
 
-    <!-- CONTENEDOR DE ALERTAS -->
+    <!-- CONTENEDOR ALERTAS -->
     <div id="alertContainer" class="alert-container"></div>
 
-    <!-- ALERTAS DESDE CONTROLLER -->
+    <!-- ALERTAS -->
     @if (TempData["MensajeError"] != null)
     {
         <script>
@@ -469,75 +483,126 @@
 
     <!-- BUSCADOR -->
     <div class="detalle-search-card">
-        <form asp-controller="DetalleDeCompra"
+
+        <form asp-controller="DetalleDeVenta"
               asp-action="Index"
               method="get"
               class="detalle-search-form"
-              id="formBusquedaCompra">
+              id="formBusquedaVenta">
 
-            <img src="~/img/Buscar.png" class="detalle-search-icon" alt="Buscar" />
+            <img src="~/img/Buscar.png"
+                 class="detalle-search-icon"
+                 alt="Buscar" />
 
             <input type="text"
-                   name="numeroCompra"
-                   id="txtBuscarCompra"
+                   name="numeroVenta"
+                   id="txtBuscarVenta"
                    class="detalle-search-input"
-                   value="@(ViewBag.NumeroCompraBuscado ?? "")"
-                   placeholder="Buscar inventario (Número de compra)"
+                   value="@(ViewBag.NumeroVentaBuscado ?? "")"
+                   placeholder="Buscar venta (Número de venta)"
                    autocomplete="off" />
+
         </form>
+
     </div>
 
-    @if (Model != null && Model.IdCompra > 0)
+    @if (Model != null && Model.IdVenta > 0)
     {
-        <!-- INFORMACIÓN -->
+        <!-- GRID INFORMACIÓN -->
         <div class="detalle-main-grid">
 
-            <!-- INFO COMPRA -->
+            <!-- INFORMACIÓN VENTA -->
             <div class="detalle-card">
+
                 <div class="detalle-card-header">
-                    <img src="~/img/InformacionDetalle.png" class="detalle-card-icon" />
-                    <h3 class="detalle-card-title">Información de la compra del inventario</h3>
+                    <img src="~/img/InformacionDetalle.png"
+                         class="detalle-card-icon" />
+
+                    <h3 class="detalle-card-title">
+                        Información de la venta
+                    </h3>
                 </div>
 
                 <div class="detalle-card-body">
+
                     <div class="detalle-info-row">
 
                         <div class="detalle-info-item">
-                            <div class="detalle-label">Fecha</div>
-                            <div class="detalle-value">@Model.FechaRegistro</div>
+                            <div class="detalle-label">
+                                Fecha
+                            </div>
+
+                            <div class="detalle-value">
+                                @Model.FechaRegistro
+                            </div>
                         </div>
 
                         <div class="detalle-info-item">
-                            <div class="detalle-label">Comprador</div>
-                            <div class="detalle-value">@Model.NombreUsuario</div>
+                            <div class="detalle-label">
+                                Tipo de factura
+                            </div>
+
+                            <div class="detalle-value">
+                                @Model.TipoFactura
+                            </div>
+                        </div>
+
+                        <div class="detalle-info-item">
+                            <div class="detalle-label">
+                                Vendedor
+                            </div>
+
+                            <div class="detalle-value">
+                                @Model.NombreUsuario
+                            </div>
                         </div>
 
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- INFO PROVEEDOR -->
+            <!-- INFORMACIÓN CLIENTE -->
             <div class="detalle-card">
+
                 <div class="detalle-card-header">
-                    <img src="~/img/UsuarioDetalle.png" class="detalle-card-icon" />
-                    <h3 class="detalle-card-title">Información del proveedor</h3>
+                    <img src="~/img/UsuarioDetalle.png"
+                         class="detalle-card-icon" />
+
+                    <h3 class="detalle-card-title">
+                        Información del cliente
+                    </h3>
                 </div>
 
                 <div class="detalle-card-body">
-                    <div class="detalle-info-row">
+
+                    <div class="detalle-info-row detalle-info-row-cliente">
 
                         <div class="detalle-info-item">
-                            <div class="detalle-label">Documento/NIT</div>
-                            <div class="detalle-value">@Model.DocumentoProveedor</div>
+                            <div class="detalle-label">
+                                Documento
+                            </div>
+
+                            <div class="detalle-value">
+                                @Model.DocumentoCliente
+                            </div>
                         </div>
 
                         <div class="detalle-info-item">
-                            <div class="detalle-label">Razón social</div>
-                            <div class="detalle-value">@Model.RazonSocialProveedor</div>
+                            <div class="detalle-label">
+                                Nombre del cliente
+                            </div>
+
+                            <div class="detalle-value">
+                                @Model.NombreCliente
+                            </div>
                         </div>
 
                     </div>
+
                 </div>
+
             </div>
 
         </div>
@@ -546,70 +611,122 @@
         <div class="detalle-card detalle-productos-card">
 
             <div class="detalle-card-header">
-                <img src="~/img/ProductoDetalle.png" class="detalle-card-icon" />
-                <h3 class="detalle-card-title">Productos de la compra del inventario</h3>
+
+                <img src="~/img/ProductoDetalle.png"
+                     class="detalle-card-icon" />
+
+                <h3 class="detalle-card-title">
+                    Productos de la venta
+                </h3>
+
             </div>
 
             <div class="detalle-table-container">
+
                 <table class="detalle-table">
 
                     <thead>
+
                         <tr>
                             <th>Producto</th>
-                            <th>Precio de Compra</th>
+                            <th>Precio</th>
                             <th>Cantidad</th>
                             <th>Subtotal</th>
                         </tr>
+
                     </thead>
 
                     <tbody>
+
                         @foreach (var item in Model.Detalles)
                         {
                             <tr>
-                                <td>@(item.oProducto != null ? item.oProducto.Nombre : "N/A")</td>
-                                <td>@item.PrecioCompra.ToString("C0")</td>
+
+                                <td>
+                                    @(item.oProducto != null
+                                        ? item.oProducto.Nombre
+                                        : "N/A")
+                                </td>
+
+                                <td>
+                                    @item.PrecioVenta.ToString("C0")
+                                </td>
+
                                 <td>
                                     <span class="detalle-cantidad-pill">
                                         @item.Cantidad
                                     </span>
                                 </td>
-                                <td>@item.MontoTotal.ToString("C0")</td>
+
+                                <td>
+                                    @item.SubTotal.ToString("C0")
+                                </td>
+
                             </tr>
                         }
+
                     </tbody>
 
                 </table>
+
             </div>
 
             <!-- TOTALES + PDF -->
             <div class="detalle-bottom-row">
 
+                <!-- TOTALES -->
                 <div class="detalle-totales">
 
                     <div class="detalle-total-card">
-                        <div class="detalle-total-label">Monto total</div>
-                        <div class="detalle-total-value">@Model.MontoTotal.ToString("C0")</div>
+
+                        <div class="detalle-total-label">
+                            Monto total
+                        </div>
+
+                        <div class="detalle-total-value">
+                            @Model.MontoTotal.ToString("C0")
+                        </div>
+
                     </div>
 
                     <div class="detalle-total-card">
-                        <div class="detalle-total-label">Monto pagado</div>
-                        <div class="detalle-total-value">@Model.MontoPago.ToString("C0")</div>
+
+                        <div class="detalle-total-label">
+                            Monto pagado
+                        </div>
+
+                        <div class="detalle-total-value">
+                            @Model.MontoPago.ToString("C0")
+                        </div>
+
                     </div>
 
                     <div class="detalle-total-card">
-                        <div class="detalle-total-label">Monto de cambio</div>
-                        <div class="detalle-total-value">@Model.MontoCambio.ToString("C0")</div>
+
+                        <div class="detalle-total-label">
+                            Monto de cambio
+                        </div>
+
+                        <div class="detalle-total-value">
+                            @Model.MontoCambio.ToString("C0")
+                        </div>
+
                     </div>
 
                 </div>
 
+                <!-- BOTÓN PDF -->
                 <div class="detalle-pdf-container">
-                    <a asp-controller="DetalleDeCompra"
+
+                    <a asp-controller="DetalleDeVenta"
                            asp-action="DescargarPdf"
-                           asp-route-idCompra="@Model.IdCompra"
+                           asp-route-numeroVenta="@Model.NumeroDocumento"
                            class="btn-descargar-pdf">
+
                         Descargar PDF
+
                     </a>
+
                 </div>
 
             </div>
@@ -618,15 +735,23 @@
     }
     else
     {
+        <!-- EMPTY STATE -->
         <div class="detalle-empty-state">
-            Ingresa un número de compra de inventario para visualizar el detalle.
+
+            Ingresa un número de venta para visualizar el detalle.
+
         </div>
     }
 
 </div>
 
 <script>
+    // =========================================
+    // ALERTAS PERSONALIZADAS
+    // =========================================
+
     function showAlert(mensaje, tipo = "danger") {
+
         const container = document.getElementById("alertContainer");
 
         if (!container) {
@@ -634,11 +759,13 @@
         }
 
         const alert = document.createElement("div");
+
         let alertClass = "alert-danger-custom";
 
         if (tipo === "success") {
             alertClass = "alert-success-custom";
-        } else if (tipo === "warning") {
+        }
+        else if (tipo === "warning") {
             alertClass = "alert-warning-custom";
         }
 
@@ -646,25 +773,35 @@
 
         alert.innerHTML = `
             <span class="alert-message">${mensaje}</span>
-            <button type="button" class="alert-close" onclick="closeAlert(this)">×</button>
+            <button type="button"
+                    class="alert-close"
+                    onclick="closeAlert(this)">
+                ×
+            </button>
         `;
 
         container.appendChild(alert);
 
         setTimeout(() => {
+
             if (alert) {
+
                 alert.style.animation = "fadeOut 0.4s ease forwards";
 
                 setTimeout(() => {
+
                     if (alert.parentNode) {
                         alert.remove();
                     }
+
                 }, 700);
             }
+
         }, 3000);
     }
 
     function closeAlert(element) {
+
         const alert = element.parentElement;
 
         if (!alert) {
@@ -674,47 +811,72 @@
         alert.style.animation = "fadeOut 0.4s ease forwards";
 
         setTimeout(() => {
+
             if (alert.parentNode) {
                 alert.remove();
             }
+
         }, 700);
     }
 
+    // =========================================
+    // EVENTOS PRINCIPALES
+    // =========================================
+
     document.addEventListener("DOMContentLoaded", function () {
-        const inputBusqueda = document.getElementById("txtBuscarCompra");
-        const formBusqueda = document.getElementById("formBusquedaCompra");
+
+        const inputBusqueda = document.getElementById("txtBuscarVenta");
+        const formBusqueda = document.getElementById("formBusquedaVenta");
         const btnPDF = document.querySelector(".btn-descargar-pdf");
 
+        // =========================================
+        // BUSCADOR
+        // =========================================
+
         if (inputBusqueda && formBusqueda) {
+
             inputBusqueda.addEventListener("keydown", function (e) {
+
                 if (e.key === "Enter") {
+
                     e.preventDefault();
 
-                    if (!validarBusquedaCompra()) {
+                    if (!validarBusquedaVenta()) {
                         return;
                     }
 
-                    mostrarLoading("Consultando compra...");
+                    mostrarLoading("Consultando venta...");
+
                     formBusqueda.submit();
                 }
+
             });
 
             inputBusqueda.focus();
         }
 
         if (formBusqueda) {
+
             formBusqueda.addEventListener("submit", function (e) {
-                if (!validarBusquedaCompra()) {
+
+                if (!validarBusquedaVenta()) {
+
                     e.preventDefault();
                     return;
                 }
 
-                mostrarLoading("Consultando compra...");
+                mostrarLoading("Consultando venta...");
             });
         }
 
+        // =========================================
+        // BOTÓN PDF
+        // =========================================
+
         if (btnPDF) {
+
             btnPDF.addEventListener("click", function () {
+
                 btnPDF.style.pointerEvents = "none";
                 btnPDF.style.opacity = "0.7";
                 btnPDF.innerText = "Generando...";
@@ -722,15 +884,24 @@
                 mostrarLoading("Generando comprobante PDF...");
 
                 setTimeout(() => {
+
                     btnPDF.style.pointerEvents = "auto";
                     btnPDF.style.opacity = "1";
                     btnPDF.innerText = "Descargar PDF";
+
                     ocultarLoading();
+
                 }, 2500);
+
             });
         }
 
-        function validarBusquedaCompra() {
+        // =========================================
+        // VALIDACIÓN BUSCADOR
+        // =========================================
+
+        function validarBusquedaVenta() {
+
             if (!inputBusqueda) {
                 return false;
             }
@@ -738,19 +909,32 @@
             const valor = inputBusqueda.value.trim();
 
             if (valor === "") {
-                showAlert("Debe ingresar un número de compra de inventario válido.", "warning");
+
+                showAlert(
+                    "Debe ingresar un número de venta válido.",
+                    "warning"
+                );
+
                 inputBusqueda.focus();
+
                 return false;
             }
 
             return true;
         }
 
+        // =========================================
+        // LOADING
+        // =========================================
+
         function mostrarLoading(mensaje) {
+
             ocultarLoading();
 
             const overlay = document.createElement("div");
+
             overlay.id = "detalle-loading-overlay";
+
             overlay.style.position = "fixed";
             overlay.style.top = "0";
             overlay.style.left = "0";
@@ -763,16 +947,23 @@
             overlay.style.alignItems = "center";
             overlay.style.zIndex = "9998";
 
+            // SPINNER
+
             const spinner = document.createElement("div");
+
             spinner.style.width = "42px";
             spinner.style.height = "42px";
             spinner.style.border = "4px solid #d6d6d6";
             spinner.style.borderTop = "4px solid #4d47c3";
             spinner.style.borderRadius = "50%";
-            spinner.style.animation = "spinDetalleCompra 1s linear infinite";
+            spinner.style.animation = "spinDetalleVenta 1s linear infinite";
+
+            // TEXTO
 
             const texto = document.createElement("div");
+
             texto.innerText = mensaje || "Cargando...";
+
             texto.style.marginTop = "12px";
             texto.style.fontSize = "13px";
             texto.style.fontWeight = "600";
@@ -780,12 +971,14 @@
 
             overlay.appendChild(spinner);
             overlay.appendChild(texto);
+
             document.body.appendChild(overlay);
 
             agregarAnimacionSpinner();
         }
 
         function ocultarLoading() {
+
             const overlay = document.getElementById("detalle-loading-overlay");
 
             if (overlay) {
@@ -793,15 +986,23 @@
             }
         }
 
+        // =========================================
+        // ANIMACIÓN SPINNER
+        // =========================================
+
         function agregarAnimacionSpinner() {
+
             if (document.getElementById("detalle-spinner-style")) {
                 return;
             }
 
             const style = document.createElement("style");
+
             style.id = "detalle-spinner-style";
+
             style.innerHTML = `
-                @@keyframes spinDetalleCompra {
+                @@keyframes spinDetalleVenta {
+
                     0% {
                         transform: rotate(0deg);
                     }
@@ -809,10 +1010,12 @@
                     100% {
                         transform: rotate(360deg);
                     }
+
                 }
             `;
 
             document.head.appendChild(style);
         }
+
     });
 </script>

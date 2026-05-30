@@ -373,6 +373,125 @@
                         opacity: 0.7;
                     }
             }
+
+            /* =========================================
+               OASIS ASSISTANT
+            ========================================= */
+
+            #oasisAssistantButton {
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                z-index: 9999;
+            }
+
+            #btnOpenAssistant {
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                border: none;
+                background: #1E1B5D;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .assistant-icon {
+                width: 65px;
+                height: 65px;
+                object-fit: contain;
+            }
+
+                #btnOpenAssistant:hover {
+                    transform: translateY(-3px) scale(1.03);
+                    background: #312E81;
+                }
+
+            .assistant-pulse {
+                position: absolute;
+                width: 68px;
+                height: 68px;
+                border-radius: 50%;
+                background: rgba(75, 67, 209, 0.35);
+                animation: assistantPulse 2s infinite;
+            }
+
+            @@keyframes assistantPulse {
+                0% {
+                    transform: scale(1);
+                    opacity: 0.8;
+                }
+
+                70% {
+                    transform: scale(1.5);
+                    opacity: 0;
+                }
+
+                100% {
+                    transform: scale(1.5);
+                    opacity: 0;
+                }
+            }
+
+            #oasisAssistantModal {
+                position: fixed;
+                bottom: 105px;
+                right: 24px;
+                width: min(430px, calc(100vw - 32px));
+                height: min(720px, calc(100vh - 130px));
+                background: #FFFFFF;
+                border-radius: 22px;
+                overflow: hidden;
+                box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+                z-index: 9998;
+                display: none;
+                border: 1px solid #D8D8D8;
+            }
+
+            #oasisAssistantFrame {
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+            @@media (max-width: 768px) {
+                #oasisAssistantModal {
+                    width: calc(100vw - 20px);
+                    height: calc(100vh - 95px);
+                    right: 10px;
+                    bottom: 85px;
+                    border-radius: 18px;
+                }
+
+                #btnOpenAssistant {
+                    width: 60px;
+                    height: 60px;
+                    font-size: 24px;
+                }
+
+                .assistant-pulse {
+                    width: 60px;
+                    height: 60px;
+                }
+            }
+
+            @@media (max-width: 480px) {
+                #oasisAssistantModal {
+                    width: 100vw;
+                    height: calc(100vh - 80px);
+                    right: 0;
+                    bottom: 80px;
+                    border-radius: 16px 16px 0 0;
+                }
+
+                #oasisAssistantButton {
+                    bottom: 14px;
+                    right: 14px;
+                }
+            }
     </style>
 </head>
 <body>
@@ -431,8 +550,8 @@
                             </a>
 
                             <a class="submenu-link-custom @ClaseActiva("Ventas", "Detalle")"
-                                   asp-controller="Ventas"
-                                   asp-action="Detalle">
+                                   asp-controller="DetalleDeVenta"
+                                   asp-action="Index">
                                 Detalle de Ventas
                             </a>
                         </div>
@@ -453,7 +572,7 @@
                             <span class="nav-icon">
                                 <img src="~/img/Compras.png" alt="Compras" class="nav-img-icon" />
                             </span>
-                            <span>Compras</span>
+                            <span>Inventario</span>
                             <span class="nav-arrow">›</span>
                         </button>
 
@@ -461,13 +580,13 @@
                             <a class="submenu-link-custom @ClaseActiva("Compras", "Index")"
                                    asp-controller="Compra"
                                    asp-action="Index">
-                                Registrar Compras
+                                Registrar Inventario
                             </a>
 
                             <a class="submenu-link-custom @ClaseActiva("Compras", "Detalle")"
                                    asp-controller="DetalleDeCompra"
                                    asp-action="Index">
-                                Detalle de Compras
+                                Detalle de Inventario
                             </a>
                         </div>
                     </li>
@@ -504,11 +623,11 @@
                 @if (TienePermiso("menucompras"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom @ClaseActiva("ReporteCompras")" asp-controller="ReporteCompras" asp-action="Index">
+                        <a class="nav-link-custom @ClaseActiva("ReporteCompras")" asp-controller="ReporteDeCompra" asp-action="Index">
                             <span class="nav-icon">
                                 <img src="~/img/ReporteCompras.png" alt="Reporte Compras" class="nav-img-icon" />
                             </span>
-                            <span>Compras</span>
+                            <span>Inventario</span>
                         </a>
                     </li>
                 }
@@ -516,7 +635,7 @@
                 @if (TienePermiso("menuventas"))
                 {
                     <li class="nav-item-custom">
-                        <a class="nav-link-custom @ClaseActiva("ReporteVentas")" asp-controller="ReporteVentas" asp-action="Index">
+                        <a class="nav-link-custom @ClaseActiva("ReporteDeVentas")" asp-controller="ReporteDeVenta" asp-action="Index">
                             <span class="nav-icon">
                                 <img src="~/img/ReporteVentas.png" alt="Reporte Ventas" class="nav-img-icon" />
                             </span>
@@ -594,6 +713,31 @@
         </main>
     </div>
 
+    <!-- BOTÓN FLOTANTE CHATBOT -->
+    <div id="oasisAssistantButton">
+
+        <div class="assistant-pulse"></div>
+
+        <button type="button"
+                id="btnOpenAssistant">
+
+            <img src="~/img/ChatBotOasis.png"
+                 alt="Oasis Assistant"
+                 class="assistant-icon" />
+
+        </button>
+
+    </div>
+
+    <!-- MODAL CHATBOT -->
+    <div id="oasisAssistantModal">
+
+        <iframe src="/ChatBot/Index"
+                id="oasisAssistantFrame">
+        </iframe>
+
+    </div>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -659,6 +803,53 @@
                     }
                 });
             });
+    </script>
+    <script>
+
+            const btnOpenAssistant =
+                document.getElementById("btnOpenAssistant");
+
+            const oasisAssistantModal =
+                document.getElementById("oasisAssistantModal");
+
+            let assistantOpen = false;
+
+            btnOpenAssistant.addEventListener("click", function () {
+
+                assistantOpen = !assistantOpen;
+
+                if (assistantOpen) {
+
+                    oasisAssistantModal.style.display = "block";
+
+                }
+                else {
+
+                    oasisAssistantModal.style.display = "none";
+
+                }
+
+            });
+
+            document.addEventListener("click", function (e) {
+
+                const dentroModal =
+                    oasisAssistantModal.contains(e.target);
+
+                const dentroBoton =
+                    btnOpenAssistant.contains(e.target);
+
+                if (!dentroModal &&
+                    !dentroBoton &&
+                    assistantOpen) {
+
+                    oasisAssistantModal.style.display = "none";
+
+                    assistantOpen = false;
+                }
+
+            });
+
     </script>
 
     @RenderSection("Scripts", required: false)

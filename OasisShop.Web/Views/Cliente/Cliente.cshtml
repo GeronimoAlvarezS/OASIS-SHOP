@@ -451,6 +451,19 @@
             transform: translateX(100%);
         }
     }
+
+    .input-error {
+        border-color: #DC2626 !important;
+        box-shadow: 0 0 0 0.12rem rgba(220, 38, 38, 0.18) !important;
+    }
+
+    .error-campo {
+        display: none;
+        color: #DC2626;
+        font-size: 12px;
+        font-weight: 400;
+        margin-top: 4px;
+    }
 </style>
 
 <div id="alertContainer" class="alert-container"></div>
@@ -582,7 +595,7 @@
                 <button type="button" class="btn-close-custom" data-bs-dismiss="modal">×</button>
             </div>
 
-            <form id="formCrearCliente" method="post" asp-controller="Cliente" asp-action="Guardar">
+            <form id="formCrearCliente" method="post" asp-controller="Cliente" asp-action="Guardar" novalidate>
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body modal-body-usuario">
@@ -590,31 +603,36 @@
 
                     <div class="modal-group">
                         <label class="modal-label" for="CrearDocumento">Documento</label>
-                        <input type="text" class="modal-input" id="CrearDocumento" name="Documento" required />
+                        <input type="text" class="modal-input" id="CrearDocumento" name="Documento" />
+                        <span class="error-campo" id="errorCrearDocumento">El documento es obligatorio.</span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label" for="CrearNombreCompleto">Nombre Completo</label>
-                        <input type="text" class="modal-input" id="CrearNombreCompleto" name="NombreCompleto" required />
+                        <input type="text" class="modal-input" id="CrearNombreCompleto" name="NombreCompleto" />
+                        <span class="error-campo" id="errorCrearNombreCompleto">El nombre completo es obligatorio.</span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label" for="CrearCorreo">Correo</label>
-                        <input type="email" class="modal-input" id="CrearCorreo" name="Correo" required />
+                        <input type="email" class="modal-input" id="CrearCorreo" name="Correo" />
+                        <span class="error-campo" id="errorCrearCorreo">El correo es obligatorio.</span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label" for="CrearTelefono">Teléfono</label>
                         <input type="text" class="modal-input" id="CrearTelefono" name="Telefono" />
+                        <span class="error-campo" id="errorCrearTelefono">El telefono es obligatorio.</span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label" for="CrearEstado">Estado</label>
-                        <select class="modal-select" id="CrearEstado" name="Estado" required>
+                        <select class="modal-select" id="CrearEstado" name="Estado">
                             <option value="">SELECCIONE</option>
                             <option value="true">Activo</option>
                             <option value="false">Inactivo</option>
                         </select>
+                        <span class="error-campo" id="errorCrearEstado">El estado es obligatorio.</span>
                     </div>
 
                     <div class="modal-footer-custom">
@@ -634,7 +652,7 @@
                 <button type="button" class="btn-close-custom" data-bs-dismiss="modal">×</button>
             </div>
 
-            <form id="formEditarCliente" method="post" asp-controller="Cliente" asp-action="Guardar">
+            <form id="formEditarCliente" method="post" asp-controller="Cliente" asp-action="Guardar" novalidate>
                 @Html.AntiForgeryToken()
 
                 <div class="modal-body modal-body-usuario">
@@ -642,17 +660,20 @@
 
                     <div class="modal-group">
                         <label class="modal-label" for="EditarDocumento">Documento</label>
-                        <input type="text" class="modal-input" id="EditarDocumento" name="Documento" required />
+                        <input type="text" class="modal-input" id="EditarDocumento" name="Documento" />
+                        <span class="error-campo" id="errorEditarDocumento">El documento es obligatorio.</span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label" for="EditarNombreCompleto">Nombre Completo</label>
-                        <input type="text" class="modal-input" id="EditarNombreCompleto" name="NombreCompleto" required />
+                        <input type="text" class="modal-input" id="EditarNombreCompleto" name="NombreCompleto" />
+                        <span class="error-campo" id="errorEditarNombreCompleto">El nombre completo es obligatorio.</span>
                     </div>
 
                     <div class="modal-group">
                         <label class="modal-label" for="EditarCorreo">Correo</label>
-                        <input type="email" class="modal-input" id="EditarCorreo" name="Correo" required />
+                        <input type="email" class="modal-input" id="EditarCorreo" name="Correo" />
+                        <span class="error-campo" id="errorEditarCorreo">El correo es obligatorio.</span>
                     </div>
 
                     <div class="modal-group">
@@ -662,11 +683,12 @@
 
                     <div class="modal-group">
                         <label class="modal-label" for="EditarEstado">Estado</label>
-                        <select class="modal-select" id="EditarEstado" name="Estado" required>
+                        <select class="modal-select" id="EditarEstado" name="Estado">
                             <option value="">SELECCIONE</option>
                             <option value="true">Activo</option>
                             <option value="false">Inactivo</option>
                         </select>
+                        <span class="error-campo" id="errorEditarEstado">El estado es obligatorio.</span>
                     </div>
 
                     <div class="modal-footer-custom">
@@ -729,6 +751,121 @@
 
 @section Scripts {
     <script>
+        const camposCrearCliente = [
+            {
+                campo: "CrearDocumento",
+                error: "errorCrearDocumento",
+                mensaje: "El documento es obligatorio."
+            },
+            {
+                campo: "CrearNombreCompleto",
+                error: "errorCrearNombreCompleto",
+                mensaje: "El nombre completo es obligatorio."
+            },
+            {
+                campo: "CrearTelefono",
+                error: "errorCrearTelefono",
+                mensaje: "El telefono es obligatorio."
+            },
+            {
+                campo: "CrearCorreo",
+                error: "errorCrearCorreo",
+                mensaje: "El correo es obligatorio."
+            },
+            {
+                campo: "CrearEstado",
+                error: "errorCrearEstado",
+                mensaje: "El estado es obligatorio."
+            }
+        ];
+
+        const camposEditarCliente = [
+            {
+                campo: "EditarDocumento",
+                error: "errorEditarDocumento",
+                mensaje: "El documento es obligatorio."
+            },
+            {
+                campo: "EditarNombreCompleto",
+                error: "errorEditarNombreCompleto",
+                mensaje: "El nombre completo es obligatorio."
+            },
+            {
+                campo: "EditarCorreo",
+                error: "errorEditarCorreo",
+                mensaje: "El correo es obligatorio."
+            },
+            {
+                campo: "EditarEstado",
+                error: "errorEditarEstado",
+                mensaje: "El estado es obligatorio."
+            }
+        ];
+
+        function validarFormulario(campos) {
+            let formularioValido = true;
+
+            campos.forEach(function (item) {
+                const campo = document.getElementById(item.campo);
+                const error = document.getElementById(item.error);
+
+                if (!campo || !error) return;
+
+                if (campo.value.trim() === "") {
+                    campo.classList.add("input-error");
+                    error.innerText = item.mensaje;
+                    error.style.display = "block";
+                    formularioValido = false;
+                } else {
+                    campo.classList.remove("input-error");
+                    error.innerText = "";
+                    error.style.display = "none";
+                }
+            });
+
+            return formularioValido;
+        }
+
+        function limpiarErroresFormulario(campos) {
+            campos.forEach(function (item) {
+                const campo = document.getElementById(item.campo);
+                const error = document.getElementById(item.error);
+
+                if (campo) {
+                    campo.classList.remove("input-error");
+                }
+
+                if (error) {
+                    error.innerText = "";
+                    error.style.display = "none";
+                }
+            });
+        }
+
+        function activarValidacionTiempoReal(campos) {
+            campos.forEach(function (item) {
+                const campo = document.getElementById(item.campo);
+
+                if (campo) {
+                    campo.addEventListener("input", function () {
+                        validarFormulario([item]);
+                    });
+
+                    campo.addEventListener("change", function () {
+                        validarFormulario([item]);
+                    });
+                }
+            });
+        }
+
+        function validarCrearCliente() {
+            return validarFormulario(camposCrearCliente);
+        }
+
+        function validarEditarCliente() {
+            return validarFormulario(camposEditarCliente);
+        }
+
         function limpiarFormularioCrearCliente() {
             document.getElementById("CrearIdCliente").value = 0;
             document.getElementById("CrearDocumento").value = "";
@@ -736,6 +873,8 @@
             document.getElementById("CrearCorreo").value = "";
             document.getElementById("CrearTelefono").value = "";
             document.getElementById("CrearEstado").value = "";
+
+            limpiarErroresFormulario(camposCrearCliente);
         }
 
         function editarCliente(id, documento, nombre, correo, telefono, estado) {
@@ -745,6 +884,8 @@
             document.getElementById("EditarCorreo").value = correo;
             document.getElementById("EditarTelefono").value = telefono || "";
             document.getElementById("EditarEstado").value = estado === "true" ? "true" : "false";
+
+            limpiarErroresFormulario(camposEditarCliente);
 
             let modal = new bootstrap.Modal(document.getElementById("modalEditarCliente"));
             modal.show();
@@ -766,39 +907,16 @@
             modal.show();
         }
 
-        function validarCrearCliente() {
-            const documento = document.getElementById("CrearDocumento").value.trim();
-            const nombre = document.getElementById("CrearNombreCompleto").value.trim();
-            const correo = document.getElementById("CrearCorreo").value.trim();
-            const estado = document.getElementById("CrearEstado").value;
-
-            if (documento === "" || nombre === "" || correo === "" || estado === "") {
-                showAlert("Todos los campos obligatorios deben completarse", "warning");
-                return false;
-            }
-
-            return true;
-        }
-
-        function validarEditarCliente() {
-            const documento = document.getElementById("EditarDocumento").value.trim();
-            const nombre = document.getElementById("EditarNombreCompleto").value.trim();
-            const correo = document.getElementById("EditarCorreo").value.trim();
-            const estado = document.getElementById("EditarEstado").value;
-
-            if (documento === "" || nombre === "" || correo === "" || estado === "") {
-                showAlert("Todos los campos obligatorios deben completarse", "warning");
-                return false;
-            }
-
-            return true;
-        }
-
         document.addEventListener("DOMContentLoaded", function () {
             const formCrear = document.getElementById("formCrearCliente");
             const formEditar = document.getElementById("formEditarCliente");
 
+            activarValidacionTiempoReal(camposCrearCliente);
+            activarValidacionTiempoReal(camposEditarCliente);
+
             if (formCrear) {
+                formCrear.setAttribute("novalidate", "novalidate");
+
                 formCrear.addEventListener("submit", function (e) {
                     e.preventDefault();
 
@@ -811,6 +929,8 @@
             }
 
             if (formEditar) {
+                formEditar.setAttribute("novalidate", "novalidate");
+
                 formEditar.addEventListener("submit", function (e) {
                     e.preventDefault();
 
