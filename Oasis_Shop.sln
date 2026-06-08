@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapaDatos", "CapaDatos\Capa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OasisShop.Web", "OasisShop.Web\OasisShop.Web.csproj", "{6CE0EE31-CFE2-41A2-9D6E-A784565AADA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PruebasUI", "PruebasUI\PruebasUI.csproj", "{43BFC825-7C1C-4C93-B829-C4C0A08803FF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{6CE0EE31-CFE2-41A2-9D6E-A784565AADA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CE0EE31-CFE2-41A2-9D6E-A784565AADA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CE0EE31-CFE2-41A2-9D6E-A784565AADA9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{43BFC825-7C1C-4C93-B829-C4C0A08803FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43BFC825-7C1C-4C93-B829-C4C0A08803FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43BFC825-7C1C-4C93-B829-C4C0A08803FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43BFC825-7C1C-4C93-B829-C4C0A08803FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
