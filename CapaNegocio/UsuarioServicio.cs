@@ -21,34 +21,32 @@ namespace CapaNegocio
         {
             Usuario usuario = objcd_usuario.ObtenerPorDocumento(documento);
 
-            // Si no existe un usuario con el documento ingresado, retorna null.
             if (usuario == null)
             {
                 return null;
             }
 
-            // Verifica si la clave ingresada coincide con la clave almacenada en formato hash.
-            bool claveValida = Seguridad.VerificarPassword(clave, usuario.Clave);
+            string claveIngresada = clave?.Trim() ?? string.Empty;
+            string claveGuardada = usuario.Clave?.Trim() ?? string.Empty;
 
-            // Compatibilidad con claves antiguas guardadas sin encriptar.
-            // Si la clave no es válida como hash, pero coincide directamente con la clave almacenada,
-            // se actualiza la clave guardándola ahora en formato hash.
-
-            if (!claveValida && usuario.Clave == clave)
+            // Caso 1: clave antigua guardada en texto plano, ejemplo: 1234
+            if (claveGuardada == claveIngresada)
             {
-                usuario.Clave = Seguridad.HashPassword(clave);
-                objcd_usuario.ActualizarClave(usuario.IdUsuario, usuario.Clave);
+                string claveHash = Seguridad.HashPassword(claveIngresada);
+
+                usuario.Clave = claveHash;
+                objcd_usuario.ActualizarClave(usuario.IdUsuario, claveHash);
+
                 return usuario;
             }
 
-            // Si la clave no es válida, se niega el acceso retornando null.
+            // Caso 2: clave ya guardada con hash
+            bool claveValida = Seguridad.VerificarPassword(claveIngresada, claveGuardada);
 
             if (!claveValida)
             {
                 return null;
             }
-
-            // Si las credenciales son correctas, retorna el usuario autenticado.
 
             return usuario;
         }
