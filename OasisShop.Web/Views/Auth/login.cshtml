@@ -258,7 +258,7 @@
 
             <div class="login-title">Iniciar Sesión</div>
 
-            <form asp-action="Login" method="post">
+            <form asp-controller="Auth" asp-action="Login" method="post">
                 @Html.AntiForgeryToken()
 
                 <div asp-validation-summary="ModelOnly" class="d-none"></div>
@@ -269,7 +269,12 @@
                         <span class="input-icon">
                             <img src="/img/loginUsuario.png" alt="Documento" class="menu-icon-img" />
                         </span>
-                        <input asp-for="Documento" class="input-custom" />
+
+                        <input asp-for="Documento"
+                               id="Documento"
+                               name="Documento"
+                               class="input-custom"
+                               autocomplete="username" />
                     </div>
                     <span asp-validation-for="Documento" class="text-danger small"></span>
                 </div>
@@ -280,7 +285,14 @@
                         <span class="input-icon">
                             <img src="/img/loginContraseña.png" alt="Contraseña" class="menu-icon-img" />
                         </span>
-                        <input asp-for="Clave" id="Clave" type="password" class="input-custom password-input" />
+
+                        <input asp-for="Clave"
+                               id="Clave"
+                               name="Clave"
+                               type="password"
+                               class="input-custom password-input"
+                               autocomplete="current-password" />
+
                         <button type="button"
                                 class="toggle-password"
                                 onclick="togglePassword('Clave', this)"
@@ -372,6 +384,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"></script>
 </body>
 </html>

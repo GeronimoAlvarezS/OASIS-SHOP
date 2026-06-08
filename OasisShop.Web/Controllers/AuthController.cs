@@ -44,7 +44,7 @@ namespace OasisShop.Web.Controllers
             HttpContext.Session.SetInt32("IdUsuario", usuario.IdUsuario);
             HttpContext.Session.SetString("NombreCompleto", usuario.NombreCompleto ?? string.Empty);
             HttpContext.Session.SetString("Documento", usuario.Documento ?? string.Empty);
-            HttpContext.Session.SetInt32("IdRol", usuario.oRol.IdRol);
+            HttpContext.Session.SetInt32("IdRol", usuario.oRol?.IdRol ?? 0);
 
             List<Permiso> listaPermisos = new PermisoServicio().Listar(usuario.IdUsuario);
             string permisos = string.Join(",", listaPermisos.Select(p => p.NombreMenu));
